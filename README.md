@@ -1,44 +1,44 @@
-# Mintlify Starter Kit
+# documentação the news
 
-Use the starter kit to get your docs deployed and ready to customize.
+nossa base de conhecimento completa para a plataforma the news.
 
-Click the green **Use this template** button at the top of this repo to copy the Mintlify starter kit. The starter kit contains examples with
+este repositório contém toda a documentação técnica e guias para usar nossa plataforma. aqui você encontra:
 
-- Guide pages
-- Navigation
-- Customizations
-- API reference pages
-- Use of popular components
+- guias de início rápido
+- navegação intuitiva  
+- personalizações visuais
+- referência completa da API
+- componentes reutilizáveis
 
-**[Follow the full quickstart guide](https://starter.mintlify.com/quickstart)**
+**[acesse o guia completo](https://docs.thenews.cc/quickstart)**
 
-## Development
+## desenvolvimento local 
 
-Install the [Mintlify CLI](https://www.npmjs.com/package/mint) to preview your documentation changes locally. To install, use the following command:
+instale o [Mintlify CLI](https://www.npmjs.com/package/mint) para visualizar suas alterações localmente:
 
 ```
 npm i -g mint
 ```
 
-Run the following command at the root of your documentation, where your `docs.json` is located:
+execute no diretório raiz da documentação (onde está o `docs.json`):
 
 ```
 mint dev
 ```
 
-View your local preview at `http://localhost:3000`.
+acesse a prévia local em `http://localhost:3000`.
 
-## Publishing changes
+## publicando alterações
 
-Install our GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app) to propagate changes from your repo to your deployment. Changes are deployed to production automatically after pushing to the default branch.
+conecte o GitHub app do [painel](https://dashboard.mintlify.com/settings/organization/github-app) para propagar mudanças automaticamente. as alterações são publicadas na produção após push na branch principal.
 
-## Need help?
+## precisa de ajuda? 
 
-### Troubleshooting
+### solução de problemas
 
-- If your dev environment isn't running: Run `mint update` to ensure you have the most recent version of the CLI.
-- If a page loads as a 404: Make sure you are running in a folder with a valid `docs.json`.
+- ambiente de desenvolvimento não funciona: execute `mint update` para a versão mais recente do CLI.
+- página carrega como 404: certifique-se de estar em uma pasta com `docs.json` válido.
 
-### Resources
-- [Mintlify documentation](https://mintlify.com/docs)
-- [Mintlify community](https://mintlify.com/community)
+### recursos úteis
+- [documentação Mintlify](https://mintlify.com/docs)
+- [comunidade the news](https://community.thenews.cc)

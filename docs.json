@@ -1,11 +1,11 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "the news",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#FF66C4",
+    "light": "#FF9DDA",
+    "dark": "#FF66C4"
   },
   "favicon": "/favicon.svg",
   "navigation": {
@@ -71,19 +71,19 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Community",
-          "href": "https://mintlify.com/community",
-          "icon": "slack"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
+          "anchor": "the news",
+          "href": "https://thenews.cc",
           "icon": "newspaper"
+        },
+        {
+          "anchor": "comunidade",
+          "href": "https://community.thenews.cc",
+          "icon": "users"
+        },
+        {
+          "anchor": "newsletter",
+          "href": "https://newsletter.thenews.cc",
+          "icon": "envelope"
         }
       ]
     }
@@ -95,21 +95,21 @@
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "label": "suporte",
+        "href": "mailto:suporte@thenews.cc"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "label": "assine já",
+      "href": "https://thenews.cc/assine"
     }
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/thenewscc",
+      "instagram": "https://instagram.com/thenewscc",
+      "linkedin": "https://linkedin.com/company/thenewscc"
     }
   }
 }
