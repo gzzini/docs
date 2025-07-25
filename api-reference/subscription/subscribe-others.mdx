@@ -1,0 +1,131 @@
+---
+title: 'Inscrever (Outros)'
+openapi: 'POST /subscribe/others'
+---
+
+## Descrição
+
+Permite que um usuário inscreva outras pessoas nas newsletters. Útil para campanhas de indicação ou quando alguém deseja inscrever amigos e familiares.
+
+## Request Body
+
+<ParamField body="referrer_email" type="string" required>
+  Email da pessoa que está fazendo a indicação
+</ParamField>
+
+<ParamField body="subscriptions" type="array" required>
+  Lista de pessoas para inscrever
+  <Expandable title="subscription object">
+    <ParamField body="email" type="string" required>
+      Email da pessoa a ser inscrita
+    </ParamField>
+    
+    <ParamField body="name" type="string">
+      Nome da pessoa a ser inscrita
+    </ParamField>
+    
+    <ParamField body="newsletter" type="string" required>
+      ID da newsletter para inscrição
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="send_notification" type="boolean">
+  Se deve enviar email de notificação para os inscritos (padrão: true)
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="total_subscriptions" type="number">
+      Total de inscrições processadas
+    </ResponseField>
+
+    <ResponseField name="successful" type="number">
+      Número de inscrições bem-sucedidas
+    </ResponseField>
+
+    <ResponseField name="failed" type="number">
+      Número de inscrições que falharam
+    </ResponseField>
+
+    <ResponseField name="results" type="array">
+      Detalhes de cada inscrição processada
+      <Expandable title="result object">
+        <ResponseField name="email" type="string">
+          Email processado
+        </ResponseField>
+        
+        <ResponseField name="success" type="boolean">
+          Se a inscrição foi bem-sucedida
+        </ResponseField>
+        
+        <ResponseField name="subscription_id" type="string">
+          ID da inscrição (se bem-sucedida)
+        </ResponseField>
+        
+        <ResponseField name="error" type="string">
+          Mensagem de erro (se falhou)
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request POST \
+  --url https://backend.testeswaffle.org/subscribe/others \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "referrer_email": "indicador@exemplo.com",
+    "subscriptions": [
+      {
+        "email": "amigo1@exemplo.com",
+        "name": "Maria Santos",
+        "newsletter": "thenews"
+      },
+      {
+        "email": "amigo2@exemplo.com",
+        "name": "Pedro Costa",
+        "newsletter": "thebizness"
+      }
+    ],
+    "send_notification": true
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "data": {
+    "total_subscriptions": 2,
+    "successful": 2,
+    "failed": 0,
+    "results": [
+      {
+        "email": "amigo1@exemplo.com",
+        "success": true,
+        "subscription_id": "sub_abc123"
+      },
+      {
+        "email": "amigo2@exemplo.com",
+        "success": true,
+        "subscription_id": "sub_def456"
+      }
+    ]
+  }
+}
+```
+
+</ResponseExample>

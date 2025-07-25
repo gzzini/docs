@@ -1,0 +1,168 @@
+---
+title: 'Obter Métricas'
+openapi: 'GET /subscription/'
+---
+
+## Descrição
+
+Retorna métricas detalhadas de inscrições, incluindo totais por newsletter, taxas de crescimento e análises temporais. Requer autenticação e permissão `subscription-metrics.view`.
+
+## Query Parameters
+
+<ParamField query="period" type="string">
+  Período para análise. Valores aceitos:
+  - `today` - Métricas do dia
+  - `week` - Últimos 7 dias
+  - `month` - Últimos 30 dias (padrão)
+  - `quarter` - Últimos 90 dias
+  - `year` - Últimos 365 dias
+</ParamField>
+
+<ParamField query="newsletter" type="string">
+  Filtrar por newsletter específica
+</ParamField>
+
+<ParamField query="include_inactive" type="boolean">
+  Incluir assinantes inativos nas métricas (padrão: false)
+</ParamField>
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Token JWT no formato: Bearer \<token>\
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="total_subscribers" type="number">
+      Total de assinantes ativos
+    </ResponseField>
+
+    <ResponseField name="new_subscribers" type="number">
+      Novos assinantes no período
+    </ResponseField>
+
+    <ResponseField name="unsubscribes" type="number">
+      Cancelamentos no período
+    </ResponseField>
+
+    <ResponseField name="growth_rate" type="number">
+      Taxa de crescimento percentual
+    </ResponseField>
+
+    <ResponseField name="by_newsletter" type="object">
+      Métricas por newsletter
+      <Expandable title="newsletter metrics">
+        <ResponseField name="[newsletter_id]" type="object">
+          <Expandable title="metrics">
+            <ResponseField name="total" type="number">
+              Total de assinantes
+            </ResponseField>
+            
+            <ResponseField name="new" type="number">
+              Novos no período
+            </ResponseField>
+            
+            <ResponseField name="unsubscribed" type="number">
+              Cancelamentos no período
+            </ResponseField>
+            
+            <ResponseField name="active_rate" type="number">
+              Taxa de assinantes ativos (%)
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="by_source" type="object">
+      Métricas por fonte de aquisição
+      <Expandable title="source metrics">
+        <ResponseField name="[source_name]" type="number">
+          Número de assinantes por fonte
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="timeline" type="array">
+      Evolução temporal das inscrições
+      <Expandable title="timeline entry">
+        <ResponseField name="date" type="string">
+          Data (YYYY-MM-DD)
+        </ResponseField>
+        
+        <ResponseField name="subscribers" type="number">
+          Total de assinantes
+        </ResponseField>
+        
+        <ResponseField name="new" type="number">
+          Novos assinantes
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request GET \
+  --url 'https://backend.testeswaffle.org/subscription/?period=month&newsletter=thenews' \
+  --header 'Authorization: Bearer seu-token-jwt'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "data": {
+    "total_subscribers": 45230,
+    "new_subscribers": 3421,
+    "unsubscribes": 234,
+    "growth_rate": 7.8,
+    "by_newsletter": {
+      "thenews": {
+        "total": 25430,
+        "new": 2100,
+        "unsubscribed": 120,
+        "active_rate": 94.5
+      },
+      "thebizness": {
+        "total": 12800,
+        "new": 890,
+        "unsubscribed": 65,
+        "active_rate": 92.3
+      }
+    },
+    "by_source": {
+      "organic": 15230,
+      "referral": 12450,
+      "social": 10550,
+      "paid": 7000
+    },
+    "timeline": [
+      {
+        "date": "2024-01-01",
+        "subscribers": 41809,
+        "new": 125
+      },
+      {
+        "date": "2024-01-02",
+        "subscribers": 41934,
+        "new": 130
+      }
+    ]
+  }
+}
+```
+
+</ResponseExample>

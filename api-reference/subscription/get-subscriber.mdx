@@ -1,0 +1,179 @@
+---
+title: 'Obter Assinante'
+openapi: 'GET /newsletters/subscriber/:email'
+---
+
+## Descrição
+
+Retorna informações detalhadas de um assinante específico pelo email. Requer autenticação e permissão `newsletters.view`.
+
+## Path Parameters
+
+<ParamField path="email" type="string" required>
+  Email do assinante a ser consultado
+</ParamField>
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Token JWT no formato: Bearer \<token>\
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="subscriber" type="object">
+      Dados do assinante
+      <Expandable title="subscriber properties">
+        <ResponseField name="id" type="string">
+          ID único do assinante
+        </ResponseField>
+        
+        <ResponseField name="email" type="string">
+          Email do assinante
+        </ResponseField>
+        
+        <ResponseField name="name" type="string">
+          Nome do assinante
+        </ResponseField>
+        
+        <ResponseField name="created_at" type="string">
+          Data de criação (ISO 8601)
+        </ResponseField>
+        
+        <ResponseField name="status" type="string">
+          Status atual (active, inactive, unsubscribed)
+        </ResponseField>
+        
+        <ResponseField name="beehiiv_id" type="string">
+          ID no sistema Beehiiv
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="subscriptions" type="array">
+      Lista de newsletters assinadas
+      <Expandable title="subscription">
+        <ResponseField name="newsletter_id" type="string">
+          ID da newsletter
+        </ResponseField>
+        
+        <ResponseField name="newsletter_name" type="string">
+          Nome da newsletter
+        </ResponseField>
+        
+        <ResponseField name="subscribed_at" type="string">
+          Data de inscrição (ISO 8601)
+        </ResponseField>
+        
+        <ResponseField name="status" type="string">
+          Status da inscrição
+        </ResponseField>
+        
+        <ResponseField name="source" type="string">
+          Fonte da inscrição
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="metrics" type="object">
+      Métricas de engajamento
+      <Expandable title="metrics properties">
+        <ResponseField name="total_opens" type="number">
+          Total de aberturas
+        </ResponseField>
+        
+        <ResponseField name="total_clicks" type="number">
+          Total de cliques
+        </ResponseField>
+        
+        <ResponseField name="average_open_rate" type="number">
+          Taxa média de abertura (%)
+        </ResponseField>
+        
+        <ResponseField name="last_engagement" type="string">
+          Data do último engajamento (ISO 8601)
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="referrals" type="object">
+      Dados de indicação
+      <Expandable title="referrals properties">
+        <ResponseField name="referred_by" type="string">
+          Email de quem indicou (se aplicável)
+        </ResponseField>
+        
+        <ResponseField name="total_referrals" type="number">
+          Total de pessoas indicadas
+        </ResponseField>
+        
+        <ResponseField name="successful_referrals" type="number">
+          Indicações bem-sucedidas
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request GET \
+  --url 'https://backend.testeswaffle.org/newsletters/subscriber/usuario@exemplo.com' \
+  --header 'Authorization: Bearer seu-token-jwt'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "data": {
+    "subscriber": {
+      "id": "sub_123456789",
+      "email": "usuario@exemplo.com",
+      "name": "João Silva",
+      "created_at": "2023-06-15T10:30:00Z",
+      "status": "active",
+      "beehiiv_id": "bhv_987654321"
+    },
+    "subscriptions": [
+      {
+        "newsletter_id": "thenews",
+        "newsletter_name": "the news",
+        "subscribed_at": "2023-06-15T10:30:00Z",
+        "status": "active",
+        "source": "referral"
+      },
+      {
+        "newsletter_id": "thebizness",
+        "newsletter_name": "the bizness",
+        "subscribed_at": "2023-08-20T14:15:00Z",
+        "status": "active",
+        "source": "organic"
+      }
+    ],
+    "metrics": {
+      "total_opens": 145,
+      "total_clicks": 32,
+      "average_open_rate": 72.5,
+      "last_engagement": "2024-01-14T08:45:00Z"
+    },
+    "referrals": {
+      "referred_by": "amigo@exemplo.com",
+      "total_referrals": 8,
+      "successful_referrals": 5
+    }
+  }
+}
+```
+
+</ResponseExample>

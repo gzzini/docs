@@ -1,0 +1,89 @@
+---
+title: 'Inscrever via Referral'
+openapi: 'POST /referrals/subscribe'
+---
+
+## Descrição
+
+Inscreve um novo indicado na newsletter através do programa de indicações. Este endpoint é público e cria um referral pendente até que o indicado confirme sua inscrição.
+
+## Request Body
+
+<ParamField body="referrer_id" type="string" required>
+  ID do usuário que está fazendo a indicação
+</ParamField>
+
+<ParamField body="referred_email" type="string" required>
+  Email da pessoa sendo indicada
+</ParamField>
+
+<ParamField body="referred_name" type="string">
+  Nome da pessoa sendo indicada
+</ParamField>
+
+<ParamField body="newsletter" type="string">
+  Newsletter para inscrição (padrão: thenews)
+</ParamField>
+
+<ParamField body="campaign" type="string">
+  Nome da campanha de indicação para tracking
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="referral_id" type="string">
+      ID único da indicação criada
+    </ResponseField>
+
+    <ResponseField name="status" type="string">
+      Status da indicação (sempre "pending" inicialmente)
+    </ResponseField>
+
+    <ResponseField name="activation_email_sent" type="boolean">
+      Indica se o email de ativação foi enviado
+    </ResponseField>
+
+    <ResponseField name="referrer_count" type="number">
+      Número total de indicações do usuário
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request POST \
+  --url https://backend.testeswaffle.org/referrals/subscribe \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "referrer_id": "usr_123456789",
+    "referred_email": "indicado@exemplo.com",
+    "referred_name": "Carlos Indicado",
+    "newsletter": "thenews",
+    "campaign": "janeiro_2024"
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "data": {
+    "referral_id": "ref_987654321",
+    "status": "pending",
+    "activation_email_sent": true,
+    "referrer_count": 5
+  }
+}
+```
+
+</ResponseExample>

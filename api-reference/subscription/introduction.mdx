@@ -1,0 +1,87 @@
+---
+title: 'Introdução'
+description: 'API para gerenciamento de inscrições e métricas de assinantes'
+---
+
+## Visão Geral
+
+A API de Subscription permite gerenciar inscrições de newsletters, acompanhar métricas de assinantes e integrar com o sistema Beehiiv. Inclui funcionalidades para inscrever usuários, gerenciar inscrições por terceiros, e visualizar métricas consolidadas.
+
+## Base URL
+
+```
+https://backend.testeswaffle.org
+```
+
+## Autenticação
+
+As rotas são divididas em duas categorias:
+
+### Rotas Públicas
+Não requerem autenticação e estão disponíveis para todos os usuários:
+- Inscrição direta na newsletter
+- Inscrição de terceiros
+- Webhooks do Beehiiv
+
+### Rotas Autenticadas
+Requerem um token JWT válido no header Authorization:
+
+```
+Authorization: Bearer <seu-token-jwt>
+```
+
+Rotas protegidas requerem também permissões específicas:
+- `subscription-metrics.view` - Para visualizar métricas
+- `subscription-metrics.edit` - Para modificar configurações
+
+## Integração com Beehiiv
+
+A API está integrada com a plataforma Beehiiv para gerenciamento de newsletters. Os webhooks do Beehiiv são processados automaticamente para atualizar métricas e status de assinantes.
+
+## Limites de Rate
+
+- **Rotas públicas**: 100 requisições por minuto
+- **Rotas autenticadas**: 1000 requisições por minuto
+- **Webhooks**: Sem limite (validados por assinatura)
+
+## Respostas
+
+Todas as respostas da API seguem o formato JSON padrão:
+
+### Sucesso
+```json
+{
+  "success": true,
+  "data": {
+    // dados da resposta
+  }
+}
+```
+
+### Erro
+```json
+{
+  "success": false,
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Descrição do erro"
+  }
+}
+```
+
+## Newsletters Disponíveis
+
+- the news (`thenews`)
+- the bizness (`thebizness`)
+- the stories (`thestories`)
+- the jobs (`thejobs`)
+- the champs (`thechamps`)
+- Rising (`rising`)
+- GoGet (`goget` ou `GoGet`)
+- health times (`healthtimes`)
+- dollar bill (`dollarbill`)
+- trend report (`trendreport`)
+
+## Próximos Passos
+
+Explore os endpoints disponíveis na API de Subscription através do menu lateral.

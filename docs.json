@@ -92,6 +92,19 @@
               "api-reference/streaks/complete-mission",
               "api-reference/streaks/export-emails"
             ]
+          },
+          {
+            "group": "Subscription API",
+            "pages": [
+              "api-reference/subscription/introduction",
+              "api-reference/subscription/subscribe",
+              "api-reference/subscription/subscribe-others",
+              "api-reference/subscription/referral-subscribe",
+              "api-reference/subscription/beehiiv-webhook",
+              "api-reference/subscription/get-metrics",
+              "api-reference/subscription/get-summary",
+              "api-reference/subscription/get-subscriber"
+            ]
           }
         ]
       }
@@ -119,7 +132,8 @@
   "openapi": [
     "/api-reference/openapi.json",
     "/api-reference/openapi-referrals.json",
-    "/api-reference/openapi-streaks.json"
+    "/api-reference/openapi-streaks.json",
+    "/api-reference/openapi-subscription.json"
   ],
   "logo": {
     "light": "https://app.thenewscc.com.br/thenews.webp",

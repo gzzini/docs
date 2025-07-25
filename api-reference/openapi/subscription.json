@@ -1,0 +1,699 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Subscription API",
+    "description": "API para gerenciamento de inscrições e métricas de assinantes",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://backend.testeswaffle.org",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+    "/subscribe": {
+      "post": {
+        "summary": "Inscrever no the news",
+        "description": "Inscreve um usuário diretamente em uma newsletter",
+        "tags": ["Public"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "newsletter"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Email do usuário"
+                  },
+                  "name": {
+                    "type": "string",
+                    "description": "Nome completo do usuário"
+                  },
+                  "newsletter": {
+                    "type": "string",
+                    "enum": ["thenews", "thebizness", "thechamps", "healthtimes", "rising", "goget", "podissovic"],
+                    "description": "ID da newsletter"
+                  },
+                  "source": {
+                    "type": "string",
+                    "description": "Origem da inscrição"
+                  },
+                  "utm_source": {
+                    "type": "string",
+                    "description": "Parâmetro UTM de origem"
+                  },
+                  "utm_medium": {
+                    "type": "string",
+                    "description": "Parâmetro UTM de meio"
+                  },
+                  "utm_campaign": {
+                    "type": "string",
+                    "description": "Parâmetro UTM de campanha"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Inscrição realizada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriptionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscribe/others": {
+      "post": {
+        "summary": "Inscrever (Outros)",
+        "description": "Permite inscrever outras pessoas nas newsletters",
+        "tags": ["Public"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["referrer_email", "subscriptions"],
+                "properties": {
+                  "referrer_email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Email de quem está indicando"
+                  },
+                  "subscriptions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["email", "newsletter"],
+                      "properties": {
+                        "email": {
+                          "type": "string",
+                          "format": "email"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "newsletter": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "send_notification": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enviar notificação aos inscritos"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Inscrições processadas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkSubscriptionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/referrals/subscribe": {
+      "post": {
+        "summary": "Inscrever via Referral",
+        "description": "Inscreve através do programa de indicações",
+        "tags": ["Public"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["referrer_id", "referred_email"],
+                "properties": {
+                  "referrer_id": {
+                    "type": "string",
+                    "description": "ID do indicador"
+                  },
+                  "referred_email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Email do indicado"
+                  },
+                  "referred_name": {
+                    "type": "string",
+                    "description": "Nome do indicado"
+                  },
+                  "newsletter": {
+                    "type": "string",
+                    "description": "Newsletter para inscrição"
+                  },
+                  "campaign": {
+                    "type": "string",
+                    "description": "Campanha de tracking"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Indicação criada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferralResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/beehiiv/subscription": {
+      "post": {
+        "summary": "Webhook Beehiiv",
+        "description": "Recebe eventos de inscrição do Beehiiv",
+        "tags": ["Webhooks"],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Beehiiv-Signature",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Assinatura HMAC para validação"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BeehiivWebhook"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook processado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/subscription/": {
+      "get": {
+        "summary": "Obter Métricas",
+        "description": "Retorna métricas detalhadas de inscrições",
+        "tags": ["Authenticated"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "period",
+            "schema": {
+              "type": "string",
+              "enum": ["today", "week", "month", "quarter", "year"],
+              "default": "month"
+            },
+            "description": "Período para análise"
+          },
+          {
+            "in": "query",
+            "name": "newsletter",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtrar por newsletter"
+          },
+          {
+            "in": "query",
+            "name": "include_inactive",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Incluir inativos"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Métricas obtidas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetricsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado"
+          }
+        }
+      }
+    },
+    "/subscription/summary": {
+      "get": {
+        "summary": "Obter Resumo",
+        "description": "Retorna resumo consolidado das métricas",
+        "tags": ["Authenticated"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "format",
+            "schema": {
+              "type": "string",
+              "enum": ["executive", "detailed", "minimal"],
+              "default": "executive"
+            },
+            "description": "Formato do resumo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resumo obtido",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SummaryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/newsletters/subscriber/{email}": {
+      "get": {
+        "summary": "Obter Assinante",
+        "description": "Retorna informações detalhadas de um assinante",
+        "tags": ["Authenticated"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "description": "Email do assinante"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dados do assinante",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubscriberResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Assinante não encontrado"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "SubscriptionResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "created": {
+                "type": "number"
+              },
+              "subscription_tier": {
+                "type": "string"
+              },
+              "subscription_premium_tier_names": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "utm_source": {
+                "type": "string"
+              },
+              "utm_medium": {
+                "type": "string"
+              },
+              "utm_channel": {
+                "type": "string"
+              },
+              "utm_campaign": {
+                "type": "string"
+              },
+              "referring_site": {
+                "type": "string"
+              },
+              "referral_code": {
+                "type": "string"
+              },
+              "stripe_customer_id": {
+                "type": "string"
+              },
+              "custom_fields": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "kind": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "array"
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              "referral_id": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "BulkSubscriptionResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "total_subscriptions": {
+                "type": "integer"
+              },
+              "successful": {
+                "type": "integer"
+              },
+              "failed": {
+                "type": "integer"
+              },
+              "results": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ReferralResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "referral_id": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "activation_email_sent": {
+                "type": "boolean"
+              },
+              "referrer_count": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "BeehiivWebhook": {
+        "type": "object",
+        "required": ["event", "data", "timestamp"],
+        "properties": {
+          "event": {
+            "type": "string",
+            "enum": ["subscriber.created", "subscriber.updated", "subscriber.unsubscribed", "subscriber.resubscribed"]
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "created_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "publication_id": {
+                "type": "string"
+              }
+            }
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "WebhookResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "processed": {
+                "type": "boolean"
+              },
+              "event_id": {
+                "type": "string"
+              },
+              "metrics_updated": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "MetricsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "total_subscribers": {
+                "type": "integer"
+              },
+              "new_subscribers": {
+                "type": "integer"
+              },
+              "unsubscribes": {
+                "type": "integer"
+              },
+              "growth_rate": {
+                "type": "number"
+              },
+              "by_newsletter": {
+                "type": "object"
+              },
+              "by_source": {
+                "type": "object"
+              },
+              "timeline": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      },
+      "SummaryResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "overview": {
+                "type": "object"
+              },
+              "highlights": {
+                "type": "object"
+              },
+              "trends": {
+                "type": "object"
+              },
+              "recommendations": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "generated_at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      },
+      "SubscriberResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "subscriber": {
+                "type": "object"
+              },
+              "subscriptions": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              },
+              "metrics": {
+                "type": "object"
+              },
+              "referrals": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

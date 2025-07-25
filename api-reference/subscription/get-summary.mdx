@@ -1,0 +1,161 @@
+---
+title: 'Obter Resumo'
+openapi: 'GET /subscription/summary'
+---
+
+## Descrição
+
+Retorna um resumo consolidado das métricas de inscrição, ideal para dashboards e visões executivas. Requer autenticação e permissão `subscription-metrics.view`.
+
+## Query Parameters
+
+<ParamField query="format" type="string">
+  Formato do resumo. Valores aceitos:
+  - `executive` - Resumo executivo (padrão)
+  - `detailed` - Resumo detalhado
+  - `minimal` - Resumo mínimo
+</ParamField>
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Token JWT no formato: Bearer \<token>\
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  Dados do resumo
+  <Expandable title="properties">
+    <ResponseField name="overview" type="object">
+      Visão geral das métricas
+      <Expandable title="overview properties">
+        <ResponseField name="total_subscribers" type="number">
+          Total de assinantes em todas as newsletters
+        </ResponseField>
+        
+        <ResponseField name="active_rate" type="number">
+          Taxa de assinantes ativos (%)
+        </ResponseField>
+        
+        <ResponseField name="monthly_growth" type="number">
+          Crescimento mensal (%)
+        </ResponseField>
+        
+        <ResponseField name="churn_rate" type="number">
+          Taxa de cancelamento (%)
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="highlights" type="object">
+      Destaques e insights
+      <Expandable title="highlights properties">
+        <ResponseField name="best_performing_newsletter" type="string">
+          Newsletter com melhor desempenho
+        </ResponseField>
+        
+        <ResponseField name="top_acquisition_source" type="string">
+          Principal fonte de aquisição
+        </ResponseField>
+        
+        <ResponseField name="engagement_score" type="number">
+          Score de engajamento (0-100)
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="trends" type="object">
+      Tendências identificadas
+      <Expandable title="trends properties">
+        <ResponseField name="growth_trend" type="string">
+          Tendência de crescimento (increasing, stable, decreasing)
+        </ResponseField>
+        
+        <ResponseField name="seasonality" type="string">
+          Padrão sazonal identificado
+        </ResponseField>
+        
+        <ResponseField name="forecast_next_month" type="number">
+          Previsão de assinantes próximo mês
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="recommendations" type="array">
+      Recomendações baseadas nos dados
+      <Expandable title="recommendation">
+        <ResponseField name="priority" type="string">
+          Prioridade (high, medium, low)
+        </ResponseField>
+        
+        <ResponseField name="action" type="string">
+          Ação recomendada
+        </ResponseField>
+        
+        <ResponseField name="impact" type="string">
+          Impacto esperado
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="generated_at" type="string">
+      Data/hora de geração do resumo (ISO 8601)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request GET \
+  --url 'https://backend.testeswaffle.org/subscription/summary?format=executive' \
+  --header 'Authorization: Bearer seu-token-jwt'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "data": {
+    "overview": {
+      "total_subscribers": 45230,
+      "active_rate": 93.2,
+      "monthly_growth": 7.8,
+      "churn_rate": 2.1
+    },
+    "highlights": {
+      "best_performing_newsletter": "thenews",
+      "top_acquisition_source": "referral",
+      "engagement_score": 82
+    },
+    "trends": {
+      "growth_trend": "increasing",
+      "seasonality": "higher_on_weekdays",
+      "forecast_next_month": 48500
+    },
+    "recommendations": [
+      {
+        "priority": "high",
+        "action": "Intensificar programa de referências",
+        "impact": "Aumento de 15% em novas inscrições"
+      },
+      {
+        "priority": "medium",
+        "action": "Otimizar horário de envio para fins de semana",
+        "impact": "Melhoria de 5% na taxa de abertura"
+      }
+    ],
+    "generated_at": "2024-01-15T14:30:00Z"
+  }
+}
+```
+
+</ResponseExample>

@@ -1,0 +1,131 @@
+---
+title: 'Webhook Beehiiv'
+openapi: 'POST /webhooks/beehiiv/subscription'
+---
+
+## Descrição
+
+Endpoint para receber webhooks do Beehiiv sobre eventos de inscrição. Este endpoint processa automaticamente eventos como novas inscrições, cancelamentos e atualizações de status.
+
+## Headers
+
+<ParamField header="X-Beehiiv-Signature" type="string" required>
+  Assinatura HMAC para validação da autenticidade do webhook
+</ParamField>
+
+## Request Body
+
+<ParamField body="event" type="string" required>
+  Tipo do evento. Valores possíveis:
+  - `subscriber.created` - Nova inscrição
+  - `subscriber.updated` - Atualização de assinante
+  - `subscriber.unsubscribed` - Cancelamento
+  - `subscriber.resubscribed` - Reinscrição
+</ParamField>
+
+<ParamField body="data" type="object" required>
+  Dados do evento
+  <Expandable title="data properties">
+    <ParamField body="id" type="string" required>
+      ID do assinante no Beehiiv
+    </ParamField>
+    
+    <ParamField body="email" type="string" required>
+      Email do assinante
+    </ParamField>
+    
+    <ParamField body="status" type="string" required>
+      Status atual (active, inactive, pending)
+    </ParamField>
+    
+    <ParamField body="created_at" type="string" required>
+      Data de criação (ISO 8601)
+    </ParamField>
+    
+    <ParamField body="publication_id" type="string" required>
+      ID da publicação/newsletter
+    </ParamField>
+    
+    <ParamField body="utm_source" type="string">
+      Origem UTM
+    </ParamField>
+    
+    <ParamField body="utm_medium" type="string">
+      Meio UTM
+    </ParamField>
+    
+    <ParamField body="utm_campaign" type="string">
+      Campanha UTM
+    </ParamField>
+    
+    <ParamField body="referral_code" type="string">
+      Código de referência (se aplicável)
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="timestamp" type="string" required>
+  Timestamp do evento (ISO 8601)
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se o webhook foi processado com sucesso
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="processed" type="boolean">
+      Se o evento foi processado
+    </ResponseField>
+
+    <ResponseField name="event_id" type="string">
+      ID único do evento processado
+    </ResponseField>
+
+    <ResponseField name="metrics_updated" type="boolean">
+      Se as métricas foram atualizadas
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request POST \
+  --url https://backend.testeswaffle.org/webhooks/beehiiv/subscription \
+  --header 'Content-Type: application/json' \
+  --header 'X-Beehiiv-Signature: sha256=...' \
+  --data '{
+    "event": "subscriber.created",
+    "data": {
+      "id": "bhv_123456",
+      "email": "novo@assinante.com",
+      "status": "active",
+      "created_at": "2024-01-15T10:30:00Z",
+      "publication_id": "pub_thenews",
+      "utm_source": "instagram",
+      "utm_medium": "social",
+      "utm_campaign": "janeiro_2024"
+    },
+    "timestamp": "2024-01-15T10:30:00Z"
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "data": {
+    "processed": true,
+    "event_id": "evt_abc123def456",
+    "metrics_updated": true
+  }
+}
+```
+
+</ResponseExample>

@@ -1,0 +1,180 @@
+---
+title: 'Inscrever no the news'
+openapi: 'POST /subscribe'
+---
+
+## Descrição
+
+Inscreve um usuário diretamente em uma newsletter. Este endpoint é público e processa a inscrição imediatamente através da integração com Beehiiv.
+
+## Request Body
+
+<ParamField body="email" type="string" required>
+  Email do usuário que deseja se inscrever
+</ParamField>
+
+<ParamField body="name" type="string">
+  Nome completo do usuário
+</ParamField>
+
+<ParamField body="newsletter" type="string" required>
+  ID da newsletter para inscrição. Valores aceitos:
+  - `thenews`
+  - `thebizness`
+  - `thestories`
+  - `thejobs`
+  - `thechamps`
+  - `rising`
+  - `goget` ou `GoGet`
+  - `healthtimes`
+  - `dollarbill`
+  - `trendreport`
+</ParamField>
+
+<ParamField body="source" type="string">
+  Origem da inscrição (ex: landing-page, referral, social)
+</ParamField>
+
+<ParamField body="utm_source" type="string">
+  Parâmetro UTM de origem
+</ParamField>
+
+<ParamField body="utm_medium" type="string">
+  Parâmetro UTM de meio
+</ParamField>
+
+<ParamField body="utm_campaign" type="string">
+  Parâmetro UTM de campanha
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem de confirmação da operação
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="id" type="string">
+      ID único da inscrição criada
+    </ResponseField>
+
+    <ResponseField name="email" type="string">
+      Email do usuário inscrito
+    </ResponseField>
+
+    <ResponseField name="status" type="string">
+      Status da inscrição (active, pending, unsubscribed)
+    </ResponseField>
+
+    <ResponseField name="created" type="number">
+      Timestamp de criação da inscrição
+    </ResponseField>
+
+    <ResponseField name="subscription_tier" type="string">
+      Tipo de assinatura (free, premium, etc.)
+    </ResponseField>
+
+    <ResponseField name="subscription_premium_tier_names" type="array">
+      Lista de nomes dos tiers premium
+    </ResponseField>
+
+    <ResponseField name="utm_source" type="string">
+      Parâmetro UTM de origem
+    </ResponseField>
+
+    <ResponseField name="utm_medium" type="string">
+      Parâmetro UTM de meio
+    </ResponseField>
+
+    <ResponseField name="utm_channel" type="string">
+      Canal UTM da inscrição
+    </ResponseField>
+
+    <ResponseField name="utm_campaign" type="string">
+      Parâmetro UTM de campanha
+    </ResponseField>
+
+    <ResponseField name="referring_site" type="string">
+      Site de referência da inscrição
+    </ResponseField>
+
+    <ResponseField name="referral_code" type="string">
+      Código de referência utilizado
+    </ResponseField>
+
+    <ResponseField name="stripe_customer_id" type="string">
+      ID do cliente no Stripe (se aplicável)
+    </ResponseField>
+
+    <ResponseField name="custom_fields" type="array">
+      Campos customizados do usuário (dados demográficos, preferências, etc.)
+    </ResponseField>
+
+    <ResponseField name="referral_id" type="string">
+      ID da referência
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request POST \
+  --url https://backend.testeswaffle.org/subscribe \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "email": "usuario@exemplo.com",
+    "name": "João Silva",
+    "newsletter": "thenews",
+    "source": "landing-page",
+    "utm_source": "instagram",
+    "utm_medium": "social",
+    "utm_campaign": "janeiro_2024"
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "message": "Dados atualizados com sucesso",
+  "data": {
+    "id": "sub_f8771aaf-6f76-46cb-a95a-bf524a617307",
+    "email": "geraldo.mazzini@waffle.com.br",
+    "status": "active",
+    "created": 1730901809,
+    "subscription_tier": "free",
+    "subscription_premium_tier_names": [],
+    "utm_source": "portal",
+    "utm_medium": "",
+    "utm_channel": "api",
+    "utm_campaign": "",
+    "referring_site": "https://thenews.waffle.com.br/",
+    "referral_code": "Tq7Hsanmni",
+    "stripe_customer_id": "",
+    "custom_fields": [
+      {
+        "name": "[MKT][PI] Recap Mensal",
+        "kind": "boolean",
+        "value": true
+      },
+      {
+        "name": "estados",
+        "kind": "string",
+        "value": "PI - Piauí"
+      }
+    ],
+    "referral_id": "f6l55ycb03"
+  }
+}
+```
+
+</ResponseExample>
