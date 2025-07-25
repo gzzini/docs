@@ -1,94 +1,186 @@
 ---
-title: 'Development'
-description: 'Preview changes locally to update your docs'
+title: 'desenvolvimento local'
+description: 'configure o ambiente de desenvolvimento para trabalhar com nossa API'
 ---
 
 <Info>
-  **Prerequisites**:
-  - Node.js version 19 or higher
-  - A docs repository with a `docs.json` file
+  **pré-requisitos**:
+  - Node.js versão 19 ou superior
+  - Wrangler CLI instalado
+  - Acesso ao Cloudflare Workers
+  - Repository com `wrangler.toml` configurado
 </Info>
 
-Follow these steps to install and run Mintlify on your operating system.
+este guia te ajuda a configurar o ambiente de desenvolvimento para trabalhar com nossa API do dashboard backend.
 
 <Steps>
-<Step title="Install the Mintlify CLI">
+<Step title="configure o ambiente backend">
 
 ```bash
-npm i -g mint
+# clone o repositório
+git clone [REPO_URL]
+cd dashboard-backend
+
+# instale dependências
+npm install
 ```
 </Step>
 
-<Step title="Preview locally">
+<Step title="configure as variáveis de ambiente">
 
-Navigate to your docs directory where your `docs.json` file is located, and run the following command:
+você precisará configurar as seguintes variáveis no `wrangler.toml`:
 
-```bash
-mint dev
+```toml
+[vars]
+JWT_SECRET = "seu_jwt_secret"
+BEEHIIV_API_KEY = "sua_api_key"
+GEMINI_API_KEY = "sua_gemini_key"
+RESEND_API_KEY = "sua_resend_key"
+# ... outras variáveis
 ```
 
-A local preview of your documentation will be available at `http://localhost:3000`.
+<Warning>
+  nunca commite secrets reais no repositório. use `wrangler secret put` para secrets sensíveis.
+</Warning>
+</Step>
+
+<Step title="execute o servidor de desenvolvimento">
+
+```bash
+# inicia o servidor local conectado ao ambiente remoto
+npm run dev
+```
+
+sua API estará disponível em `http://localhost:8787`.
+
+</Step>
+
+<Step title="teste os endpoints">
+
+você pode testar os endpoints usando curl ou Postman:
+
+```bash
+# teste um endpoint público
+curl http://localhost:8787/referrals/count
+
+# teste um endpoint autenticado
+curl -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+     http://localhost:8787/referrals
+```
 
 </Step>
 </Steps>
 
-## Custom ports
+## estrutura do projeto
 
-By default, Mintlify uses port 3000. You can customize the port Mintlify runs on by using the `--port` flag. For example, to run Mintlify on port 3333, use this command:
+nossa API é organizada da seguinte forma:
+
+```
+dashboard-backend/
+├── src/
+│   ├── routes/          # definições de rotas
+│   ├── handlers/        # lógica de negócio
+│   ├── services/        # integrações externas
+│   ├── middleware/      # autenticação e cache
+│   ├── schema/          # schemas do banco
+│   └── types/           # tipos TypeScript
+├── drizzle/             # migrações do banco
+└── wrangler.toml        # configuração do Workers
+```
+
+## bancos de dados
+
+ossa arquitetura utiliza múltiplos bancos D1 especializados:
+
+<CardGroup cols={2}>
+  <Card title="📊 DB" icon="database">
+    dados principais, métricas e newsletters
+  </Card>
+  <Card title="🎯 STREAKS" icon="fire">
+    gamificação, leituras e engagement
+  </Card>
+  <Card title="👥 CRM" icon="users">
+    gestão de relacionamento com clientes
+  </Card>
+  <Card title="📝 FORMS" icon="file-text">
+    formulários dinâmicos e submissions
+  </Card>
+</CardGroup>
+
+## migrações do banco
+
+para aplicar migrações localmente:
 
 ```bash
-mint dev --port 3333
+# gerar nova migração
+npm run generate
+
+# aplicar migrações localmente
+npm run migrate
 ```
 
-If you attempt to run Mintlify on a port that's already in use, it will use the next available port:
+## deploy para produção
 
-```md
-Port 3000 is already in use. Trying 3001 instead.
-```
-
-## Mintlify versions
-
-Please note that each CLI release is associated with a specific version of Mintlify. If your local preview does not align with the production version, please update the CLI:
+quando estiver pronto para fazer deploy:
 
 ```bash
-npm mint update
+# deploy com minificação e source maps
+npm run deploy
 ```
 
-## Validating links
+<Note>
+  o deploy inclui automaticamente integração com Sentry para monitoramento de erros.
+</Note>
 
-The CLI can assist with validating links in your documentation. To identify any broken links, use the following command:
+## ferramentas recomendadas
 
-```bash
-mint broken-links
-```
+para melhor experiência de desenvolvimento:
 
-## Deployment
+- **VSCode** com extensões TypeScript
+- **Drizzle Kit** para gestão do banco
+- **Postman** ou **Insomnia** para teste de APIs
+- **Wrangler** para gestão do Cloudflare Workers
 
-If the deployment is successful, you should see the following:
-
-<Frame>
-  <img src="/images/checks-passed.png" alt="Screenshot of a deployment confirmation message that says All checks have passed." style={{ borderRadius: '0.5rem' }} />
-</Frame>
-
-## Code formatting
-
-We suggest using extensions on your IDE to recognize and format MDX. If you're a VSCode user, consider the [MDX VSCode extension](https://marketplace.visualstudio.com/items?itemName=unifiedjs.vscode-mdx) for syntax highlighting, and [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) for code formatting.
-
-## Troubleshooting
+## solução de problemas
 
 <AccordionGroup>
-  <Accordion title='Error: Could not load the "sharp" module using the darwin-arm64 runtime'>
+  <Accordion title='erro: "wrangler not found"'>
 
-    This may be due to an outdated version of node. Try the following:
-    1. Remove the currently-installed version of the CLI: `npm remove -g mint`
-    2. Upgrade to Node v19 or higher.
-    3. Reinstall the CLI: `npm i -g mint`
+    instale o wrangler CLI globalmente:
+    ```bash
+    npm install -g wrangler
+    ```
+    
+    ou use via npx:
+    ```bash
+    npx wrangler dev --remote
+    ```
   </Accordion>
 
-  <Accordion title="Issue: Encountering an unknown error">
+  <Accordion title="erro de autenticação com Cloudflare">
   
-    Solution: Go to the root of your device and delete the `~/.mintlify` folder. Then run `mint dev` again.
+    faça login no Cloudflare:
+    ```bash
+    wrangler login
+    ```
+    
+    verifique se o `account_id` está correto no `wrangler.toml`.
+  </Accordion>
+  
+  <Accordion title="erro: banco de dados não encontrado">
+  
+    verifique se os database IDs estão corretos no `wrangler.toml` e se os bancos existem no painel do Cloudflare.
+  </Accordion>
+  
+  <Accordion title="endpoints retornando 500">
+  
+    verifique os logs do Sentry ou use `wrangler tail` para debug em tempo real:
+    ```bash
+    wrangler tail
+    ```
   </Accordion>
 </AccordionGroup>
 
-Curious about what changed in the latest CLI version? Check out the [CLI changelog](https://www.npmjs.com/package/mintlify?activeTab=versions).
+<Tip>
+  **dica**: use `console.log()` liberalmente durante desenvolvimento - os logs aparecerão no terminal com `npm run dev`.
+</Tip>

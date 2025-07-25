@@ -1,80 +1,138 @@
 ---
 title: "início rápido"
-description: "construa documentação incrível em minutos"
+description: "comece a usar nossa API em minutos"
 ---
 
 ## comece em três passos
 
-coloque sua documentação funcionando localmente e faça sua primeira personalização.
+integre com nossa API do dashboard backend e faça sua primeira requisição.
 
-### passo 1: configure seu ambiente local
+### passo 1: obtenha suas credenciais
 
 <AccordionGroup>
-  <Accordion icon="copy" title="clone sua documentação localmente">
-    durante o processo de configuração, você criou um repositório GitHub com o conteúdo da documentação. você pode encontrar o link deste repositório no seu [painel](https://dashboard.mintlify.com).
+  <Accordion icon="key" title="gere seu token JWT">
+    para acessar endpoints protegidos, você precisará de um token JWT válido.
     
-    para clonar o repositório localmente e fazer alterações e visualizações, siga o guia [clonando um repositório](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) do GitHub.
+    faça uma requisição para o endpoint de login:
+    ```bash
+    curl -X POST https://backend.testeswaffle.org/auth/login \
+      -H "Content-Type: application/json" \
+      -d '{"email": "seu@email.com", "password": "sua_senha"}'
+    ```
+    
+    <Tip>guarde o token retornado - você precisará dele para requisições autenticadas.</Tip>
   </Accordion>
-  <Accordion icon="rectangle-terminal" title="inicie o servidor de prévia">
-    1. instale o Mintlify CLI: `npm i -g mint`
-    2. navegue até o diretório da documentação e execute: `mint dev`
-    3. abra `http://localhost:3000` para ver sua documentação ao vivo!
+  <Accordion icon="test-tube" title="teste um endpoint público">
+    primeiro, teste um endpoint que não requer autenticação:
+    ```bash
+    curl https://backend.testeswaffle.org/referrals/count
+    ```
     
-    <Tip>sua prévia atualiza automaticamente conforme você edita os arquivos.</Tip>
+    se retornar dados JSON, a API está funcionando!
   </Accordion>
 </AccordionGroup>
 
-### passo 2: publique suas alterações
+### passo 2: faça sua primeira requisição autenticada
 
 <AccordionGroup>
-  <Accordion icon="github" title="instale nosso app do GitHub">
-    instale o app GitHub do Mintlify através do seu [painel](https://dashboard.mintlify.com/settings/organization/github-app).
+  <Accordion icon="shield" title="use seu token JWT">
+    agora teste um endpoint que requer autenticação usando o token obtido:
     
-    nosso app GitHub publica automaticamente suas alterações no site da documentação - você não precisa gerenciar publicações manualmente.
+    ```bash
+    curl -H "Authorization: Bearer SEU_JWT_TOKEN" \
+         https://backend.testeswaffle.org/referrals
+    ```
+    
+    <Warning>substitua `SEU_JWT_TOKEN` pelo token real retornado no passo anterior.</Warning>
 </Accordion>
-<Accordion icon="palette" title="atualize nome e cores do site">
-    para uma primeira alteração, vamos atualizar o nome e cores da documentação.
+<Accordion icon="database" title="explore os dados">
+    nossa API gerencia múltiplos tipos de dados:
 
-    1. abra `docs.json` no seu editor.
-    2. altere o campo `"name"` para o nome do seu projeto.
-    3. atualize as `"colors"` para combinar com sua marca.
-    4. salve e veja suas alterações instantaneamente em `http://localhost:3000`.
+    - **referrals**: sistema de indicações
+    - **streaks**: gamificação de leitura  
+    - **metrics**: métricas de ads
+    - **newsletters**: gestão de cadernos
+    - **forms**: formulários dinâmicos
 
-    <Tip>experimente alterar a cor primária para ver a diferença imediata!</Tip>
+    <Tip>comece explorando os endpoints de referrals - são os mais utilizados!</Tip>
   </Accordion>
 </AccordionGroup>
 
-### passo 3: entre no ar
+### passo 3: integre com sua aplicação
 
-<Accordion icon="rocket" title="publique sua documentação">
-  1. faça commit e push das suas alterações.
-  2. sua documentação será atualizada e estará no ar em instantes!
+<Accordion icon="rocket" title="implemente em sua aplicação">
+  agora você pode integrar nossa API em qualquer linguagem:
+  
+  **JavaScript/Node.js:**
+  ```javascript
+  const response = await fetch('https://backend.testeswaffle.org/referrals', {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  });
+  const data = await response.json();
+  ```
+  
+  **Python:**
+  ```python
+  import requests
+  
+  headers = {
+      'Authorization': f'Bearer {token}',
+      'Content-Type': 'application/json'
+  }
+  response = requests.get('https://backend.testeswaffle.org/referrals', headers=headers)
+  data = response.json()
+  ```
 </Accordion>
 
 ## próximos passos 🎯
 
-agora que sua documentação está funcionando, explore essas funcionalidades principais:
+agora que você já fez sua primeira requisição, explore nossas principais funcionalidades:
 
 <CardGroup cols={2}>
 
-<Card title="escreva conteúdo" icon="pen-to-square" href="/essentials/markdown">
-  aprenda sintaxe MDX e comece a escrever sua documentação.
+<Card title="sistema de referrals" icon="users" href="/api-reference/referrals/introduction">
+  implemente indicações com anti-fraude e gamificação.
 </Card>
 
-<Card title="personalize o estilo" icon="palette" href="/essentials/settings">
-  faça sua documentação combinar perfeitamente com sua marca.
+<Card title="gamificação de leitura" icon="fire" href="/api-reference/streaks/introduction">
+  adicione streaks, missões e rankings aos seus usuários.
 </Card>
 
-<Card title="adicione exemplos de código" icon="square-code" href="/essentials/code">
-  inclua blocos de código com destaque de sintaxe.
+<Card title="métricas de ads" icon="chart-bar" href="/api-reference/introduction">
+  acesse dados unificados do Facebook, TikTok e Google Ads.
 </Card>
 
-<Card title="documentação da API" icon="code" href="/api-reference/introduction">
-  gere automaticamente documentação da API a partir de specs OpenAPI.
+<Card title="gestão de newsletters" icon="newspaper" href="/api-reference/introduction">
+  gerencie múltiplos cadernos e subscribers.
+</Card>
+
+</CardGroup>
+
+## exemplos práticos 💡
+
+<CardGroup cols={2}>
+
+<Card title="dashboard de indicações" icon="dashboard">
+  ```javascript
+  // buscar indicações do usuário
+  const referrals = await api.get('/referrals', {
+    params: { email: 'user@email.com' }
+  });
+  ```
+</Card>
+
+<Card title="ranking de streaks" icon="trophy">
+  ```javascript
+  // obter ranking de leitores
+  const ranking = await api.get('/streaks/ranking');
+  ```
 </Card>
 
 </CardGroup>
 
 <Note>
-  **precisa de ajuda?** 🤝 veja nossa [documentação completa](https://docs.thenews.cc) ou participe da nossa [comunidade](https://community.thenews.cc).
+  **precisa de ajuda?** 🤝 veja nossa [documentação completa](/api-reference/introduction) ou nos contate via [suporte](mailto:suporte@thenews.cc).
 </Note>
