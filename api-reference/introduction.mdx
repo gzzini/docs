@@ -1,33 +1,160 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: 'Introdução'
+description: 'API completa para gerenciamento de dados e operações do ecossistema'
+---
+
+## Bem-vindo à API do the news
+
+O backend do the news é uma solução robusta e escalável construída sobre **Cloudflare Workers**, projetada para gerenciar todo o ecossistema de dados e operações do Grupo the news. Nossa API possui endpoints seguros e performáticos para newsletters, métricas de ads, engagement de usuários, CRM e muito mais.
+
+<CardGroup cols={2}>
+  <Card
+    title="Referrals API"
+    icon="users"
+    href="/api-reference/referrals/introduction"
+  >
+    Sistema completo de indicações com anti-fraude e gamificação
+  </Card>
+  <Card
+    title="Streaks API"
+    icon="fire"
+    href="/api-reference/streaks/introduction"
+  >
+    Gamificação de leitura com missões, rankings e recompensas
+  </Card>
+</CardGroup>
+
+## Arquitetura & Tecnologia
+
+Nossa API foi construída com tecnologias modernas e escaláveis:
+
+- **Runtime**: Cloudflare Workers (Edge Computing)
+- **Framework**: Hono (Ultra-rápido e lightweight)
+- **Databases**: Cloudflare D1 (SQLite distribuído)
+- **Cache**: Cloudflare KV (Cache global)
+- **ORM**: Drizzle ORM (Type-safe)
+- **AI**: Google Gemini (Insights automáticos)
+- **Monitoramento**: Sentry (Error tracking)
+
+### Múltiplos Bancos Especializados
+
+Nossa arquitetura utiliza bancos de dados especializados para cada domínio:
+
+<AccordionGroup>
+  <Accordion title="📊 DB Principal">
+    Dados principais da aplicação, métricas de ads e newsletters
+  </Accordion>
+  <Accordion title="🎯 STREAKS">
+    Sistema de gamificação, leituras e engagement dos usuários
+  </Accordion>
+  <Accordion title="👥 CRM">
+    Gestão de relacionamento com clientes e segmentação
+  </Accordion>
+  <Accordion title="📝 FORMS">
+    Formulários dinâmicos e submissions
+  </Accordion>
+  <Accordion title="🎫 TICKETS">
+    Sistema de suporte e tickets
+  </Accordion>
+  <Accordion title="📈 ACQUISITIONS">
+    Tracking de aquisição de usuários
+  </Accordion>
+  <Accordion title="🔗 SOCIAL">
+    Integrações e parcerias sociais
+  </Accordion>
+  <Accordion title="⚡ PIXEL">
+    Otimização de tracking por pixel
+  </Accordion>
+</AccordionGroup>
+
+## Autenticação
+
+<Warning>
+  **Rotas Protegidas**: Muitos endpoints requerem autenticação JWT para acesso. Certifique-se de incluir o token de autenticação nos headers das requisições.
+</Warning>
+
+Todos os endpoints autenticados utilizam **Bearer Token Authentication** via JWT:
+
+```bash
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+### Tipos de Endpoints
+
+<CardGroup cols={2}>
+  <Card title="🔓 Públicos" icon="globe">
+    Endpoints acessíveis sem autenticação (login, registro, webhooks)
+  </Card>
+  <Card title="🔒 Autenticados" icon="lock">
+    Endpoints que requerem JWT token válido (dashboard, admin, exports)
+  </Card>
+</CardGroup>
+
+## Newsletters Suportadas
+
+Nossa API gerencia múltiplos cadernos do ecossistema the news:
+
+<CardGroup cols={3}>
+  <Card title="📰 the news" icon="newspaper">
+    Caderno principal de notícias
+  </Card>
+  <Card title="💼 the bizness" icon="briefcase">
+    Caderno de negócios
+  </Card>
+  <Card title="🏆 the champs" icon="trophy">
+    Caderno de esportes
+  </Card>
+  <Card title="🏥 health times" icon="heart">
+    Caderno de saúde e bem-estar
+  </Card>
+  <Card title="📈 Rising" icon="trending-up">
+    Caderno de tendências e crescimento
+  </Card>
+  <Card title="🎯 GoGet" icon="target">
+    Caderno de produtividade e lifestyle
+  </Card>
+</CardGroup>
+
+## Recursos Principais
+
+### 🔄 Cache Ultra-Otimizado
+Sistema de cache inteligente com invalidação automática e métricas de performance em tempo real.
+
+### 🤖 IA Integrada
+Insights automáticos gerados por Google Gemini para análise de performance e recomendações.
+
+### 📊 Métricas Multi-Plataforma
+Integração completa com Facebook Ads, TikTok Ads, Google Ads e Instagram para métricas unificadas.
+
+### 🛡️ Sistema Anti-Fraude
+Detecção avançada de padrões suspeitos no programa de indicações com scoring automático.
+
+### ⚡ Performance Edge
+Distribuição global via Cloudflare Edge com latência ultra-baixa em qualquer lugar do mundo.
+
+## Rate Limits & Limites
+
+<Info>
+  Nossa API utiliza a infraestrutura do Cloudflare Workers, que oferece alta disponibilidade e escalabilidade automática.
+</Info>
+
+- **Timeout por requisição**: 120 segundos (2 minutos)
+- **Timeout para cache**: 50ms para hits de cache
+- **Scheduled tasks**: Executam a cada 7 horas para atualizações automáticas
+
+## Suporte & Status
+
+<CardGroup cols={2}>
+  <Card title="📋 Status da API" icon="chart-line">
+    Monitore o status em tempo real dos nossos serviços
+  </Card>
+  <Card title="🐛 Report de Bugs" icon="bug">
+    Reporte problemas via Sentry integration
+  </Card>
+</CardGroup>
+
 ---
 
 <Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
+  **Começando**: Explore nossa documentação começando pelos endpoints de [Referrals](/api-reference/referrals/introduction) ou [Streaks](/api-reference/streaks/introduction) para entender os principais recursos da API.
 </Note>
-
-## Welcome
-
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
-
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
-
-## Authentication
-
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
-
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
-```
