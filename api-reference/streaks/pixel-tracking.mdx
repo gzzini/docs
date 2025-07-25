@@ -1,0 +1,76 @@
+---
+title: 'Pixel de Rastreamento'
+openapi: 'GET /streaks/pixel'
+---
+
+## Descrição
+
+Pixel de rastreamento para monitorar abertura de emails. Retorna uma imagem transparente 1x1 e registra a leitura em background.
+
+## Query Parameters
+
+<ParamField query="email" type="string" required>
+  Email do leitor
+</ParamField>
+
+<ParamField query="id" type="string" required>
+  ID do post ou email
+</ParamField>
+
+<ParamField query="utm_source" type="string">
+  Fonte UTM para tracking
+</ParamField>
+
+<ParamField query="utm_medium" type="string">
+  Meio UTM para tracking
+</ParamField>
+
+<ParamField query="utm_campaign" type="string">
+  Campanha UTM para tracking
+</ParamField>
+
+<ParamField query="utm_channel" type="string">
+  Canal UTM para tracking
+</ParamField>
+
+<ParamField query="state" type="string">
+  Estado adicional para tracking
+</ParamField>
+
+## Response
+
+Retorna uma imagem PNG transparente de 1x1 pixel com headers de cache agressivo.
+
+### Headers de Resposta
+
+- `Content-Type`: image/png
+- `Cache-Control`: public, max-age=31536000, immutable
+- `ETag`: Baseado nos parâmetros da requisição
+
+<RequestExample>
+
+```bash
+curl --request GET \
+  --url 'https://backend.testeswaffle.org/streaks/pixel?email=leitor@exemplo.com&id=post_123&utm_source=newsletter&utm_medium=email'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```
+[Imagem PNG transparente 1x1]
+
+Headers:
+Content-Type: image/png
+Cache-Control: public, max-age=31536000, immutable
+ETag: "W/abc123xyz"
+```
+
+</ResponseExample>
+
+## Notas
+
+- O pixel executa o registro da leitura de forma assíncrona
+- Implementa cache agressivo para otimizar performance
+- Usado principalmente em emails para tracking de abertura

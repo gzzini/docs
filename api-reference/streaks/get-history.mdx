@@ -1,0 +1,86 @@
+---
+title: 'Histórico de Leituras'
+openapi: 'GET /streaks/history'
+---
+
+## Descrição
+
+Obtém o histórico completo de leituras de um usuário, incluindo posts lidos e datas.
+
+## Query Parameters
+
+<ParamField query="email" type="string" required>
+  Email do usuário
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  Lista de leituras do usuário
+  <Expandable title="reading object">
+    <ResponseField name="postId" type="string">
+      ID do post lido
+    </ResponseField>
+
+    <ResponseField name="postTitle" type="string">
+      Título do post
+    </ResponseField>
+
+    <ResponseField name="readAt" type="string">
+      Data e hora da leitura no formato ISO 8601
+    </ResponseField>
+
+    <ResponseField name="utm_source" type="string">
+      Fonte UTM da leitura
+    </ResponseField>
+
+    <ResponseField name="utm_medium" type="string">
+      Meio UTM da leitura
+    </ResponseField>
+
+    <ResponseField name="utm_campaign" type="string">
+      Campanha UTM da leitura
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request GET \
+  --url 'https://backend.testeswaffle.org/streaks/history?email=leitor@exemplo.com'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "postId": "post_123456",
+      "postTitle": "Como manter seu streak de leitura",
+      "readAt": "2024-01-20T10:30:00Z",
+      "utm_source": "newsletter",
+      "utm_medium": "email",
+      "utm_campaign": "daily_news"
+    },
+    {
+      "postId": "post_123457",
+      "postTitle": "Os benefícios da leitura diária",
+      "readAt": "2024-01-19T09:15:00Z",
+      "utm_source": "website",
+      "utm_medium": "organic",
+      "utm_campaign": null
+    }
+  ]
+}
+```
+
+</ResponseExample>

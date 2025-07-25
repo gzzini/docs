@@ -1,0 +1,71 @@
+---
+title: 'Exportar Emails'
+openapi: 'GET /streaks/export-emails'
+---
+
+## Descrição
+
+Exporta emails de usuários filtrados por critérios de streak em formato CSV. **Requer autenticação JWT**.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Token JWT no formato: Bearer {token}
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="start_date" type="string">
+  Data inicial no formato YYYY-MM-DD
+</ParamField>
+
+<ParamField query="end_date" type="string">
+  Data final no formato YYYY-MM-DD
+</ParamField>
+
+<ParamField query="streak_type" type="string">
+  Tipo de filtro: current_streak ou max_streak
+</ParamField>
+
+<ParamField query="streak_value" type="number">
+  Valor do streak para filtrar
+</ParamField>
+
+<ParamField query="comparison" type="string">
+  Tipo de comparação: greater_than, less_than, equal_to
+</ParamField>
+
+## Response
+
+Retorna um arquivo CSV com os dados dos usuários que atendem aos critérios.
+
+### Campos do CSV
+
+- `email`: Email do usuário
+- `current_streak`: Streak atual
+- `max_streak`: Maior streak alcançado
+- `total_reads`: Total de leituras
+- `last_read_date`: Data da última leitura
+- `created_at`: Data de registro
+
+<RequestExample>
+
+```bash
+curl --request GET \
+  --url 'https://backend.testeswaffle.org/streaks/export-emails?streak_type=current_streak&streak_value=30&comparison=greater_than' \
+  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' \
+  --output usuarios_streak.csv
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```csv
+email,current_streak,max_streak,total_reads,last_read_date,created_at
+usuario1@exemplo.com,45,50,120,2024-01-20,2023-10-15
+usuario2@exemplo.com,32,32,95,2024-01-20,2023-11-20
+usuario3@exemplo.com,31,60,180,2024-01-19,2023-08-10
+```
+
+</ResponseExample>

@@ -74,6 +74,24 @@
               "api-reference/referrals/check-fraud",
               "api-reference/referrals/update-fraud"
             ]
+          },
+          {
+            "group": "Streaks API",
+            "pages": [
+              "api-reference/streaks/introduction",
+              "api-reference/streaks/register-read",
+              "api-reference/streaks/get-user-streak",
+              "api-reference/streaks/get-history",
+              "api-reference/streaks/add-ice-credits",
+              "api-reference/streaks/get-reading-dates",
+              "api-reference/streaks/save-share",
+              "api-reference/streaks/get-ranking",
+              "api-reference/streaks/pixel-tracking",
+              "api-reference/streaks/get-missions",
+              "api-reference/streaks/update-gift-preferences",
+              "api-reference/streaks/complete-mission",
+              "api-reference/streaks/export-emails"
+            ]
           }
         ]
       }
@@ -100,7 +118,8 @@
   },
   "openapi": [
     "/api-reference/openapi.json",
-    "/api-reference/openapi-referrals.json"
+    "/api-reference/openapi-referrals.json",
+    "/api-reference/openapi-streaks.json"
   ],
   "logo": {
     "light": "https://app.thenewscc.com.br/thenews.webp",

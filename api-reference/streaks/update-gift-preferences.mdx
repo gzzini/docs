@@ -1,0 +1,85 @@
+---
+title: 'Atualizar Preferências de Presentes'
+openapi: 'POST /streaks/missions/preferences'
+---
+
+## Descrição
+
+Atualiza as preferências do usuário sobre recebimento de presentes das missões.
+
+## Request Body
+
+<ParamField body="email" type="string" required>
+  Email do leitor
+</ParamField>
+
+<ParamField body="wantsToReceiveTheGifts" type="string" required>
+  Preferência de recebimento: NEVER_REPLIED, DONT_WANT, ou WANT
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem informativa sobre o resultado
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="email" type="string">
+      Email do usuário
+    </ResponseField>
+
+    <ResponseField name="previousPreference" type="string">
+      Preferência anterior
+    </ResponseField>
+
+    <ResponseField name="newPreference" type="string">
+      Nova preferência definida
+    </ResponseField>
+
+    <ResponseField name="updatedAt" type="string">
+      Data e hora da atualização
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request POST \
+  --url https://backend.testeswaffle.org/streaks/missions/preferences \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "email": "leitor@exemplo.com",
+    "wantsToReceiveTheGifts": "WANT"
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "message": "Preferências de presentes atualizadas com sucesso",
+  "data": {
+    "email": "leitor@exemplo.com",
+    "previousPreference": "NEVER_REPLIED",
+    "newPreference": "WANT",
+    "updatedAt": "2024-01-20T16:45:00Z"
+  }
+}
+```
+
+</ResponseExample>
+
+## Valores Aceitos
+
+- **NEVER_REPLIED**: Usuário nunca respondeu sobre preferências
+- **DONT_WANT**: Usuário não quer receber presentes físicos
+- **WANT**: Usuário quer receber presentes físicos

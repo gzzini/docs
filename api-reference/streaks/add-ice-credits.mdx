@@ -1,0 +1,79 @@
+---
+title: 'Adicionar Ice Credits'
+openapi: 'POST /streaks/ice-credits'
+---
+
+## Descrição
+
+Adiciona créditos de gelo (ice credits) para um usuário. Estes créditos permitem "congelar" o streak por um dia caso o usuário não consiga ler.
+
+## Request Body
+
+<ParamField body="email" type="string" required>
+  Email do usuário
+</ParamField>
+
+<ParamField body="credits" type="number" required>
+  Quantidade de créditos a adicionar
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem informativa sobre o resultado
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="email" type="string">
+      Email do usuário
+    </ResponseField>
+
+    <ResponseField name="previousCredits" type="number">
+      Quantidade de créditos antes da operação
+    </ResponseField>
+
+    <ResponseField name="addedCredits" type="number">
+      Quantidade de créditos adicionados
+    </ResponseField>
+
+    <ResponseField name="totalCredits" type="number">
+      Total de créditos após a operação
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request POST \
+  --url https://backend.testeswaffle.org/streaks/ice-credits \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "email": "leitor@exemplo.com",
+    "credits": 3
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "message": "Ice credits adicionados com sucesso",
+  "data": {
+    "email": "leitor@exemplo.com",
+    "previousCredits": 2,
+    "addedCredits": 3,
+    "totalCredits": 5
+  }
+}
+```
+
+</ResponseExample>

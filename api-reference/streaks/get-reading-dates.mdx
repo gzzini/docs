@@ -1,0 +1,72 @@
+---
+title: 'Datas de Leitura'
+openapi: 'GET /streaks/dates'
+---
+
+## Descrição
+
+Obtém todas as datas em que o usuário realizou leituras, útil para visualização de calendário.
+
+## Query Parameters
+
+<ParamField query="email" type="string" required>
+  Email do usuário
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="dates" type="array">
+      Lista de datas em que houve leitura (formato YYYY-MM-DD)
+    </ResponseField>
+
+    <ResponseField name="totalDays" type="number">
+      Total de dias com leitura
+    </ResponseField>
+
+    <ResponseField name="firstReadDate" type="string">
+      Data da primeira leitura registrada
+    </ResponseField>
+
+    <ResponseField name="lastReadDate" type="string">
+      Data da última leitura registrada
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request GET \
+  --url 'https://backend.testeswaffle.org/streaks/dates?email=leitor@exemplo.com'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "data": {
+    "dates": [
+      "2024-01-20",
+      "2024-01-19",
+      "2024-01-18",
+      "2024-01-17",
+      "2024-01-16",
+      "2024-01-15"
+    ],
+    "totalDays": 45,
+    "firstReadDate": "2023-12-01",
+    "lastReadDate": "2024-01-20"
+  }
+}
+```
+
+</ResponseExample>

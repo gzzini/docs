@@ -1,0 +1,716 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Streaks API",
+    "description": "API para gerenciamento de streaks e gamificação de leitura do the news",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://backend.testeswaffle.org"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "paths": {
+    "/streaks/read": {
+      "post": {
+        "summary": "Registrar Leitura",
+        "description": "Registra uma nova leitura de conteúdo para um usuário",
+        "tags": ["Streaks"],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "postId"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Email do leitor"
+                  },
+                  "postId": {
+                    "type": "string",
+                    "description": "ID do post lido"
+                  },
+                  "utm_source": {
+                    "type": "string",
+                    "description": "Fonte UTM para tracking"
+                  },
+                  "utm_medium": {
+                    "type": "string",
+                    "description": "Meio UTM para tracking"
+                  },
+                  "utm_campaign": {
+                    "type": "string",
+                    "description": "Campanha UTM para tracking"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Leitura registrada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "readerId": { "type": "string" },
+                        "currentStreak": { "type": "number" },
+                        "maxStreak": { "type": "number" },
+                        "readToday": { "type": "boolean" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streaks/user": {
+      "get": {
+        "summary": "Obter Streak do Usuário",
+        "description": "Obtém informações detalhadas sobre o streak atual do usuário",
+        "tags": ["Streaks"],
+        "security": [],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "description": "Email do usuário"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Informações do streak obtidas com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "readerId": { "type": "string" },
+                        "currentStreak": { "type": "number" },
+                        "maxStreak": { "type": "number" },
+                        "weekdays": {
+                          "type": "object",
+                          "properties": {
+                            "segunda": { "type": "boolean" },
+                            "terca": { "type": "boolean" },
+                            "quarta": { "type": "boolean" },
+                            "quinta": { "type": "boolean" },
+                            "sexta": { "type": "boolean" },
+                            "sabado": { "type": "boolean" },
+                            "domingo": { "type": "boolean" }
+                          }
+                        }
+                      }
+                    },
+                    "notifications": { "type": "boolean" },
+                    "url": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streaks/history": {
+      "get": {
+        "summary": "Histórico de Leituras",
+        "description": "Obtém o histórico completo de leituras de um usuário",
+        "tags": ["Streaks"],
+        "security": [],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "description": "Email do usuário"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Histórico obtido com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "postId": { "type": "string" },
+                          "postTitle": { "type": "string" },
+                          "readAt": { "type": "string", "format": "date-time" },
+                          "utm_source": { "type": "string" },
+                          "utm_medium": { "type": "string" },
+                          "utm_campaign": { "type": "string" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streaks/ice-credits": {
+      "post": {
+        "summary": "Adicionar Ice Credits",
+        "description": "Adiciona créditos de gelo para um usuário",
+        "tags": ["Streaks"],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "credits"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Email do usuário"
+                  },
+                  "credits": {
+                    "type": "number",
+                    "description": "Quantidade de créditos a adicionar"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Créditos adicionados com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "email": { "type": "string" },
+                        "previousCredits": { "type": "number" },
+                        "addedCredits": { "type": "number" },
+                        "totalCredits": { "type": "number" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streaks/dates": {
+      "get": {
+        "summary": "Datas de Leitura",
+        "description": "Obtém todas as datas em que o usuário realizou leituras",
+        "tags": ["Streaks"],
+        "security": [],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "description": "Email do usuário"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Datas obtidas com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "dates": {
+                          "type": "array",
+                          "items": { "type": "string", "format": "date" }
+                        },
+                        "totalDays": { "type": "number" },
+                        "firstReadDate": { "type": "string", "format": "date" },
+                        "lastReadDate": { "type": "string", "format": "date" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streaks/share": {
+      "post": {
+        "summary": "Registrar Compartilhamento",
+        "description": "Registra quando um usuário compartilha seu streak",
+        "tags": ["Streaks"],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "platform"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Email do usuário"
+                  },
+                  "platform": {
+                    "type": "string",
+                    "description": "Plataforma de compartilhamento",
+                    "enum": ["twitter", "facebook", "instagram", "whatsapp", "linkedin"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Compartilhamento registrado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "shareId": { "type": "string" },
+                        "email": { "type": "string" },
+                        "platform": { "type": "string" },
+                        "sharedAt": { "type": "string", "format": "date-time" },
+                        "currentStreak": { "type": "number" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streaks/ranking": {
+      "get": {
+        "summary": "Ranking de Leitores",
+        "description": "Obtém o ranking dos leitores com maiores streaks",
+        "tags": ["Streaks"],
+        "security": [],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "description": "Email do usuário para destacar sua posição"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ranking obtido com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "ranking": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "position": { "type": "number" },
+                              "email": { "type": "string" },
+                              "currentStreak": { "type": "number" },
+                              "maxStreak": { "type": "number" },
+                              "isCurrentUser": { "type": "boolean" }
+                            }
+                          }
+                        },
+                        "userPosition": {
+                          "type": "object",
+                          "properties": {
+                            "position": { "type": "number" },
+                            "totalReaders": { "type": "number" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streaks/pixel": {
+      "get": {
+        "summary": "Pixel de Rastreamento",
+        "description": "Pixel de rastreamento para monitorar abertura de emails",
+        "tags": ["Tracking"],
+        "security": [],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string", "format": "email" },
+            "description": "Email do leitor"
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "ID do post ou email"
+          },
+          {
+            "name": "utm_source",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Fonte UTM"
+          },
+          {
+            "name": "utm_medium",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Meio UTM"
+          },
+          {
+            "name": "utm_campaign",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Campanha UTM"
+          },
+          {
+            "name": "utm_channel",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Canal UTM"
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Estado adicional"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pixel transparente 1x1",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streaks/missions": {
+      "get": {
+        "summary": "Obter Missões",
+        "description": "Obtém as missões de streak disponíveis para um leitor",
+        "tags": ["Missions"],
+        "security": [],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "description": "Email do leitor"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Missões obtidas com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "isFirstAccess": { "type": "boolean" },
+                        "goals": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "daysToMaintain": { "type": "number" },
+                              "gift": { "type": "string" },
+                              "emoji": { "type": "string" },
+                              "alreadyCompletedThisGoal": { "type": "boolean" },
+                              "wantsToReceiveTheGift": {
+                                "type": "string",
+                                "enum": ["NEVER_REPLIED", "DONT_WANT", "WANT"]
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streaks/missions/preferences": {
+      "post": {
+        "summary": "Atualizar Preferências de Presentes",
+        "description": "Atualiza as preferências do usuário sobre recebimento de presentes",
+        "tags": ["Missions"],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "wantsToReceiveTheGifts"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Email do leitor"
+                  },
+                  "wantsToReceiveTheGifts": {
+                    "type": "string",
+                    "enum": ["NEVER_REPLIED", "DONT_WANT", "WANT"],
+                    "description": "Preferência de recebimento"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Preferências atualizadas com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "email": { "type": "string" },
+                        "previousPreference": { "type": "string" },
+                        "newPreference": { "type": "string" },
+                        "updatedAt": { "type": "string", "format": "date-time" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streaks/missions/complete": {
+      "post": {
+        "summary": "Completar Missão",
+        "description": "Marca uma missão como completada",
+        "tags": ["Missions"],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "daysToMaintain"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Email do leitor"
+                  },
+                  "daysToMaintain": {
+                    "type": "number",
+                    "enum": [7, 30, 90],
+                    "description": "Número de dias da missão"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Missão completada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "missionId": { "type": "string" },
+                        "email": { "type": "string" },
+                        "daysToMaintain": { "type": "number" },
+                        "completedAt": { "type": "string", "format": "date-time" },
+                        "gift": { "type": "string" },
+                        "currentStreak": { "type": "number" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streaks/export-emails": {
+      "get": {
+        "summary": "Exportar Emails",
+        "description": "Exporta emails de usuários filtrados por critérios de streak",
+        "tags": ["Admin"],
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "schema": { "type": "string", "format": "date" },
+            "description": "Data inicial (YYYY-MM-DD)"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "schema": { "type": "string", "format": "date" },
+            "description": "Data final (YYYY-MM-DD)"
+          },
+          {
+            "name": "streak_type",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["current_streak", "max_streak"]
+            },
+            "description": "Tipo de filtro de streak"
+          },
+          {
+            "name": "streak_value",
+            "in": "query",
+            "schema": { "type": "number" },
+            "description": "Valor do streak para filtrar"
+          },
+          {
+            "name": "comparison",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["greater_than", "less_than", "equal_to"]
+            },
+            "description": "Tipo de comparação"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Arquivo CSV com os dados",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

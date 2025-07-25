@@ -1,0 +1,84 @@
+---
+title: 'Registrar Compartilhamento'
+openapi: 'POST /streaks/share'
+---
+
+## Descrição
+
+Registra quando um usuário compartilha seu streak em redes sociais.
+
+## Request Body
+
+<ParamField body="email" type="string" required>
+  Email do usuário
+</ParamField>
+
+<ParamField body="platform" type="string" required>
+  Plataforma onde foi compartilhado (twitter, facebook, instagram, whatsapp, etc)
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem informativa sobre o resultado
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="shareId" type="string">
+      ID único do compartilhamento
+    </ResponseField>
+
+    <ResponseField name="email" type="string">
+      Email do usuário
+    </ResponseField>
+
+    <ResponseField name="platform" type="string">
+      Plataforma do compartilhamento
+    </ResponseField>
+
+    <ResponseField name="sharedAt" type="string">
+      Data e hora do compartilhamento
+    </ResponseField>
+
+    <ResponseField name="currentStreak" type="number">
+      Streak no momento do compartilhamento
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request POST \
+  --url https://backend.testeswaffle.org/streaks/share \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "email": "leitor@exemplo.com",
+    "platform": "twitter"
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "message": "Compartilhamento registrado com sucesso",
+  "data": {
+    "shareId": "share_123456",
+    "email": "leitor@exemplo.com",
+    "platform": "twitter",
+    "sharedAt": "2024-01-20T15:30:00Z",
+    "currentStreak": 30
+  }
+}
+```
+
+</ResponseExample>

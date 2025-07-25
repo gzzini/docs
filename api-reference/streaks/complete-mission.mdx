@@ -1,0 +1,89 @@
+---
+title: 'Completar Missão'
+openapi: 'POST /streaks/missions/complete'
+---
+
+## Descrição
+
+Marca uma missão como completada quando o usuário atinge o objetivo de dias de streak.
+
+## Request Body
+
+<ParamField body="email" type="string" required>
+  Email do leitor
+</ParamField>
+
+<ParamField body="daysToMaintain" type="number" required>
+  Número de dias da missão completada (7, 30, ou 90)
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem informativa sobre o resultado
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="missionId" type="string">
+      ID da missão completada
+    </ResponseField>
+
+    <ResponseField name="email" type="string">
+      Email do usuário
+    </ResponseField>
+
+    <ResponseField name="daysToMaintain" type="number">
+      Dias da missão completada
+    </ResponseField>
+
+    <ResponseField name="completedAt" type="string">
+      Data e hora da conclusão
+    </ResponseField>
+
+    <ResponseField name="gift" type="string">
+      Descrição do presente conquistado
+    </ResponseField>
+
+    <ResponseField name="currentStreak" type="number">
+      Streak atual no momento da conclusão
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request POST \
+  --url https://backend.testeswaffle.org/streaks/missions/complete \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "email": "leitor@exemplo.com",
+    "daysToMaintain": 30
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "message": "Missão completada com sucesso! Parabéns!",
+  "data": {
+    "missionId": "mission_30days_123",
+    "email": "leitor@exemplo.com",
+    "daysToMaintain": 30,
+    "completedAt": "2024-01-20T17:00:00Z",
+    "gift": "Camiseta oficial do the news",
+    "currentStreak": 30
+  }
+}
+```
+
+</ResponseExample>

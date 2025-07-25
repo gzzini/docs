@@ -1,0 +1,66 @@
+---
+title: 'Introdução'
+description: 'API para gerenciamento de streaks e leitura de conteúdo'
+---
+
+## Visão Geral
+
+A API de Streaks permite gerenciar todo o sistema de gamificação de leitura, incluindo registro de leituras, acompanhamento de sequências (streaks), missões, rankings e recompensas.
+
+## Base URL
+
+```
+https://backend.testeswaffle.org
+```
+
+## Autenticação
+
+A maioria das rotas é pública e não requer autenticação. Apenas rotas administrativas específicas requerem autenticação JWT.
+
+### Rotas Públicas
+A maioria das rotas de streaks está disponível publicamente para facilitar o tracking de leituras.
+
+### Rotas Autenticadas
+Apenas a rota de exportação de emails requer token JWT no header Authorization:
+
+```
+Authorization: Bearer <seu-token-jwt>
+```
+
+## Conceitos Principais
+
+### Streak
+Uma sequência de dias consecutivos em que o usuário leu conteúdo. O streak é resetado se o usuário perder um dia.
+
+### Ice Credits
+Sistema de créditos que permite ao usuário "congelar" seu streak por um dia caso não consiga ler.
+
+### Missões
+Desafios de manter o streak por determinados períodos (7, 30, 90 dias) com recompensas associadas.
+
+## Respostas
+
+Todas as respostas da API seguem o formato JSON padrão:
+
+### Sucesso
+```json
+{
+  "success": true,
+  "message": "Mensagem de sucesso",
+  "data": {
+    // dados da resposta
+  }
+}
+```
+
+### Erro
+```json
+{
+  "success": false,
+  "message": "Descrição do erro"
+}
+```
+
+## Próximos Passos
+
+Explore os endpoints disponíveis na API de Streaks através do menu lateral.

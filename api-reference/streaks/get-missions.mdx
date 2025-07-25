@@ -1,0 +1,98 @@
+---
+title: 'Obter Missões'
+openapi: 'GET /streaks/missions'
+---
+
+## Descrição
+
+Obtém as missões de streak disponíveis para um leitor, incluindo progresso e preferências de presentes.
+
+## Query Parameters
+
+<ParamField query="email" type="string" required>
+  Email do leitor
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="isFirstAccess" type="boolean">
+      Indica se é o primeiro acesso do usuário às missões
+    </ResponseField>
+
+    <ResponseField name="goals" type="array">
+      Lista de missões disponíveis
+      <Expandable title="goal object">
+        <ResponseField name="daysToMaintain" type="number">
+          Número de dias que deve manter o streak
+        </ResponseField>
+
+        <ResponseField name="gift" type="string">
+          Descrição do presente da missão
+        </ResponseField>
+
+        <ResponseField name="emoji" type="string">
+          Emoji representativo da missão
+        </ResponseField>
+
+        <ResponseField name="alreadyCompletedThisGoal" type="boolean">
+          Se o usuário já completou esta missão
+        </ResponseField>
+
+        <ResponseField name="wantsToReceiveTheGift" type="string">
+          Preferência de recebimento: NEVER_REPLIED, DONT_WANT, ou WANT
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request GET \
+  --url 'https://backend.testeswaffle.org/streaks/missions?email=leitor@exemplo.com'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "data": {
+    "isFirstAccess": false,
+    "goals": [
+      {
+        "daysToMaintain": 7,
+        "gift": "Adesivos exclusivos do the news",
+        "emoji": "🎯",
+        "alreadyCompletedThisGoal": true,
+        "wantsToReceiveTheGift": "WANT"
+      },
+      {
+        "daysToMaintain": 30,
+        "gift": "Camiseta oficial do the news",
+        "emoji": "👕",
+        "alreadyCompletedThisGoal": false,
+        "wantsToReceiveTheGift": "NEVER_REPLIED"
+      },
+      {
+        "daysToMaintain": 90,
+        "gift": "Kit completo de presentes",
+        "emoji": "🎁",
+        "alreadyCompletedThisGoal": false,
+        "wantsToReceiveTheGift": "NEVER_REPLIED"
+      }
+    ]
+  }
+}
+```
+
+</ResponseExample>

@@ -1,0 +1,94 @@
+---
+title: 'Registrar Leitura'
+openapi: 'POST /streaks/read'
+---
+
+## Descrição
+
+Registra uma nova leitura de conteúdo para um usuário, atualizando seu streak.
+
+## Request Body
+
+<ParamField body="email" type="string" required>
+  Email do leitor
+</ParamField>
+
+<ParamField body="postId" type="string" required>
+  ID do post lido
+</ParamField>
+
+<ParamField body="utm_source" type="string">
+  Fonte UTM para tracking
+</ParamField>
+
+<ParamField body="utm_medium" type="string">
+  Meio UTM para tracking
+</ParamField>
+
+<ParamField body="utm_campaign" type="string">
+  Campanha UTM para tracking
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem informativa sobre o resultado
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="readerId" type="string">
+      ID único do leitor
+    </ResponseField>
+
+    <ResponseField name="currentStreak" type="number">
+      Streak atual do usuário
+    </ResponseField>
+
+    <ResponseField name="maxStreak" type="number">
+      Maior streak já alcançado pelo usuário
+    </ResponseField>
+
+    <ResponseField name="readToday" type="boolean">
+      Indica se o usuário já leu hoje
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request POST \
+  --url https://backend.testeswaffle.org/streaks/read \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "email": "leitor@exemplo.com",
+    "postId": "post_123456",
+    "utm_source": "newsletter",
+    "utm_medium": "email",
+    "utm_campaign": "daily_news"
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "message": "Leitura registrada com sucesso",
+  "data": {
+    "readerId": "reader_789",
+    "currentStreak": 7,
+    "maxStreak": 15,
+    "readToday": true
+  }
+}
+```
+
+</ResponseExample>

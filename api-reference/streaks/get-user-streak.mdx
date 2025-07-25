@@ -1,0 +1,116 @@
+---
+title: 'Obter Streak do Usuário'
+openapi: 'GET /streaks/user'
+---
+
+## Descrição
+
+Obtém informações detalhadas sobre o streak atual do usuário, incluindo dias da semana lidos.
+
+## Query Parameters
+
+<ParamField query="email" type="string" required>
+  Email do usuário
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem informativa
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="readerId" type="string">
+      ID único do leitor
+    </ResponseField>
+
+    <ResponseField name="currentStreak" type="number">
+      Streak atual do usuário
+    </ResponseField>
+
+    <ResponseField name="maxStreak" type="number">
+      Maior streak já alcançado
+    </ResponseField>
+
+    <ResponseField name="weekdays" type="object">
+      <Expandable title="days">
+        <ResponseField name="segunda" type="boolean">
+          Se leu na segunda-feira desta semana
+        </ResponseField>
+
+        <ResponseField name="terca" type="boolean">
+          Se leu na terça-feira desta semana
+        </ResponseField>
+
+        <ResponseField name="quarta" type="boolean">
+          Se leu na quarta-feira desta semana
+        </ResponseField>
+
+        <ResponseField name="quinta" type="boolean">
+          Se leu na quinta-feira desta semana
+        </ResponseField>
+
+        <ResponseField name="sexta" type="boolean">
+          Se leu na sexta-feira desta semana
+        </ResponseField>
+
+        <ResponseField name="sabado" type="boolean">
+          Se leu no sábado desta semana
+        </ResponseField>
+
+        <ResponseField name="domingo" type="boolean">
+          Se leu no domingo desta semana
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="notifications" type="boolean">
+  Se o usuário tem notificações ativadas
+</ResponseField>
+
+<ResponseField name="url" type="string">
+  URL relacionada ao usuário
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request GET \
+  --url 'https://backend.testeswaffle.org/streaks/user?email=leitor@exemplo.com'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "message": "Streak obtido com sucesso",
+  "data": {
+    "readerId": "reader_789",
+    "currentStreak": 15,
+    "maxStreak": 30,
+    "weekdays": {
+      "segunda": true,
+      "terca": true,
+      "quarta": true,
+      "quinta": true,
+      "sexta": false,
+      "sabado": false,
+      "domingo": false
+    }
+  },
+  "notifications": true,
+  "url": "https://thenewscc.com.br/streak"
+}
+```
+
+</ResponseExample>

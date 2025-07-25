@@ -1,0 +1,110 @@
+---
+title: 'Ranking de Leitores'
+openapi: 'GET /streaks/ranking'
+---
+
+## Descrição
+
+Obtém o ranking dos leitores com maiores streaks, com opção de destacar a posição de um usuário específico.
+
+## Query Parameters
+
+<ParamField query="email" type="string">
+  Email do usuário para destacar sua posição no ranking
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="ranking" type="array">
+      Lista dos top leitores
+      <Expandable title="reader object">
+        <ResponseField name="position" type="number">
+          Posição no ranking
+        </ResponseField>
+
+        <ResponseField name="email" type="string">
+          Email do leitor (parcialmente ocultado)
+        </ResponseField>
+
+        <ResponseField name="currentStreak" type="number">
+          Streak atual
+        </ResponseField>
+
+        <ResponseField name="maxStreak" type="number">
+          Maior streak alcançado
+        </ResponseField>
+
+        <ResponseField name="isCurrentUser" type="boolean">
+          Indica se é o usuário consultado
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="userPosition" type="object">
+      Informações específicas do usuário consultado (se email fornecido)
+      <Expandable title="properties">
+        <ResponseField name="position" type="number">
+          Posição do usuário no ranking geral
+        </ResponseField>
+
+        <ResponseField name="totalReaders" type="number">
+          Total de leitores no ranking
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request GET \
+  --url 'https://backend.testeswaffle.org/streaks/ranking?email=leitor@exemplo.com'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "data": {
+    "ranking": [
+      {
+        "position": 1,
+        "email": "top***@***.com",
+        "currentStreak": 365,
+        "maxStreak": 365,
+        "isCurrentUser": false
+      },
+      {
+        "position": 2,
+        "email": "sec***@***.com",
+        "currentStreak": 180,
+        "maxStreak": 200,
+        "isCurrentUser": false
+      },
+      {
+        "position": 3,
+        "email": "lei***@exemplo.com",
+        "currentStreak": 150,
+        "maxStreak": 150,
+        "isCurrentUser": true
+      }
+    ],
+    "userPosition": {
+      "position": 3,
+      "totalReaders": 5432
+    }
+  }
+}
+```
+
+</ResponseExample>
