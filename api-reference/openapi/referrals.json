@@ -369,8 +369,9 @@
     "/referrals": {
       "get": {
         "summary": "Listar Indicações",
-        "description": "Lista todas as indicações com filtros e paginação",
+        "description": "Lista todas as indicações com filtros e paginação. Requer autenticação JWT.",
         "tags": ["Authenticated"],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "email",
@@ -475,8 +476,9 @@
     "/referrals/delivery": {
       "get": {
         "summary": "Listar Entregas",
-        "description": "Lista as respostas dos formulários de entrega",
+        "description": "Lista as respostas dos formulários de entrega. Requer autenticação JWT.",
         "tags": ["Authenticated"],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "startDate",
@@ -575,8 +577,9 @@
     "/referrals/ban": {
       "post": {
         "summary": "Banir/Desbanir Usuário",
-        "description": "Alterna o status de banimento de um usuário",
+        "description": "Alterna o status de banimento de um usuário. Requer autenticação JWT.",
         "tags": ["Authenticated"],
+        "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
           "content": {
@@ -628,8 +631,9 @@
     "/referrals/banned": {
       "get": {
         "summary": "Listar Usuários Banidos",
-        "description": "Retorna a lista de todos os usuários banidos",
+        "description": "Retorna a lista de todos os usuários banidos. Requer autenticação JWT.",
         "tags": ["Authenticated"],
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
             "name": "page",
@@ -664,6 +668,140 @@
                         },
                         "pagination": {
                           "type": "object"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/referrals/resend/history": {
+      "get": {
+        "summary": "Histórico de Reenvios",
+        "description": "Obtém o histórico de emails de ativação reenviados. Requer autenticação JWT.",
+        "tags": ["Authenticated"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "number", "default": 1 },
+            "description": "Número da página"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "number", "default": 20 },
+            "description": "Itens por página"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "desc"
+            },
+            "description": "Ordenação"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Histórico de reenvios",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "resends": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "referral_id": { "type": "string" },
+                              "referred_email": { "type": "string" },
+                              "resend_count": { "type": "number" },
+                              "last_resent_at": { "type": "string", "format": "date-time" },
+                              "status": { "type": "string" }
+                            }
+                          }
+                        },
+                        "pagination": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/referrals/resend/confirmation": {
+      "post": {
+        "summary": "Reenviar Emails de Confirmação em Lote",
+        "description": "Reenvia emails de confirmação para múltiplas indicações pendentes. Requer autenticação JWT.",
+        "tags": ["Authenticated"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["referral_ids"],
+                "properties": {
+                  "referral_ids": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "Lista de IDs das indicações para reenviar"
+                  },
+                  "force_resend": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Forçar reenvio mesmo se já atingiu o limite"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Emails reenviados com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "total_requested": { "type": "number" },
+                        "emails_sent": { "type": "number" },
+                        "failed": { "type": "number" },
+                        "skipped": { "type": "number" },
+                        "results": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "referral_id": { "type": "string" },
+                              "status": { "type": "string" },
+                              "message": { "type": "string" }
+                            }
+                          }
                         }
                       }
                     }
