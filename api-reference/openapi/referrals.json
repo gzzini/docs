@@ -1,0 +1,803 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Referrals API",
+    "description": "API para gerenciamento do programa de indicações do the news",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://backend.testeswaffle.org"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "paths": {
+    "/referrals/register": {
+      "post": {
+        "summary": "Registrar Usuário",
+        "description": "Registra um novo usuário no programa de indicações",
+        "tags": ["Public"],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Email do novo usuário"
+                  },
+                  "referrer_id": {
+                    "type": "string",
+                    "description": "ID do usuário que está fazendo a indicação"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Usuário registrado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "user_id": { "type": "string" },
+                        "email": { "type": "string" },
+                        "created_at": { "type": "string", "format": "date-time" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/referrals/login": {
+      "post": {
+        "summary": "Login de Usuário",
+        "description": "Realiza o login de um usuário existente",
+        "tags": ["Public"],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Email do usuário"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login realizado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "token": { "type": "string" },
+                        "user": {
+                          "type": "object",
+                          "properties": {
+                            "user_id": { "type": "string" },
+                            "email": { "type": "string" },
+                            "referral_count": { "type": "number" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/referrals/subscribe": {
+      "post": {
+        "summary": "Inscrever Indicação",
+        "description": "Inscreve um novo indicado na newsletter",
+        "tags": ["Public"],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["referrer_id", "referred_email"],
+                "properties": {
+                  "referrer_id": {
+                    "type": "string",
+                    "description": "ID do usuário que está fazendo a indicação"
+                  },
+                  "referred_email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Email da pessoa sendo indicada"
+                  },
+                  "campaign": {
+                    "type": "string",
+                    "description": "Nome da campanha de indicação"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Indicação criada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "referral_id": { "type": "string" },
+                        "status": { "type": "string" },
+                        "activation_email_sent": { "type": "boolean" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/referrals/activate": {
+      "get": {
+        "summary": "Ativar Indicação",
+        "description": "Ativa uma indicação pendente",
+        "tags": ["Public"],
+        "security": [],
+        "parameters": [
+          {
+            "name": "subscriptionId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Email do indicado"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Indicação ativada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "referral_id": { "type": "string" },
+                        "status": { "type": "string" },
+                        "activated_at": { "type": "string", "format": "date-time" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/referrals/count/{email}": {
+      "get": {
+        "summary": "Contagem por Email",
+        "description": "Obtém a contagem de indicações para um email",
+        "tags": ["Public"],
+        "security": [],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            },
+            "description": "Email do usuário"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contagem obtida com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "active": { "type": "number" },
+                        "pending": { "type": "number" },
+                        "total": { "type": "number" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/referrals/resend/{referralId}": {
+      "post": {
+        "summary": "Reenviar Email de Ativação",
+        "description": "Reenvia o email de ativação para uma indicação pendente",
+        "tags": ["Public"],
+        "security": [],
+        "parameters": [
+          {
+            "name": "referralId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID da indicação"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Email reenviado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "email_sent": { "type": "boolean" },
+                        "resend_count": { "type": "number" },
+                        "resends_remaining": { "type": "number" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/referrals/export": {
+      "get": {
+        "summary": "Exportar Indicações",
+        "description": "Exporta dados de indicações em formato CSV",
+        "tags": ["Public"],
+        "security": [],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["active", "pending", "all"]
+            },
+            "description": "Filtrar por status"
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Data inicial (YYYY-MM-DD)"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Data final (YYYY-MM-DD)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Arquivo CSV com os dados",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/referrals": {
+      "get": {
+        "summary": "Listar Indicações",
+        "description": "Lista todas as indicações com filtros e paginação",
+        "tags": ["Authenticated"],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Filtrar por email do indicador"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["active", "pending", "banned"]
+            },
+            "description": "Filtrar por status"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "default": 1
+            },
+            "description": "Número da página"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "default": 20,
+              "maximum": 100
+            },
+            "description": "Itens por página"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "desc"
+            },
+            "description": "Ordenação"
+          },
+          {
+            "name": "sortField",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "created_at"
+            },
+            "description": "Campo para ordenação"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de indicações",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "referrals": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "referral_id": { "type": "string" },
+                              "referrer_email": { "type": "string" },
+                              "referred_email": { "type": "string" },
+                              "status": { "type": "string" },
+                              "created_at": { "type": "string", "format": "date-time" },
+                              "activated_at": { "type": "string", "format": "date-time" },
+                              "fraud_score": { "type": "number" }
+                            }
+                          }
+                        },
+                        "pagination": {
+                          "type": "object",
+                          "properties": {
+                            "total": { "type": "number" },
+                            "page": { "type": "number" },
+                            "limit": { "type": "number" },
+                            "pages": { "type": "number" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/referrals/delivery": {
+      "get": {
+        "summary": "Listar Entregas",
+        "description": "Lista as respostas dos formulários de entrega",
+        "tags": ["Authenticated"],
+        "parameters": [
+          {
+            "name": "startDate",
+            "in": "query",
+            "schema": { "type": "string", "format": "date" },
+            "description": "Data inicial (YYYY-MM-DD)"
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "schema": { "type": "string", "format": "date" },
+            "description": "Data final (YYYY-MM-DD)"
+          },
+          {
+            "name": "productId",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "ID do produto"
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Email do usuário"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "number", "default": 1 },
+            "description": "Número da página"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "number", "default": 20 },
+            "description": "Itens por página"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "desc"
+            },
+            "description": "Ordenação"
+          },
+          {
+            "name": "sortField",
+            "in": "query",
+            "schema": { "type": "string", "default": "created_at" },
+            "description": "Campo para ordenação"
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "csv"],
+              "default": "json"
+            },
+            "description": "Formato da resposta"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de entregas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "deliveries": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "pagination": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/referrals/ban": {
+      "post": {
+        "summary": "Banir/Desbanir Usuário",
+        "description": "Alterna o status de banimento de um usuário",
+        "tags": ["Authenticated"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email"],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Email do usuário"
+                  },
+                  "reason": {
+                    "type": "string",
+                    "description": "Motivo do banimento"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "user_email": { "type": "string" },
+                        "action": { "type": "string" },
+                        "banned_at": { "type": "string", "format": "date-time" },
+                        "reason": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/referrals/banned": {
+      "get": {
+        "summary": "Listar Usuários Banidos",
+        "description": "Retorna a lista de todos os usuários banidos",
+        "tags": ["Authenticated"],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "number", "default": 1 },
+            "description": "Número da página"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "number", "default": 20, "maximum": 100 },
+            "description": "Itens por página"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de usuários banidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "banned_users": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "pagination": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/referrals/check-fraud": {
+      "post": {
+        "summary": "Verificar Fraude",
+        "description": "Executa uma verificação de fraude de emergência",
+        "tags": ["Public"],
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["referrer_email", "referred_emails"],
+                "properties": {
+                  "referrer_email": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Email do indicador"
+                  },
+                  "referred_emails": {
+                    "type": "array",
+                    "items": { "type": "string", "format": "email" },
+                    "description": "Lista de emails indicados"
+                  },
+                  "force_check": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Forçar verificação"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado da verificação",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "fraud_detected": { "type": "boolean" },
+                        "fraud_score": { "type": "number" },
+                        "suspicious_patterns": {
+                          "type": "array",
+                          "items": { "type": "string" }
+                        },
+                        "recommendations": {
+                          "type": "array",
+                          "items": { "type": "string" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/referrals/update-fraud": {
+      "post": {
+        "summary": "Atualizar Dados de Fraude",
+        "description": "Atualiza dados de fraude ausentes em indicações antigas",
+        "tags": ["Public"],
+        "security": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "batch_size": {
+                    "type": "number",
+                    "default": 100,
+                    "description": "Tamanho do lote"
+                  },
+                  "start_date": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "Data inicial (YYYY-MM-DD)"
+                  },
+                  "end_date": {
+                    "type": "string",
+                    "format": "date",
+                    "description": "Data final (YYYY-MM-DD)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resultado do processamento",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "processed": { "type": "number" },
+                        "updated": { "type": "number" },
+                        "fraud_detected": { "type": "number" },
+                        "processing_time": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

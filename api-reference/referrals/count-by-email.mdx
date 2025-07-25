@@ -1,0 +1,60 @@
+---
+title: 'Contagem por Email'
+openapi: 'GET /referrals/count/{email}'
+---
+
+## Descrição
+
+Obtém a contagem de indicações ativas e pendentes para um email específico. Este endpoint é público e útil para mostrar o progresso do usuário.
+
+## Path Parameters
+
+<ParamField path="email" type="string" required>
+  Email do usuário para consultar as indicações
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="active" type="number">
+      Número de indicações ativas (confirmadas)
+    </ResponseField>
+
+    <ResponseField name="pending" type="number">
+      Número de indicações pendentes de confirmação
+    </ResponseField>
+
+    <ResponseField name="total" type="number">
+      Total de indicações (ativas + pendentes)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request GET \
+  --url https://backend.testeswaffle.org/referrals/count/usuario@exemplo.com
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "data": {
+    "active": 12,
+    "pending": 3,
+    "total": 15
+  }
+}
+```
+
+</ResponseExample>

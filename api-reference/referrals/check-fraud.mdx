@@ -1,0 +1,91 @@
+---
+title: 'Verificar Fraude'
+openapi: 'POST /referrals/check-fraud'
+---
+
+## Descrição
+
+Executa uma verificação de fraude de emergência em indicações suspeitas. Este endpoint é público mas deve ser usado com moderação.
+
+## Request Body
+
+<ParamField body="referrer_email" type="string" required>
+  Email do usuário indicador
+</ParamField>
+
+<ParamField body="referred_emails" type="array" required>
+  Lista de emails indicados a serem verificados
+</ParamField>
+
+<ParamField body="force_check" type="boolean" default="false">
+  Forçar verificação mesmo se já foi checado recentemente
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="fraud_detected" type="boolean">
+      Indica se foi detectada fraude
+    </ResponseField>
+
+    <ResponseField name="fraud_score" type="number">
+      Pontuação de fraude (0-1, onde 1 é alta probabilidade de fraude)
+    </ResponseField>
+
+    <ResponseField name="suspicious_patterns" type="array">
+      Lista de padrões suspeitos detectados
+    </ResponseField>
+
+    <ResponseField name="recommendations" type="array">
+      Recomendações de ação baseadas na análise
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request POST \
+  --url https://backend.testeswaffle.org/referrals/check-fraud \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "referrer_email": "suspeito@exemplo.com",
+    "referred_emails": [
+      "fake1@exemplo.com",
+      "fake2@exemplo.com",
+      "fake3@exemplo.com"
+    ],
+    "force_check": true
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "data": {
+    "fraud_detected": true,
+    "fraud_score": 0.85,
+    "suspicious_patterns": [
+      "Múltiplos emails com padrão similar",
+      "Todos os emails criados no mesmo período",
+      "Domínios temporários detectados"
+    ],
+    "recommendations": [
+      "Revisar manualmente as indicações",
+      "Considerar banimento do usuário",
+      "Bloquear domínios suspeitos"
+    ]
+  }
+}
+```
+
+</ResponseExample>

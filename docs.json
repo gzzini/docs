@@ -3,9 +3,9 @@
   "theme": "mint",
   "name": "the news",
   "colors": {
-    "primary": "#FF66C4",
-    "light": "#FF9DDA",
-    "dark": "#FF66C4"
+    "primary": "#FFCE04",
+    "light": "#FFCE04",
+    "dark": "#FFCE04"
   },
   "favicon": "/favicon.svg",
   "navigation": {
@@ -64,6 +64,25 @@
               "api-reference/endpoint/delete",
               "api-reference/endpoint/webhook"
             ]
+          },
+          {
+            "group": "Referrals API",
+            "pages": [
+              "api-reference/referrals/introduction",
+              "api-reference/referrals/register",
+              "api-reference/referrals/login",
+              "api-reference/referrals/subscribe",
+              "api-reference/referrals/activate",
+              "api-reference/referrals/count-by-email",
+              "api-reference/referrals/resend",
+              "api-reference/referrals/export",
+              "api-reference/referrals/list",
+              "api-reference/referrals/delivery",
+              "api-reference/referrals/ban",
+              "api-reference/referrals/banned-list",
+              "api-reference/referrals/check-fraud",
+              "api-reference/referrals/update-fraud"
+            ]
           }
         ]
       }
@@ -72,22 +91,26 @@
       "anchors": [
         {
           "anchor": "the news",
-          "href": "https://thenews.cc",
+          "href": "https://thenewscc.com.br",
           "icon": "newspaper"
         },
         {
-          "anchor": "comunidade",
-          "href": "https://community.thenews.cc",
-          "icon": "users"
+          "anchor": "foguinho",
+          "href": "https://thenewscc.com.br/streak",
+          "icon": "fire"
         },
         {
-          "anchor": "newsletter",
-          "href": "https://newsletter.thenews.cc",
-          "icon": "envelope"
+          "anchor": "programa de indicações",
+          "href": "https://app.thenewscc.com.br",
+          "icon": "users"
         }
       ]
     }
   },
+  "openapi": [
+    "/api-reference/openapi.json",
+    "/api-reference/openapi-referrals.json"
+  ],
   "logo": {
     "light": "/logo/light.svg",
     "dark": "/logo/dark.svg"
@@ -96,19 +119,19 @@
     "links": [
       {
         "label": "suporte",
-        "href": "mailto:suporte@thenews.cc"
+        "href": "mailto:tech@waffle.com.br"
       }
     ],
     "primary": {
       "type": "button",
       "label": "assine já",
-      "href": "https://thenews.cc/assine"
+      "href": "https://thenewscc.com.br/"
     }
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/thenewscc",
-      "instagram": "https://instagram.com/thenewscc",
+      "x": "https://x.com/thenews_br",
+      "instagram": "https://instagram.com/thenews.cc",
       "linkedin": "https://linkedin.com/company/thenewscc"
     }
   }

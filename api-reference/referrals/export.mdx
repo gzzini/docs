@@ -1,0 +1,55 @@
+---
+title: 'Exportar Indicações'
+openapi: 'GET /referrals/export'
+---
+
+## Descrição
+
+Exporta dados de indicações em formato CSV. Este endpoint é público e permite exportação simplificada dos dados.
+
+## Query Parameters
+
+<ParamField query="status" type="string">
+  Filtrar por status (active, pending, all)
+</ParamField>
+
+<ParamField query="start_date" type="string">
+  Data inicial no formato YYYY-MM-DD
+</ParamField>
+
+<ParamField query="end_date" type="string">
+  Data final no formato YYYY-MM-DD
+</ParamField>
+
+## Response
+
+Retorna um arquivo CSV com os dados das indicações.
+
+### Campos do CSV
+
+- `referrer_email`: Email do indicador
+- `referred_email`: Email do indicado
+- `status`: Status da indicação
+- `created_at`: Data de criação
+- `activated_at`: Data de ativação (se aplicável)
+
+<RequestExample>
+
+```bash
+curl --request GET \
+  --url 'https://backend.testeswaffle.org/referrals/export?status=active&start_date=2024-01-01' \
+  --output referrals.csv
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```csv
+referrer_email,referred_email,status,created_at,activated_at
+usuario1@exemplo.com,indicado1@exemplo.com,active,2024-01-15T10:00:00Z,2024-01-15T14:30:00Z
+usuario2@exemplo.com,indicado2@exemplo.com,active,2024-01-16T11:00:00Z,2024-01-16T15:45:00Z
+usuario3@exemplo.com,indicado3@exemplo.com,pending,2024-01-17T12:00:00Z,
+```
+
+</ResponseExample>

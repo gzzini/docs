@@ -1,0 +1,66 @@
+---
+title: 'Reenviar Email de Ativação'
+openapi: 'POST /referrals/resend/{referralId}'
+---
+
+## Descrição
+
+Reenvia o email de ativação para uma indicação pendente. Cada indicação tem um limite máximo de 2 reenvios.
+
+## Path Parameters
+
+<ParamField path="referralId" type="string" required>
+  ID da indicação para reenviar o email
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="email_sent" type="boolean">
+      Indica se o email foi reenviado com sucesso
+    </ResponseField>
+
+    <ResponseField name="resend_count" type="number">
+      Número total de reenvios para esta indicação
+    </ResponseField>
+
+    <ResponseField name="resends_remaining" type="number">
+      Número de reenvios ainda disponíveis
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request POST \
+  --url https://backend.testeswaffle.org/referrals/resend/ref_987654321
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "data": {
+    "email_sent": true,
+    "resend_count": 1,
+    "resends_remaining": 1
+  }
+}
+```
+
+</ResponseExample>
+
+## Erros
+
+<ResponseField name="MAX_RESENDS_REACHED" type="error">
+  Retornado quando o limite de 2 reenvios foi atingido
+</ResponseField>

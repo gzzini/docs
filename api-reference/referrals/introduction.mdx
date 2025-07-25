@@ -1,0 +1,62 @@
+---
+title: 'Referrals API'
+description: 'API para gerenciamento do programa de indicações'
+---
+
+## Visão Geral
+
+A API de Referrals permite gerenciar todo o programa de indicações, incluindo registro de usuários, tracking de indicações, ativação de referrals e detecção de fraudes.
+
+## Base URL
+
+```
+https://backend.testeswaffle.org
+```
+
+## Autenticação
+
+As rotas são divididas em duas categorias:
+
+### Rotas Públicas
+Não requerem autenticação e estão disponíveis para todos os usuários.
+
+### Rotas Autenticadas
+Requerem um token JWT válido no header Authorization:
+
+```
+Authorization: Bearer <seu-token-jwt>
+```
+
+## Limites de Rate
+
+- **Rotas públicas**: 100 requisições por minuto
+- **Rotas autenticadas**: 1000 requisições por minuto
+
+## Respostas
+
+Todas as respostas da API seguem o formato JSON padrão:
+
+### Sucesso
+```json
+{
+  "success": true,
+  "data": {
+    // dados da resposta
+  }
+}
+```
+
+### Erro
+```json
+{
+  "success": false,
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Descrição do erro"
+  }
+}
+```
+
+## Próximos Passos
+
+Explore os endpoints disponíveis na API de Referrals através do menu lateral.

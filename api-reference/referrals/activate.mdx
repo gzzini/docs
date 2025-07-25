@@ -1,0 +1,60 @@
+---
+title: 'Ativar Indicação'
+openapi: 'GET /referrals/activate'
+---
+
+## Descrição
+
+Ativa uma indicação pendente. Este endpoint é normalmente acessado através do link de confirmação enviado por email ao indicado.
+
+## Query Parameters
+
+<ParamField query="subscriptionId" type="string" required>
+  Email do indicado (usado como ID de inscrição)
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="referral_id" type="string">
+      ID da indicação ativada
+    </ResponseField>
+
+    <ResponseField name="status" type="string">
+      Novo status da indicação ("active")
+    </ResponseField>
+
+    <ResponseField name="activated_at" type="string">
+      Data e hora de ativação no formato ISO 8601
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request GET \
+  --url 'https://backend.testeswaffle.org/referrals/activate?subscriptionId=indicado@exemplo.com'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "data": {
+    "referral_id": "ref_987654321",
+    "status": "active",
+    "activated_at": "2024-01-15T14:30:00Z"
+  }
+}
+```
+
+</ResponseExample>

@@ -1,0 +1,81 @@
+---
+title: 'Banir/Desbanir Usuário'
+openapi: 'POST /referrals/ban'
+---
+
+## Descrição
+
+Alterna o status de banimento de um usuário. Se o usuário estiver ativo, será banido. Se estiver banido, será reativado. **Requer autenticação JWT**.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Token JWT no formato: Bearer {token}
+</ParamField>
+
+## Request Body
+
+<ParamField body="email" type="string" required>
+  Email do usuário a ser banido/desbanido
+</ParamField>
+
+<ParamField body="reason" type="string">
+  Motivo do banimento (opcional)
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="user_email" type="string">
+      Email do usuário afetado
+    </ResponseField>
+
+    <ResponseField name="action" type="string">
+      Ação realizada: "banned" ou "unbanned"
+    </ResponseField>
+
+    <ResponseField name="banned_at" type="string">
+      Data do banimento (se aplicável)
+    </ResponseField>
+
+    <ResponseField name="reason" type="string">
+      Motivo do banimento (se fornecido)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request POST \
+  --url https://backend.testeswaffle.org/referrals/ban \
+  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "email": "usuario.suspeito@exemplo.com",
+    "reason": "Múltiplas tentativas de fraude detectadas"
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "data": {
+    "user_email": "usuario.suspeito@exemplo.com",
+    "action": "banned",
+    "banned_at": "2024-01-15T16:45:00Z",
+    "reason": "Múltiplas tentativas de fraude detectadas"
+  }
+}
+```
+
+</ResponseExample>

@@ -1,0 +1,86 @@
+---
+title: 'Atualizar Dados de Fraude'
+openapi: 'POST /referrals/update-fraud'
+---
+
+## Descrição
+
+Atualiza dados de fraude ausentes em indicações antigas. Este endpoint tem um timeout de 30 minutos devido ao processamento extensivo. É público mas deve ser usado apenas quando necessário.
+
+## Request Body
+
+<ParamField body="batch_size" type="number" default="100">
+  Tamanho do lote para processamento
+</ParamField>
+
+<ParamField body="start_date" type="string">
+  Data inicial para processar indicações (formato YYYY-MM-DD)
+</ParamField>
+
+<ParamField body="end_date" type="string">
+  Data final para processar indicações (formato YYYY-MM-DD)
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="processed" type="number">
+      Número de indicações processadas
+    </ResponseField>
+
+    <ResponseField name="updated" type="number">
+      Número de indicações atualizadas com novos dados de fraude
+    </ResponseField>
+
+    <ResponseField name="fraud_detected" type="number">
+      Número de indicações com fraude detectada
+    </ResponseField>
+
+    <ResponseField name="processing_time" type="string">
+      Tempo total de processamento
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request POST \
+  --url https://backend.testeswaffle.org/referrals/update-fraud \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "batch_size": 500,
+    "start_date": "2024-01-01",
+    "end_date": "2024-01-31"
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "data": {
+    "processed": 1250,
+    "updated": 876,
+    "fraud_detected": 42,
+    "processing_time": "12m 34s"
+  }
+}
+```
+
+</ResponseExample>
+
+## Notas
+
+- Este endpoint tem timeout de 30 minutos
+- Processa indicações em lotes para otimizar performance
+- Recomendado executar em horários de baixo tráfego
+- Pode ser necessário executar múltiplas vezes para grandes volumes

@@ -1,0 +1,184 @@
+---
+title: 'Listar Entregas'
+openapi: 'GET /referrals/delivery'
+---
+
+## Descrição
+
+Lista as respostas dos formulários de entrega submetidos pelos usuários. **Requer autenticação JWT**.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Token JWT no formato: Bearer {token}
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="startDate" type="string">
+  Data inicial no formato YYYY-MM-DD
+</ParamField>
+
+<ParamField query="endDate" type="string">
+  Data final no formato YYYY-MM-DD
+</ParamField>
+
+<ParamField query="productId" type="string">
+  ID do produto para filtrar
+</ParamField>
+
+<ParamField query="email" type="string">
+  Email do usuário para filtrar
+</ParamField>
+
+<ParamField query="page" type="number" default="1">
+  Número da página
+</ParamField>
+
+<ParamField query="limit" type="number" default="20">
+  Número de itens por página
+</ParamField>
+
+<ParamField query="sort" type="string" default="desc">
+  Ordenação: asc ou desc
+</ParamField>
+
+<ParamField query="sortField" type="string" default="created_at">
+  Campo para ordenação
+</ParamField>
+
+<ParamField query="format" type="string" default="json">
+  Formato da resposta: json ou csv
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="deliveries" type="array">
+      <Expandable title="delivery object">
+        <ResponseField name="delivery_id" type="string">
+          ID único da entrega
+        </ResponseField>
+
+        <ResponseField name="user_email" type="string">
+          Email do usuário
+        </ResponseField>
+
+        <ResponseField name="product_id" type="string">
+          ID do produto
+        </ResponseField>
+
+        <ResponseField name="product_name" type="string">
+          Nome do produto
+        </ResponseField>
+
+        <ResponseField name="delivery_address" type="object">
+          <Expandable title="address fields">
+            <ResponseField name="street" type="string">
+              Rua
+            </ResponseField>
+
+            <ResponseField name="number" type="string">
+              Número
+            </ResponseField>
+
+            <ResponseField name="complement" type="string">
+              Complemento
+            </ResponseField>
+
+            <ResponseField name="city" type="string">
+              Cidade
+            </ResponseField>
+
+            <ResponseField name="state" type="string">
+              Estado
+            </ResponseField>
+
+            <ResponseField name="zip_code" type="string">
+              CEP
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+
+        <ResponseField name="submitted_at" type="string">
+          Data de submissão
+        </ResponseField>
+
+        <ResponseField name="status" type="string">
+          Status da entrega
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="pagination" type="object">
+      <Expandable title="properties">
+        <ResponseField name="total" type="number">
+          Total de registros
+        </ResponseField>
+
+        <ResponseField name="page" type="number">
+          Página atual
+        </ResponseField>
+
+        <ResponseField name="limit" type="number">
+          Itens por página
+        </ResponseField>
+
+        <ResponseField name="pages" type="number">
+          Total de páginas
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request GET \
+  --url 'https://backend.testeswaffle.org/referrals/delivery?startDate=2024-01-01&format=json' \
+  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "data": {
+    "deliveries": [
+      {
+        "delivery_id": "del_123456789",
+        "user_email": "usuario@exemplo.com",
+        "product_id": "prod_001",
+        "product_name": "Kit Premium the news",
+        "delivery_address": {
+          "street": "Rua Exemplo",
+          "number": "123",
+          "complement": "Apto 456",
+          "city": "São Paulo",
+          "state": "SP",
+          "zip_code": "01234-567"
+        },
+        "submitted_at": "2024-01-20T10:30:00Z",
+        "status": "pending"
+      }
+    ],
+    "pagination": {
+      "total": 45,
+      "page": 1,
+      "limit": 20,
+      "pages": 3
+    }
+  }
+}
+```
+
+</ResponseExample>

@@ -1,0 +1,141 @@
+---
+title: 'Listar Indicações'
+openapi: 'GET /referrals'
+---
+
+## Descrição
+
+Lista todas as indicações com filtros e paginação. **Requer autenticação JWT**.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Token JWT no formato: Bearer {token}
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="email" type="string">
+  Filtrar por email do indicador
+</ParamField>
+
+<ParamField query="status" type="string">
+  Filtrar por status da indicação (active, pending, banned)
+</ParamField>
+
+<ParamField query="page" type="number" default="1">
+  Número da página
+</ParamField>
+
+<ParamField query="limit" type="number" default="20">
+  Número de itens por página (máximo: 100)
+</ParamField>
+
+<ParamField query="sort" type="string" default="desc">
+  Ordenação: asc ou desc
+</ParamField>
+
+<ParamField query="sortField" type="string" default="created_at">
+  Campo para ordenação
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="referrals" type="array">
+      <Expandable title="referral object">
+        <ResponseField name="referral_id" type="string">
+          ID único da indicação
+        </ResponseField>
+
+        <ResponseField name="referrer_email" type="string">
+          Email do indicador
+        </ResponseField>
+
+        <ResponseField name="referred_email" type="string">
+          Email do indicado
+        </ResponseField>
+
+        <ResponseField name="status" type="string">
+          Status da indicação
+        </ResponseField>
+
+        <ResponseField name="created_at" type="string">
+          Data de criação
+        </ResponseField>
+
+        <ResponseField name="activated_at" type="string">
+          Data de ativação (se aplicável)
+        </ResponseField>
+
+        <ResponseField name="fraud_score" type="number">
+          Pontuação de detecção de fraude
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="pagination" type="object">
+      <Expandable title="properties">
+        <ResponseField name="total" type="number">
+          Total de registros
+        </ResponseField>
+
+        <ResponseField name="page" type="number">
+          Página atual
+        </ResponseField>
+
+        <ResponseField name="limit" type="number">
+          Itens por página
+        </ResponseField>
+
+        <ResponseField name="pages" type="number">
+          Total de páginas
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request GET \
+  --url 'https://backend.testeswaffle.org/referrals?status=active&page=1&limit=50' \
+  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "data": {
+    "referrals": [
+      {
+        "referral_id": "ref_123456789",
+        "referrer_email": "usuario@exemplo.com",
+        "referred_email": "indicado@exemplo.com",
+        "status": "active",
+        "created_at": "2024-01-15T10:00:00Z",
+        "activated_at": "2024-01-15T14:30:00Z",
+        "fraud_score": 0.1
+      }
+    ],
+    "pagination": {
+      "total": 150,
+      "page": 1,
+      "limit": 50,
+      "pages": 3
+    }
+  }
+}
+```
+
+</ResponseExample>

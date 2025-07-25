@@ -1,0 +1,75 @@
+---
+title: 'Login de Usuário'
+openapi: 'POST /referrals/login'
+---
+
+## Descrição
+
+Realiza o login de um usuário existente no programa de indicações. Este endpoint é público e não requer autenticação prévia.
+
+## Request Body
+
+<ParamField body="email" type="string" required>
+  Email do usuário
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="token" type="string">
+      Token JWT para autenticação em rotas protegidas
+    </ResponseField>
+
+    <ResponseField name="user" type="object">
+      <Expandable title="properties">
+        <ResponseField name="user_id" type="string">
+          ID único do usuário
+        </ResponseField>
+
+        <ResponseField name="email" type="string">
+          Email do usuário
+        </ResponseField>
+
+        <ResponseField name="referral_count" type="number">
+          Número total de indicações do usuário
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request POST \
+  --url https://backend.testeswaffle.org/referrals/login \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "email": "usuario@exemplo.com"
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "user_id": "usr_123456789",
+      "email": "usuario@exemplo.com",
+      "referral_count": 5
+    }
+  }
+}
+```
+
+</ResponseExample>

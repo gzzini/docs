@@ -1,0 +1,115 @@
+---
+title: 'Listar Usuários Banidos'
+openapi: 'GET /referrals/banned'
+---
+
+## Descrição
+
+Retorna a lista de todos os usuários banidos do programa de indicações. **Requer autenticação JWT**.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Token JWT no formato: Bearer {token}
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="page" type="number" default="1">
+  Número da página
+</ParamField>
+
+<ParamField query="limit" type="number" default="20">
+  Número de itens por página (máximo: 100)
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="banned_users" type="array">
+      <Expandable title="banned user object">
+        <ResponseField name="email" type="string">
+          Email do usuário banido
+        </ResponseField>
+
+        <ResponseField name="banned_at" type="string">
+          Data e hora do banimento
+        </ResponseField>
+
+        <ResponseField name="reason" type="string">
+          Motivo do banimento
+        </ResponseField>
+
+        <ResponseField name="banned_by" type="string">
+          Email do administrador que aplicou o banimento
+        </ResponseField>
+
+        <ResponseField name="referrals_before_ban" type="number">
+          Número de indicações antes do banimento
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="pagination" type="object">
+      <Expandable title="properties">
+        <ResponseField name="total" type="number">
+          Total de usuários banidos
+        </ResponseField>
+
+        <ResponseField name="page" type="number">
+          Página atual
+        </ResponseField>
+
+        <ResponseField name="limit" type="number">
+          Itens por página
+        </ResponseField>
+
+        <ResponseField name="pages" type="number">
+          Total de páginas
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl --request GET \
+  --url 'https://backend.testeswaffle.org/referrals/banned?page=1&limit=50' \
+  --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "data": {
+    "banned_users": [
+      {
+        "email": "usuario.banido@exemplo.com",
+        "banned_at": "2024-01-15T16:45:00Z",
+        "reason": "Múltiplas tentativas de fraude detectadas",
+        "banned_by": "admin@thenewscc.com.br",
+        "referrals_before_ban": 47
+      }
+    ],
+    "pagination": {
+      "total": 12,
+      "page": 1,
+      "limit": 50,
+      "pages": 1
+    }
+  }
+}
+```
+
+</ResponseExample>
