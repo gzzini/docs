@@ -144,6 +144,7 @@
               "api-reference/referrals/export",
               "api-reference/referrals/list",
               "api-reference/referrals/delivery",
+              "api-reference/referrals/delivery-buttons",
               "api-reference/referrals/ban",
               "api-reference/referrals/banned-list",
               "api-reference/referrals/check-fraud",

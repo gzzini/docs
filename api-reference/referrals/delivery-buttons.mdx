@@ -1,0 +1,220 @@
+---
+title: 'Status dos Formulários de Entrega'
+openapi: 'GET /referrals/delivery-buttons'
+---
+
+## Descrição
+
+Verifica quais formulários de entrega de produtos/recompensas um usuário já enviou. Esta rota retorna o status de preenchimento para todos os produtos disponíveis no programa de referências.
+
+## Autenticação
+
+<Note>
+  Esta rota requer autenticação JWT. O usuário é identificado automaticamente pelo token fornecido.
+</Note>
+
+## Response
+
+### Response Format
+
+```json
+{
+  "success": boolean,
+  "email": string,
+  "products": {
+    "[productId]": {
+      "title": string,
+      "submitted": boolean,
+      "submittedAt": number | null
+    }
+  }
+}
+```
+
+### Campos da Resposta
+
+- **success** - Indica se a operação foi bem-sucedida
+- **email** - Email do usuário autenticado
+- **products** - Objeto contendo todos os produtos disponíveis
+
+#### Objeto Product
+
+- **title** - Nome do produto/recompensa
+- **submitted** - Se o usuário já enviou o formulário de entrega
+- **submittedAt** - Timestamp de quando o formulário foi enviado (null se não enviado)
+
+## Produtos Disponíveis
+
+O sistema monitora os seguintes produtos do programa de referências:
+
+### Produtos Físicos
+- **Report do Grupo Waffle** - Documento exclusivo da história da empresa
+- **Adesivos** - Pack de adesivos do the news
+- **Porta-cartão** - Porta-cartão oficial
+- **Moleskine** - Caderno moleskine personalizado
+- **Caneca** - Caneca oficial do the news
+- **Mochila** - Mochila do dênius
+- **Meia** - Par de meias estilizadas
+- **Boné** - Boné oficial do the news
+- **Marcador de página** - Marcador magnético personalizado
+
+## Exemplo de Uso
+
+### Request
+```bash
+curl --request GET \
+  --url 'https://backend.testeswaffle.org/referrals/delivery-buttons' \
+  --header 'Authorization: Bearer SEU_JWT_TOKEN'
+```
+
+### Response Exemplo
+
+```json
+{
+  "success": true,
+  "email": "usuario@exemplo.com",
+  "products": {
+    "845e91831319e89c4d656bdb80c278ac09a7230d61e5dfd2e1b1fbb436ac8917": {
+      "title": "Report do Grupo Waffle",
+      "submitted": true,
+      "submittedAt": 1642680000000
+    },
+    "1dcfa7e4bfff2d1a67076fde7e2e293f5de37187715082a1195469283a44c03c": {
+      "title": "adesivos",
+      "submitted": false,
+      "submittedAt": null
+    },
+    "6c024054ed780426bccb574c5a0fa28f775e550a91a88ee20158e4ddab987147": {
+      "title": "Porta-cartão",
+      "submitted": true,
+      "submittedAt": 1642690000000
+    },
+    "d950113d83977940d0160cdc6f59edd3da64ac03b4f7cd896a27921a45cd8fb4": {
+      "title": "Moleskine",
+      "submitted": false,
+      "submittedAt": null
+    },
+    "8923cac0414836b7dde6ce693aec4f8dc094093acb2c89f937774a74830ec09": {
+      "title": "Caneca",
+      "submitted": false,
+      "submittedAt": null
+    },
+    "a4f6433a1b183ba0774b86095184ba1dda9a44e7f8d42bea2e6c967ab781c079": {
+      "title": "Mochila",
+      "submitted": false,
+      "submittedAt": null
+    },
+    "37c5bbe4f17965a8e4df866b6d9ae2258ee8b583d64c27b2574803985825f0e9": {
+      "title": "meia",
+      "submitted": false,
+      "submittedAt": null
+    },
+    "c8dacf657fe92b6064dbcde0f7888936b2c35871e6c61f7b4581accba92c278d": {
+      "title": "boné",
+      "submitted": false,
+      "submittedAt": null
+    },
+    "de89f476871268f9234ac86d5973af61bc7f15acc8a686f45d4ee77992bc57fa": {
+      "title": "marcador de página",
+      "submitted": false,
+      "submittedAt": null
+    }
+  }
+}
+```
+
+### Exemplo de Erro
+
+```json
+{
+  "success": false,
+  "message": "Token inválido ou expirado"
+}
+```
+
+## Casos de Uso
+
+### Frontend - Exibir Status dos Formulários
+```javascript
+const response = await fetch('/referrals/delivery-buttons', {
+  headers: { 'Authorization': `Bearer ${token}` }
+});
+
+const data = await response.json();
+
+if (data.success) {
+  // Mostrar quais formulários já foram preenchidos
+  Object.entries(data.products).forEach(([productId, product]) => {
+    if (product.submitted) {
+      console.log(`✅ ${product.title} - Enviado em ${new Date(product.submittedAt)}`);
+    } else {
+      console.log(`❌ ${product.title} - Pendente`);
+    }
+  });
+}
+```
+
+### Filtrar Produtos Pendentes
+```javascript
+const pendingProducts = Object.entries(data.products)
+  .filter(([_, product]) => !product.submitted)
+  .map(([productId, product]) => ({ productId, ...product }));
+
+console.log(`${pendingProducts.length} formulários pendentes`);
+```
+
+### Dashboard de Progresso
+```javascript
+const totalProducts = Object.keys(data.products).length;
+const submittedCount = Object.values(data.products)
+  .filter(product => product.submitted).length;
+
+const progressPercentage = (submittedCount / totalProducts) * 100;
+console.log(`Progresso: ${progressPercentage.toFixed(1)}% (${submittedCount}/${totalProducts})`);
+```
+
+## Regras de Negócio
+
+### IDs dos Produtos
+- Os IDs dos produtos são hashes SHA-256 únicos
+- Cada produto possui um ID fixo que nunca muda
+- IDs são usados para rastreamento interno e links de formulários
+
+### Status de Submissão
+- **submitted: true** - Usuário já preencheu e enviou o formulário
+- **submitted: false** - Formulário ainda não foi preenchido
+- **submittedAt** - Timestamp Unix em milissegundos (para JavaScript Date)
+
+### Elegibilidade
+- Todos os produtos são retornados independente da elegibilidade do usuário
+- Frontend deve verificar número de referrals para determinar quais produtos estão disponíveis
+- Integração com sistema de recompensas baseado em metas de referrals
+
+## Implementação Técnica
+
+### Database
+- Formulários armazenados na tabela `deliveryForms` (banco FORMS)
+- Busca baseada no email do usuário (case-insensitive)
+- Join com configuração PRODUCTS para obter informações completas
+
+### Performance
+- Query otimizada com índice em email
+- Resposta típica < 200ms
+- Cache não implementado (dados atualizados em tempo real)
+
+### Segurança
+- Autenticação JWT obrigatória
+- Usuário só vê seus próprios formulários
+- Email extraído do token (não aceito como parâmetro)
+
+## Notas de Integração
+
+### Relacionamento com Outros Endpoints
+- Use com `/referrals/count` para verificar elegibilidade
+- Combine com dados de recompensas para interface completa
+- Integra com sistema de formulários dinâmicos
+
+### Monitoramento
+- Log de acesso para auditoria
+- Métricas de taxa de preenchimento por produto
+- Alertas para produtos com baixa adesão
