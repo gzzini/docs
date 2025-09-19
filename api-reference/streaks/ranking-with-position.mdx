@@ -1,0 +1,214 @@
+---
+title: 'Ranking Global com Posição do Usuário'
+openapi: 'GET /streaks/ranking/global/with-position'
+---
+
+## Descrição
+
+Obtém o ranking global dos top 100 leitores e inclui a posição específica do usuário autenticado, mesmo que ele esteja fora do top 100. Esta rota combina o ranking geral com informações personalizadas do usuário.
+
+## Autenticação
+
+<Note>
+  Esta rota requer autenticação JWT. O usuário é identificado pelo token fornecido no header `Authorization: Bearer <token>`.
+</Note>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="ranking" type="array">
+      Lista dos top 100 leitores (mesma estrutura do ranking global)
+      <Expandable title="ranking item">
+        <ResponseField name="position" type="number">
+          Posição no ranking (1-100)
+        </ResponseField>
+
+        <ResponseField name="displayName" type="string">
+          Nome de exibição do leitor
+        </ResponseField>
+
+        <ResponseField name="email" type="string">
+          Email mascarado
+        </ResponseField>
+
+        <ResponseField name="currentStreak" type="number">
+          Streak atual do leitor
+        </ResponseField>
+
+        <ResponseField name="maxStreak" type="number">
+          Maior streak já alcançado
+        </ResponseField>
+
+        <ResponseField name="lastInteractionDate" type="string">
+          Data da última interação formatada
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="lastUpdated" type="string">
+      Timestamp da última atualização
+    </ResponseField>
+
+    <ResponseField name="cacheInfo" type="object">
+      Informações do cache
+    </ResponseField>
+
+    <ResponseField name="userPosition" type="object">
+      Informações específicas do usuário autenticado (apenas se estiver fora do top 100)
+      <Expandable title="properties">
+        <ResponseField name="position" type="number">
+          Posição real do usuário no ranking geral
+        </ResponseField>
+
+        <ResponseField name="displayName" type="string">
+          Nome de exibição do usuário
+        </ResponseField>
+
+        <ResponseField name="email" type="string">
+          Email mascarado do usuário
+        </ResponseField>
+
+        <ResponseField name="currentStreak" type="number">
+          Streak atual do usuário
+        </ResponseField>
+
+        <ResponseField name="maxStreak" type="number">
+          Maior streak do usuário
+        </ResponseField>
+
+        <ResponseField name="lastInteractionDate" type="string">
+          Última interação do usuário
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --request GET \
+  --url 'https://backend.testeswaffle.org/streaks/ranking/global/with-position' \
+  --header 'Authorization: Bearer SEU_JWT_TOKEN'
+```
+
+```javascript JavaScript
+const response = await fetch('https://backend.testeswaffle.org/streaks/ranking/global/with-position', {
+  headers: {
+    'Authorization': 'Bearer SEU_JWT_TOKEN'
+  }
+});
+const data = await response.json();
+console.log(data);
+```
+
+```python Python
+import requests
+
+headers = {
+    'Authorization': 'Bearer SEU_JWT_TOKEN'
+}
+
+response = requests.get(
+    'https://backend.testeswaffle.org/streaks/ranking/global/with-position',
+    headers=headers
+)
+data = response.json()
+print(data)
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Usuário no Top 100
+{
+  "success": true,
+  "data": {
+    "ranking": [
+      {
+        "position": 1,
+        "displayName": "João Silva",
+        "email": "jo***@gmail.com",
+        "currentStreak": 365,
+        "maxStreak": 365,
+        "lastInteractionDate": "19/01/2025 08:30:15"
+      },
+      {
+        "position": 2,
+        "displayName": "Carlos Usuário",
+        "email": "ca***@exemplo.com",
+        "currentStreak": 280,
+        "maxStreak": 300,
+        "lastInteractionDate": "19/01/2025 07:45:22"
+      }
+    ],
+    "lastUpdated": "2025-01-19T11:30:00.000Z",
+    "cacheInfo": {
+      "cached": true,
+      "ttl": 61200
+    }
+  }
+}
+```
+
+```json Usuário Fora do Top 100
+{
+  "success": true,
+  "data": {
+    "ranking": [
+      {
+        "position": 1,
+        "displayName": "João Silva",
+        "email": "jo***@gmail.com",
+        "currentStreak": 365,
+        "maxStreak": 365,
+        "lastInteractionDate": "19/01/2025 08:30:15"
+      }
+    ],
+    "lastUpdated": "2025-01-19T11:30:00.000Z",
+    "cacheInfo": {
+      "cached": true,
+      "ttl": 61200
+    },
+    "userPosition": {
+      "position": 1247,
+      "displayName": "Maria Santos",
+      "email": "ma***@exemplo.com",
+      "currentStreak": 15,
+      "maxStreak": 45,
+      "lastInteractionDate": "19/01/2025 06:20:10"
+    }
+  }
+}
+```
+
+</ResponseExample>
+
+## Comportamento
+
+### Quando o usuário está no Top 100
+- Retorna apenas o ranking global normal
+- Usuário aparece destacado na lista do ranking
+- Campo `userPosition` não é incluído
+
+### Quando o usuário está fora do Top 100
+- Retorna o ranking global dos top 100
+- Adiciona campo `userPosition` com informações específicas do usuário
+- Calcula posição real do usuário no ranking geral (considerando todos os leitores ativos)
+
+### Casos Especiais
+- Se o usuário não tem streak ativo (currentStreak = 0), `userPosition` será `null`
+- Se o usuário não existe no sistema, apenas o ranking global é retornado
+- Cache é compartilhado com a rota de ranking global para melhor performance
+
+## Notas de Implementação
+
+- Utiliza o mesmo cache do ranking global
+- Posição do usuário é calculada em tempo real quando necessário
+- Filtro de 30 dias para cálculo de posição (vs 7 dias para o ranking global)

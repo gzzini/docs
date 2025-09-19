@@ -48,6 +48,81 @@
         ]
       },
       {
+        "tab": "Portal",
+        "groups": [
+          {
+            "group": "Visão Geral",
+            "pages": [
+              "portal/introduction"
+            ]
+          },
+          {
+            "group": "Arquitetura",
+            "pages": [
+              "portal/architecture/overview",
+              "portal/architecture/tech-stack",
+              "portal/architecture/design-patterns",
+              "portal/architecture/database-schema",
+              "portal/architecture/api-design"
+            ]
+          },
+          {
+            "group": "Backend",
+            "pages": [
+              "portal/backend/microservices",
+              "portal/backend/authentication",
+              "portal/backend/authorization",
+              "portal/backend/cache-strategy",
+              "portal/backend/queue-system",
+              "portal/backend/data-processing"
+            ]
+          },
+          {
+            "group": "Frontend",
+            "pages": [
+              "portal/frontend/components",
+              "portal/frontend/design-system",
+              "portal/frontend/state-management",
+              "portal/frontend/routing",
+              "portal/frontend/performance",
+              "portal/frontend/testing"
+            ]
+          },
+          {
+            "group": "Deploy & CI/CD",
+            "pages": [
+              "portal/deploy/environments",
+              "portal/deploy/github-actions",
+              "portal/deploy/docker",
+              "portal/deploy/kubernetes",
+              "portal/deploy/rollback",
+              "portal/deploy/migrations"
+            ]
+          },
+          {
+            "group": "Monitoramento",
+            "pages": [
+              "portal/monitoring/metrics",
+              "portal/monitoring/logging",
+              "portal/monitoring/alerting",
+              "portal/monitoring/dashboards",
+              "portal/monitoring/performance",
+              "portal/monitoring/errors"
+            ]
+          },
+          {
+            "group": "Segurança",
+            "pages": [
+              "portal/security/best-practices",
+              "portal/security/owasp",
+              "portal/security/secrets-management",
+              "portal/security/compliance",
+              "portal/security/incident-response"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "API reference",
         "groups": [
           {
@@ -85,12 +160,20 @@
               "api-reference/streaks/add-ice-credits",
               "api-reference/streaks/get-reading-dates",
               "api-reference/streaks/save-share",
-              "api-reference/streaks/get-ranking",
               "api-reference/streaks/pixel-tracking",
               "api-reference/streaks/get-missions",
               "api-reference/streaks/update-gift-preferences",
               "api-reference/streaks/complete-mission",
-              "api-reference/streaks/export-emails"
+              "api-reference/streaks/export-emails",
+              "api-reference/streaks/ranking-overview",
+              "api-reference/streaks/ranking-global",
+              "api-reference/streaks/ranking-with-position",
+              "api-reference/streaks/ranking-invalidate-cache",
+              "api-reference/streaks/groups-create",
+              "api-reference/streaks/groups-list",
+              "api-reference/streaks/groups-add-members",
+              "api-reference/streaks/groups-ranking",
+              "api-reference/streaks/get-ranking"
             ]
           },
           {
@@ -130,10 +213,10 @@
     }
   },
   "openapi": [
-    "/api-reference/openapi.json",
-    "/api-reference/openapi-referrals.json",
-    "/api-reference/openapi-streaks.json",
-    "/api-reference/openapi-subscription.json"
+    "/api-reference/openapi/openapi.json",
+    "/api-reference/openapi/referrals.json",
+    "/api-reference/openapi/streaks.json",
+    "/api-reference/openapi/subscription.json"
   ],
   "logo": {
     "light": "https://app.thenewscc.com.br/thenews.webp",

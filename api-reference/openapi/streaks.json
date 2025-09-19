@@ -865,6 +865,368 @@
           }
         }
       }
+    },
+    "/streaks/ranking/global": {
+      "get": {
+        "summary": "Ranking Global",
+        "description": "Obtém o ranking global dos top 100 leitores com maior streak de leitura",
+        "tags": ["Ranking"],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Ranking global obtido com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "ranking": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "position": { "type": "number" },
+                              "displayName": { "type": "string" },
+                              "email": { "type": "string" },
+                              "currentStreak": { "type": "number" },
+                              "maxStreak": { "type": "number" },
+                              "lastInteractionDate": { "type": "string" }
+                            }
+                          }
+                        },
+                        "lastUpdated": { "type": "string", "format": "date-time" },
+                        "cacheInfo": {
+                          "type": "object",
+                          "properties": {
+                            "cached": { "type": "boolean" },
+                            "ttl": { "type": "number" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streaks/ranking/global/with-position": {
+      "get": {
+        "summary": "Ranking Global com Posição do Usuário",
+        "description": "Obtém o ranking global e inclui a posição específica do usuário autenticado",
+        "tags": ["Ranking"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Ranking com posição do usuário obtido com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "ranking": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "position": { "type": "number" },
+                              "displayName": { "type": "string" },
+                              "email": { "type": "string" },
+                              "currentStreak": { "type": "number" },
+                              "maxStreak": { "type": "number" },
+                              "lastInteractionDate": { "type": "string" }
+                            }
+                          }
+                        },
+                        "lastUpdated": { "type": "string", "format": "date-time" },
+                        "cacheInfo": {
+                          "type": "object",
+                          "properties": {
+                            "cached": { "type": "boolean" },
+                            "ttl": { "type": "number" }
+                          }
+                        },
+                        "userPosition": {
+                          "type": "object",
+                          "properties": {
+                            "position": { "type": "number" },
+                            "displayName": { "type": "string" },
+                            "email": { "type": "string" },
+                            "currentStreak": { "type": "number" },
+                            "maxStreak": { "type": "number" },
+                            "lastInteractionDate": { "type": "string" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streaks/ranking/global/invalidate-cache": {
+      "post": {
+        "summary": "Invalidar Cache do Ranking",
+        "description": "Invalida forçosamente o cache do ranking global (uso administrativo)",
+        "tags": ["Admin"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Cache invalidado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streaks/groups": {
+      "post": {
+        "summary": "Criar Grupo de Amigos",
+        "description": "Cria um novo grupo de amigos para competições privadas de streak",
+        "tags": ["Friend Groups"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["groupName"],
+                "properties": {
+                  "groupName": {
+                    "type": "string",
+                    "description": "Nome do grupo"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Descrição opcional do grupo"
+                  },
+                  "isPublic": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Se o grupo é público"
+                  },
+                  "maxMembers": {
+                    "type": "number",
+                    "default": 50,
+                    "description": "Limite máximo de membros"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Grupo criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "groupId": { "type": "string" },
+                        "groupName": { "type": "string" },
+                        "description": { "type": "string" },
+                        "ownerEmail": { "type": "string" },
+                        "isPublic": { "type": "number" },
+                        "maxMembers": { "type": "number" },
+                        "memberCount": { "type": "number" },
+                        "createdAt": { "type": "number" },
+                        "updatedAt": { "type": "number" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Listar Grupos do Usuário",
+        "description": "Lista todos os grupos dos quais o usuário autenticado é membro",
+        "tags": ["Friend Groups"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Lista de grupos obtida com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "groups": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "groupId": { "type": "string" },
+                              "groupName": { "type": "string" },
+                              "description": { "type": "string" },
+                              "ownerEmail": { "type": "string" },
+                              "isPublic": { "type": "number" },
+                              "maxMembers": { "type": "number" },
+                              "memberCount": { "type": "number" },
+                              "isOwner": { "type": "boolean" },
+                              "createdAt": { "type": "number" },
+                              "joinedAt": { "type": "number" }
+                            }
+                          }
+                        },
+                        "totalGroups": { "type": "number" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streaks/groups/{groupId}/members": {
+      "post": {
+        "summary": "Adicionar Membros ao Grupo",
+        "description": "Adiciona novos membros a um grupo de amigos existente",
+        "tags": ["Friend Groups"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "ID único do grupo"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["emails"],
+                "properties": {
+                  "emails": {
+                    "type": "array",
+                    "items": { "type": "string", "format": "email" },
+                    "description": "Lista de emails dos usuários a serem adicionados"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Membros adicionados com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/streaks/groups/{groupId}/ranking": {
+      "get": {
+        "summary": "Ranking do Grupo",
+        "description": "Obtém o ranking de streaks dos membros de um grupo específico",
+        "tags": ["Friend Groups"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "groupId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "ID único do grupo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ranking do grupo obtido com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "group": {
+                          "type": "object",
+                          "properties": {
+                            "groupId": { "type": "string" },
+                            "groupName": { "type": "string" },
+                            "description": { "type": "string" },
+                            "isPublic": { "type": "boolean" },
+                            "ownerEmail": { "type": "string" },
+                            "memberCount": { "type": "number" }
+                          }
+                        },
+                        "ranking": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "position": { "type": "number" },
+                              "displayName": { "type": "string" },
+                              "email": { "type": "string" },
+                              "currentStreak": { "type": "number" },
+                              "maxStreak": { "type": "number" },
+                              "lastInteractionDate": { "type": "string" }
+                            }
+                          }
+                        },
+                        "lastUpdated": { "type": "string", "format": "date-time" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

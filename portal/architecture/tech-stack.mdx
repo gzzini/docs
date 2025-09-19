@@ -1,0 +1,488 @@
+---
+title: Tech Stack
+description: Stack tecnológico serverless do Portal do The News
+---
+
+# Tech Stack
+
+Detalhamento completo do stack serverless utilizado no Portal do The News.
+
+## Frontend
+
+### Core Technologies
+
+<CardGroup cols={2}>
+  <Card title="Next.js 15" icon="react">
+    **React Framework**
+    - App Router
+    - Server Components + Actions
+    - Edge Runtime
+    - Partial Pre-rendering (PPR)
+  </Card>
+  
+  <Card title="TypeScript 5.4" icon="code">
+    **Type Safety**
+    - Strict mode
+    - Server/Client separation
+    - Database type generation
+    - API type safety
+  </Card>
+  
+  <Card title="TailwindCSS 3.4" icon="paintbrush">
+    **Utility-First CSS**
+    - JIT compilation
+    - Design system tokens
+    - Dark mode
+    - Container queries
+  </Card>
+  
+  <Card title="Cloudflare Pages" icon="globe">
+    **JAMstack Hosting**
+    - Global edge deployment
+    - Instant rollbacks
+    - Branch previews
+    - Custom domains
+  </Card>
+</CardGroup>
+
+### Libraries & Tools
+
+```json
+{
+  "dependencies": {
+    "next": "^15.0.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "typescript": "^5.4.0",
+    "@neondatabase/serverless": "^0.9.0",
+    "drizzle-orm": "^0.30.0",
+    "next-sanity": "^9.0.0",
+    "next-auth": "^4.24.0",
+    "@t3-oss/env-nextjs": "^0.10.0",
+    "zod": "^3.22.0",
+    "tailwindcss": "^3.4.0",
+    "framer-motion": "^11.0.0",
+    "@radix-ui/react-*": "^1.0.0",
+    "lucide-react": "^0.400.0"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.20.0",
+    "wrangler": "^3.0.0",
+    "@cloudflare/workers-types": "^4.0.0"
+  }
+}
+```
+
+## Serverless Backend
+
+### Next.js Server-Side
+
+<Tabs>
+  <Tab title="API Routes">
+    ```typescript
+    // app/api/users/route.ts
+    import { db } from '@/lib/db'
+    import { users } from '@/lib/schema'
+    
+    export async function GET(request: Request) {
+      const allUsers = await db.select().from(users)
+      return Response.json(allUsers)
+    }
+    
+    export async function POST(request: Request) {
+      const body = await request.json()
+      const newUser = await db.insert(users).values(body)
+      return Response.json(newUser)
+    }
+    
+    export const runtime = 'edge'
+    ```
+  </Tab>
+  
+  <Tab title="Server Actions">
+    ```typescript
+    // app/lib/actions.ts
+    'use server'
+    
+    import { revalidatePath } from 'next/cache'
+    import { db } from '@/lib/db'
+    
+    export async function createUser(formData: FormData) {
+      const result = await db.insert(users).values({
+        email: formData.get('email') as string,
+        name: formData.get('name') as string
+      })
+      
+      revalidatePath('/users')
+      return result
+    }
+    ```
+  </Tab>
+  
+  <Tab title="Middleware">
+    ```typescript
+    // middleware.ts
+    import { NextRequest, NextResponse } from 'next/server'
+    import { getToken } from 'next-auth/jwt'
+    
+    export async function middleware(request: NextRequest) {
+      const token = await getToken({ req: request })
+      
+      if (!token && request.nextUrl.pathname.startsWith('/dashboard')) {
+        return NextResponse.redirect(new URL('/login', request.url))
+      }
+      
+      return NextResponse.next()
+    }
+    
+    export const config = {
+      matcher: ['/dashboard/:path*', '/admin/:path*']
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Databases & Storage
+
+### Primary Database
+
+<Card title="Neon PostgreSQL" icon="database">
+  **Serverless PostgreSQL**
+  - Branching for development
+  - Auto-scaling compute
+  - Connection pooling
+  - Read replicas
+  
+  ```typescript
+  // lib/db.ts
+  import { neon } from '@neondatabase/serverless'
+  import { drizzle } from 'drizzle-orm/neon-http'
+  
+  const sql = neon(process.env.DATABASE_URL!)
+  export const db = drizzle(sql)
+  ```
+</Card>
+
+### Edge Storage
+
+<CardGroup cols={2}>
+  <Card title="Cloudflare D1" icon="circle-nodes">
+    **SQLite at Edge**
+    - Global distribution
+    - Zero latency reads
+    - SQL interface
+    - Perfect for caching
+    
+    ```typescript
+    // Edge database for caching
+    const stmt = env.D1_DB.prepare('SELECT * FROM cache WHERE key = ?')
+    const result = await stmt.bind(key).first()
+    ```
+  </Card>
+  
+  <Card title="Cloudflare KV" icon="key">
+    **Key-Value Store**
+    - Global edge storage
+    - Eventually consistent
+    - Simple API
+    - Session storage
+    
+    ```typescript
+    // Session storage
+    await env.KV.put(`session:${id}`, JSON.stringify(session), {
+      expirationTtl: 3600 // 1 hour
+    })
+    ```
+  </Card>
+</CardGroup>
+
+### Content Management
+
+<Card title="Sanity.io" icon="edit">
+  **Headless CMS**
+  - Real-time API
+  - Image optimization
+  - Content relationships
+  - GROQ query language
+  
+  ```typescript
+  // lib/sanity.ts
+  import { createClient } from 'next-sanity'
+  
+  export const sanity = createClient({
+    projectId: process.env.SANITY_PROJECT_ID!,
+    dataset: 'production',
+    apiVersion: '2024-01-01',
+    useCdn: true
+  })
+  
+  // Fetch articles
+  const articles = await sanity.fetch(`
+    *[_type == "article"] {
+      title,
+      slug,
+      publishedAt,
+      excerpt,
+      "author": author->name
+    }
+  `)
+  ```
+</Card>
+
+## Infrastructure
+
+### Cloudflare Stack
+
+<CardGroup cols={2}>
+  <Card title="Edge Computing" icon="zap">
+    **Cloudflare Pages**
+    - Global edge deployment
+    - Instant rollbacks
+    - Branch previews
+    - Custom domains + SSL
+  </Card>
+  
+  <Card title="CDN & Security" icon="shield">
+    **Cloudflare CDN**
+    - 330+ locations
+    - DDoS protection
+    - Web Application Firewall
+    - Bot management
+  </Card>
+</CardGroup>
+
+### External Services
+
+| Service | Purpose | Integration |
+|---------|---------|-------------|
+| **Neon** | Primary database | Serverless PostgreSQL |
+| **Sanity.io** | Content management | Headless CMS |
+| **NextAuth.js** | Authentication | OAuth + JWT |
+| **Sentry** | Error monitoring | SDK integration |
+
+## Database Schema
+
+### Drizzle ORM Setup
+
+```typescript
+// drizzle.config.ts
+import type { Config } from 'drizzle-kit'
+
+export default {
+  schema: './src/lib/schema.ts',
+  out: './drizzle',
+  driver: 'pg',
+  dbCredentials: {
+    connectionString: process.env.DATABASE_URL!,
+  },
+} satisfies Config
+```
+
+### Schema Definition
+
+```typescript
+// lib/schema.ts
+import { pgTable, uuid, varchar, timestamp, text, boolean } from 'drizzle-orm/pg-core'
+
+export const users = pgTable('users', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  email: varchar('email', { length: 255 }).unique().notNull(),
+  name: varchar('name', { length: 255 }),
+  avatar: varchar('avatar', { length: 500 }),
+  emailVerified: boolean('email_verified').default(false),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+})
+
+export const articles = pgTable('articles', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  title: varchar('title', { length: 500 }).notNull(),
+  slug: varchar('slug', { length: 200 }).unique().notNull(),
+  content: text('content').notNull(),
+  excerpt: text('excerpt'),
+  published: boolean('published').default(false),
+  publishedAt: timestamp('published_at'),
+  authorId: uuid('author_id').references(() => users.id),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+})
+```
+
+## Authentication
+
+### NextAuth.js Configuration
+
+```typescript
+// lib/auth.ts
+import NextAuth from 'next-auth'
+import GoogleProvider from 'next-auth/providers/google'
+import { DrizzleAdapter } from '@auth/drizzle-adapter'
+import { db } from './db'
+
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  adapter: DrizzleAdapter(db),
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+  ],
+  callbacks: {
+    session({ session, user }) {
+      session.user.id = user.id
+      return session
+    },
+  },
+  pages: {
+    signIn: '/login',
+    signOut: '/logout',
+    error: '/auth-error',
+  },
+})
+```
+
+## Development Tools
+
+### Local Development
+
+<CardGroup cols={2}>
+  <Card title="Core Tools" icon="terminal">
+    - **pnpm**: Fast package manager
+    - **wrangler**: Cloudflare CLI
+    - **drizzle-kit**: Database toolkit
+    - **next**: Framework CLI
+  </Card>
+  
+  <Card title="VSCode Extensions" icon="puzzle-piece">
+    - Tailwind CSS IntelliSense
+    - TypeScript Hero
+    - Cloudflare Workers
+    - Sanity.io
+    - Drizzle ORM
+    - Error Lens
+  </Card>
+</CardGroup>
+
+### Scripts Package.json
+
+```json
+{
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "db:push": "drizzle-kit push:pg",
+    "db:generate": "drizzle-kit generate:pg",
+    "db:studio": "drizzle-kit studio",
+    "sanity": "sanity dev",
+    "cf:dev": "wrangler dev",
+    "cf:deploy": "wrangler deploy"
+  }
+}
+```
+
+## Monitoring & Observability
+
+### Serverless Monitoring
+
+```typescript
+// Monitoring integrations
+const monitoring = {
+  analytics: {
+    web: "Cloudflare Web Analytics",
+    performance: "Vercel Analytics", 
+    core_vitals: "Next.js Analytics",
+    custom_events: "Cloudflare Workers Analytics"
+  },
+  
+  errors: {
+    client_side: "Sentry Browser SDK",
+    server_side: "Sentry Next.js",
+    edge_runtime: "Sentry Edge Runtime"
+  },
+  
+  performance: {
+    database: "Neon Monitoring",
+    edge: "Cloudflare Analytics",
+    application: "Next.js Speed Insights"
+  }
+};
+```
+
+### Sentry Integration
+
+```typescript
+// sentry.client.config.ts
+import * as Sentry from '@sentry/nextjs'
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  tracesSampleRate: 1.0,
+  debug: false,
+  replaysOnErrorSampleRate: 1.0,
+  replaysSessionSampleRate: 0.1,
+  integrations: [
+    new Sentry.Replay({
+      maskAllText: true,
+      blockAllMedia: true,
+    }),
+  ],
+})
+```
+
+## Deployment
+
+### Environment Variables
+
+```bash
+# .env.example
+# Database
+DATABASE_URL="postgresql://user:pass@host/db"
+
+# Cloudflare
+CLOUDFLARE_ACCOUNT_ID="..."
+CLOUDFLARE_API_TOKEN="..."
+
+# Sanity
+SANITY_PROJECT_ID="..."
+SANITY_DATASET="production"
+
+# Auth
+NEXTAUTH_URL="https://portal.thenewscc.com.br"
+NEXTAUTH_SECRET="..."
+GOOGLE_CLIENT_ID="..."
+GOOGLE_CLIENT_SECRET="..."
+
+# Monitoring
+SENTRY_DSN="..."
+```
+
+### Deploy Pipeline
+
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+      - run: pnpm install
+      - run: pnpm build
+      - uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: portal-thenews
+          directory: .next
+```

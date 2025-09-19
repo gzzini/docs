@@ -15,13 +15,20 @@ https://backend.testeswaffle.org
 
 ## Autenticação
 
-A maioria das rotas é pública e não requer autenticação. Apenas rotas administrativas específicas requerem autenticação JWT.
+O sistema de streaks possui rotas públicas e autenticadas, dependendo da funcionalidade:
 
 ### Rotas Públicas
-A maioria das rotas de streaks está disponível publicamente para facilitar o tracking de leituras.
+- Registro de leituras e pixel tracking
+- Ranking global de leitores
+- Informações básicas de streaks
 
 ### Rotas Autenticadas
-Apenas a rota de exportação de emails requer token JWT no header Authorization:
+- Grupos de amigos (criação, gerenciamento, rankings)
+- Ranking personalizado com posição do usuário
+- Operações administrativas
+- Exportação de dados
+
+Para rotas autenticadas, inclua o token JWT no header:
 
 ```
 Authorization: Bearer <seu-token-jwt>
@@ -37,6 +44,14 @@ Sistema de créditos que permite ao usuário "congelar" seu streak por um dia ca
 
 ### Missões
 Desafios de manter o streak por determinados períodos (7, 30, 90 dias) com recompensas associadas.
+
+### Rankings
+Sistema de competição entre leitores, disponível em dois formatos:
+- **Global**: Top 100 leitores com maiores streaks
+- **Grupos de Amigos**: Competições privadas entre conhecidos
+
+### Grupos de Amigos
+Funcionalidade que permite criar grupos privados para competições de streak entre amigos, família ou colegas.
 
 ## Respostas
 

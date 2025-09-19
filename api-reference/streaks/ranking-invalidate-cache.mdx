@@ -1,0 +1,133 @@
+---
+title: 'Invalidar Cache do Ranking'
+openapi: 'POST /streaks/ranking/global/invalidate-cache'
+---
+
+## Descrição
+
+Invalida forçosamente o cache do ranking global. Esta é uma rota administrativa que permite forçar a regeneração do ranking em casos especiais, como após correções de dados ou atualizações importantes.
+
+## Autenticação
+
+<Warning>
+  Esta rota requer autenticação JWT e é destinada apenas para uso administrativo. Apenas usuários com permissões adequadas devem ter acesso.
+</Warning>
+
+## Uso Recomendado
+
+Esta rota deve ser usada em situações específicas:
+- Após correções manuais de streaks no banco de dados
+- Após migrações ou atualizações de dados
+- Quando detectadas inconsistências no ranking
+- Para testes e validações em ambiente de desenvolvimento
+
+<Note>
+  O cache do ranking é renovado automaticamente às 5h da manhã todos os dias. Use esta rota apenas quando necessário.
+</Note>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a invalidação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem descritiva sobre o resultado da operação
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --request POST \
+  --url 'https://backend.testeswaffle.org/streaks/ranking/global/invalidate-cache' \
+  --header 'Authorization: Bearer SEU_JWT_TOKEN_ADMIN'
+```
+
+```javascript JavaScript
+const response = await fetch('https://backend.testeswaffle.org/streaks/ranking/global/invalidate-cache', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer SEU_JWT_TOKEN_ADMIN'
+  }
+});
+const data = await response.json();
+console.log(data);
+```
+
+```python Python
+import requests
+
+headers = {
+    'Authorization': 'Bearer SEU_JWT_TOKEN_ADMIN'
+}
+
+response = requests.post(
+    'https://backend.testeswaffle.org/streaks/ranking/global/invalidate-cache',
+    headers=headers
+)
+data = response.json()
+print(data)
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Sucesso
+{
+  "success": true,
+  "message": "Cache do ranking global invalidado com sucesso"
+}
+```
+
+```json Erro
+{
+  "success": false,
+  "message": "Erro ao invalidar cache do ranking",
+  "error": "Detalhes do erro específico"
+}
+```
+
+</ResponseExample>
+
+## Efeitos da Invalidação
+
+### Imediatos
+- Cache do ranking global é removido do KV storage
+- Próxima requisição ao ranking irá regenerar os dados do banco
+- Tempo de resposta será maior na primeira consulta após invalidação
+
+### Subsequentes
+- Novo cache será criado com TTL até as próximas 5h da manhã
+- Performance normal restaurada após primeira regeneração
+- Todos os endpoints de ranking utilizarão os novos dados
+
+## Monitoramento
+
+### Logs
+A invalidação de cache é registrada nos logs do sistema:
+```
+[StreakRankingHandler] Cache invalidado manualmente às [timestamp]
+```
+
+### Métricas
+- Tempo de regeneração do cache
+- Número de registros processados
+- Performance das queries de ranking
+
+## Considerações de Performance
+
+<Warning>
+  Evite invalidar o cache durante horários de pico (7h-9h e 18h-20h) pois a regeneração pode causar latência temporária.
+</Warning>
+
+### Impacto Estimado
+- **Regeneração**: 2-5 segundos para processar ~100k leitores
+- **Cache miss**: Primeira consulta pode levar 3-8 segundos
+- **Recuperação**: Performance normal em ~10 segundos
+
+### Alternativas
+Em vez de invalidar o cache, considere:
+- Aguardar a renovação automática às 5h
+- Usar endpoints de debug para investigar problemas
+- Aplicar correções de dados em horários de baixo tráfego

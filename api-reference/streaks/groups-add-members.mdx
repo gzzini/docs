@@ -1,0 +1,253 @@
+---
+title: 'Adicionar Membros ao Grupo'
+openapi: 'POST /streaks/groups/:groupId/members'
+---
+
+## Descrição
+
+Adiciona novos membros a um grupo de amigos existente. Qualquer membro ativo do grupo pode convidar novos membros, não apenas o dono do grupo.
+
+## Autenticação
+
+<Note>
+  Esta rota requer autenticação JWT. O usuário deve ser membro ativo do grupo para poder adicionar novos membros.
+</Note>
+
+## Path Parameters
+
+<ParamField path="groupId" type="string" required>
+  ID único do grupo onde os membros serão adicionados
+</ParamField>
+
+## Request Body
+
+<ParamField body="emails" type="array" required>
+  Lista de emails dos usuários a serem adicionados ao grupo
+  
+  <Expandable title="emails array">
+    <ParamField body="emails[]" type="string" format="email">
+      Email válido do usuário a ser convidado
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem descritiva sobre o resultado da operação
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --request POST \
+  --url 'https://backend.testeswaffle.org/streaks/groups/abc123xyz0/members' \
+  --header 'Authorization: Bearer SEU_JWT_TOKEN' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "emails": [
+      "amigo1@exemplo.com",
+      "amigo2@exemplo.com",
+      "colega@trabalho.com"
+    ]
+  }'
+```
+
+```javascript JavaScript
+const groupId = 'abc123xyz0';
+const response = await fetch(`https://backend.testeswaffle.org/streaks/groups/${groupId}/members`, {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer SEU_JWT_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    emails: [
+      'amigo1@exemplo.com',
+      'amigo2@exemplo.com',
+      'colega@trabalho.com'
+    ]
+  })
+});
+const data = await response.json();
+console.log(data);
+```
+
+```python Python
+import requests
+
+group_id = 'abc123xyz0'
+headers = {
+    'Authorization': 'Bearer SEU_JWT_TOKEN',
+    'Content-Type': 'application/json'
+}
+
+payload = {
+    'emails': [
+        'amigo1@exemplo.com',
+        'amigo2@exemplo.com',
+        'colega@trabalho.com'
+    ]
+}
+
+response = requests.post(
+    f'https://backend.testeswaffle.org/streaks/groups/{group_id}/members',
+    headers=headers,
+    json=payload
+)
+data = response.json()
+print(data)
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Sucesso
+{
+  "success": true,
+  "message": "Membros adicionados ao grupo Leitores do Escritório"
+}
+```
+
+```json Erro - Grupo não encontrado
+{
+  "success": false,
+  "error": "Grupo não encontrado"
+}
+```
+
+```json Erro - Sem permissão
+{
+  "success": false,
+  "error": "Apenas membros do grupo podem adicionar novos membros"
+}
+```
+
+```json Erro - Limite excedido
+{
+  "success": false,
+  "error": "Limite de membros excedido. Máximo: 20, Atual: 18"
+}
+```
+
+```json Erro - Lista vazia
+{
+  "success": false,
+  "error": "Lista de emails é obrigatória"
+}
+```
+
+</ResponseExample>
+
+## Regras de Negócio
+
+### Permissões
+- **Qualquer membro** pode adicionar novos membros (não apenas o dono)
+- Usuário deve ser membro ativo (`isActive = 1`)
+- Usuário deve existir no grupo
+
+### Validações
+
+#### Lista de Emails
+- Array obrigatório e não-vazio
+- Emails devem ter formato válido
+- Duplicados são automaticamente ignorados
+
+#### Limites do Grupo
+- Verifica limite de `maxMembers` do grupo
+- Conta membros ativos atuais + novos membros
+- Rejeita operação se exceder limite
+
+#### Membros Existentes
+- Emails já presentes no grupo são ignorados silenciosamente
+- Não gera erro para membros duplicados
+- Log de debug registra tentativas de duplicação
+
+### Comportamentos
+
+#### Processamento
+- Emails são convertidos para lowercase
+- Inserção individual com tratamento de erros
+- Operação continua mesmo se alguns emails falharem
+
+#### Timestamps
+- `addedByEmail`: Email de quem fez o convite
+- `joinedAt`: Timestamp da adição
+- `updatedAt` do grupo é atualizado
+
+#### Notificações
+- Sistema pode ser estendido para notificar novos membros
+- Logs de auditoria para rastreamento
+
+## Casos de Uso
+
+### Convite em Lote
+```javascript
+// Adicionar múltiplos colegas de uma vez
+const emails = [
+  'joao@empresa.com',
+  'maria@empresa.com',
+  'carlos@empresa.com'
+];
+```
+
+### Tratamento de Erros
+```javascript
+try {
+  const response = await addMembers(groupId, emails);
+  if (response.success) {
+    showSuccess('Membros adicionados com sucesso!');
+  }
+} catch (error) {
+  if (error.message.includes('Limite')) {
+    showError('Grupo está no limite de membros');
+  }
+}
+```
+
+### Verificação Prévia
+```javascript
+// Verificar limites antes de adicionar
+const group = await getGroupInfo(groupId);
+const available = group.maxMembers - group.memberCount;
+if (emails.length > available) {
+  alert(`Só é possível adicionar ${available} membros`);
+}
+```
+
+## Limitações
+
+### Técnicas
+- Máximo de 50 emails por requisição (recomendado)
+- Timeout de 30 segundos para operações grandes
+- Rate limiting por usuário
+
+### Funcionais
+- Não verifica se emails existem no sistema
+- Usuários inexistentes aparecem no grupo mas sem streak
+- Sem sistema de confirmação/convite
+
+## Próximos Passos
+
+Após adicionar membros:
+
+1. **Verificar adição**: `GET /streaks/groups/:groupId/ranking`
+2. **Gerenciar membros**: Implementar remoção se necessário
+3. **Notificar**: Comunicar novos membros por email/push
+
+## Notas de Implementação
+
+### Database
+- Tabela: `friendGroupMembers`
+- Índices: `(groupId, memberEmail)` único
+- Foreign key: `groupId` → `friendGroups.groupId`
+
+### Performance
+- Operação em batch quando possível
+- Transações para consistência
+- Logs detalhados para debugging

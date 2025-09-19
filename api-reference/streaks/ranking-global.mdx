@@ -1,0 +1,102 @@
+---
+title: 'Ranking Global'
+openapi: 'GET /streaks/ranking/global'
+---
+
+## Descrição
+
+Obtém o ranking global dos top 100 leitores com maior streak de leitura. Esta rota é pública e não requer autenticação.
+
+O ranking é atualizado automaticamente e utiliza cache otimizado que expira todos os dias às 5h da manhã (horário de Brasília).
+
+## Características
+
+- **Cache Inteligente**: TTL dinâmico que expira às 5h (horário de Brasília)
+- **Top 100**: Retorna apenas os 100 melhores leitores
+- **Emails Mascarados**: Emails parcialmente ocultos para privacidade
+- **Filtro de Atividade**: Apenas leitores ativos nos últimos 7 dias
+- **Performance Otimizada**: Query com índices e JOINs otimizados
+
+## Response
+
+### Response Format
+
+```json
+{
+  "success": boolean,
+  "data": {
+    "ranking": [
+      {
+        "position": number,
+        "displayName": string,
+        "email": string, // mascarado
+        "currentStreak": number,
+        "maxStreak": number,
+        "lastInteractionDate": string // formato brasileiro
+      }
+    ],
+    "lastUpdated": string, // ISO timestamp
+    "cacheInfo": {
+      "cached": boolean,
+      "ttl": number // segundos
+    }
+  }
+}
+```
+
+## Exemplo de Uso
+
+### Request
+```bash
+curl --request GET \
+  --url 'https://backend.testeswaffle.org/streaks/ranking/global'
+```
+
+### Response
+```json
+{
+  "success": true,
+  "data": {
+    "ranking": [
+      {
+        "position": 1,
+        "displayName": "João Silva",
+        "email": "jo***@gmail.com",
+        "currentStreak": 365,
+        "maxStreak": 365,
+        "lastInteractionDate": "19/01/2025 08:30:15"
+      },
+      {
+        "position": 2,
+        "displayName": "Maria Santos",
+        "email": "ma***@hotmail.com",
+        "currentStreak": 280,
+        "maxStreak": 320,
+        "lastInteractionDate": "19/01/2025 07:45:22"
+      }
+    ],
+    "lastUpdated": "2025-01-19T11:30:00.000Z",
+    "cacheInfo": {
+      "cached": true,
+      "ttl": 61200
+    }
+  }
+}
+```
+
+## Notas de Implementação
+
+### Cache Strategy
+- O cache é invalidado automaticamente às 5h da manhã (horário de Brasília)
+- TTL dinâmico calculado para expirar no próximo horário de renovação
+- Máximo de 24 horas de cache como failsafe
+
+### Filtros Aplicados
+- Apenas streaks ativos (currentStreak > 0)
+- Leitores com atividade nos últimos 7 dias
+- Ordenação por streak atual, depois por streak máximo
+
+### Privacidade
+- Emails são mascarados mantendo apenas os 2 primeiros caracteres do nome de usuário
+- Display names buscados do banco de autenticação
+- Fallback para "Leitor Anônimo" quando display name não disponível

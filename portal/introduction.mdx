@@ -1,0 +1,96 @@
+---
+title: Portal - Documentação Técnica
+description: Documentação técnica interna do Portal do The News
+---
+
+# Portal - Documentação Técnica
+
+Documentação técnica completa do Portal do The News para o time de desenvolvimento.
+
+## Visão Geral da Arquitetura
+
+O Portal do The News é construído com uma arquitetura moderna e escalável, projetada para atender milhões de leitores diariamente.
+
+## Stack Tecnológico
+
+<CardGroup cols={2}>
+  <Card title="Frontend" icon="browser">
+    React, Next.js, TypeScript, TailwindCSS
+  </Card>
+  
+  <Card title="Backend" icon="server">
+    Node.js, Express, PostgreSQL, Redis
+  </Card>
+  
+  <Card title="Infraestrutura" icon="cloud">
+    AWS, Docker, Kubernetes, CloudFront
+  </Card>
+  
+  <Card title="Monitoramento" icon="chart-line">
+    DataDog, Sentry, New Relic, CloudWatch
+  </Card>
+</CardGroup>
+
+## Seções da Documentação
+
+### Arquitetura e Design
+Detalhes sobre a arquitetura do sistema, padrões de design e decisões técnicas.
+
+### Backend Services
+Documentação dos microserviços, APIs internas e integrações.
+
+### Frontend Components
+Biblioteca de componentes, design system e guidelines de UI/UX.
+
+### Deploy e CI/CD
+Processos de deploy, pipelines de CI/CD e gestão de releases.
+
+### Monitoramento e Performance
+Métricas, dashboards, alertas e otimizações de performance.
+
+### Segurança
+Práticas de segurança, autenticação, autorização e compliance.
+
+## Ambientes
+
+<Tabs>
+  <Tab title="Development">
+    - **URL**: dev.portal.thenewscc.com.br
+    - **Branch**: develop
+    - **Deploy**: Automático via GitHub Actions
+  </Tab>
+  
+  <Tab title="Staging">
+    - **URL**: staging.portal.thenewscc.com.br
+    - **Branch**: staging
+    - **Deploy**: Manual via Jenkins
+  </Tab>
+  
+  <Tab title="Production">
+    - **URL**: portal.thenewscc.com.br
+    - **Branch**: main
+    - **Deploy**: Manual com aprovação
+  </Tab>
+</Tabs>
+
+## Links Importantes
+
+<CardGroup cols={3}>
+  <Card title="GitHub" href="https://github.com/thenewscc/portal" icon="github">
+    Repositório principal
+  </Card>
+  
+  <Card title="Jira" href="https://thenewscc.atlassian.net" icon="list-check">
+    Gestão de tarefas
+  </Card>
+  
+  <Card title="Confluence" href="https://thenewscc.confluence.com" icon="book">
+    Wiki da equipe
+  </Card>
+</CardGroup>
+
+## Contatos da Equipe
+
+- **Tech Lead**: tech.lead@waffle.com.br
+- **DevOps**: devops@waffle.com.br
+- **Slack**: #portal-dev

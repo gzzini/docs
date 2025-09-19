@@ -1,0 +1,168 @@
+---
+title: 'Ranking de Streaks - Visão Geral'
+description: 'Sistema completo de rankings para competições de leitura'
+---
+
+## Introdução
+
+O sistema de ranking de streaks permite que os usuários vejam sua posição em relação a outros leitores, tanto globalmente quanto em grupos privados de amigos. O sistema foi projetado para ser altamente performático e escalável.
+
+## Funcionalidades Principais
+
+### 1. Ranking Global
+- **Top 100 leitores** com maiores streaks ativos
+- **Cache inteligente** que expira às 5h da manhã (horário de Brasília)
+- **Emails mascarados** para preservar privacidade
+- **Filtro de atividade** (apenas leitores ativos nos últimos 7 dias)
+
+### 2. Grupos de Amigos
+- **Criação de grupos** privados ou públicos
+- **Convites para membros** por email
+- **Rankings específicos** por grupo
+- **Limites configuráveis** de membros
+
+### 3. Posicionamento Personalizado
+- **Posição individual** mesmo fora do top 100
+- **Comparação em tempo real** com outros leitores
+- **Histórico de performance** através dos rankings
+
+## Endpoints Disponíveis
+
+### Endpoints Principais
+
+- **[Ranking Global](/api-reference/streaks/ranking-global)** - Top 100 leitores globais com cache otimizado
+- **[Ranking com Posição](/api-reference/streaks/ranking-with-position)** - Ranking global + posição específica do usuário
+- **[Criar Grupo](/api-reference/streaks/groups-create)** - Criar grupos privados de competição
+- **[Listar Grupos](/api-reference/streaks/groups-list)** - Ver todos os grupos do usuário
+- **[Adicionar Membros](/api-reference/streaks/groups-add-members)** - Convidar amigos para grupos
+- **[Ranking do Grupo](/api-reference/streaks/groups-ranking)** - Competição entre membros do grupo
+
+## Arquitetura do Sistema
+
+### Cache Strategy
+```
+Cache TTL Dinâmico
+├── Expira às 5h (Brasília)
+├── Máximo 24h como failsafe
+├── Regeneração automática
+└── Invalidação manual disponível
+```
+
+### Database Design
+```
+Tabelas Principais
+├── readerStreaks (dados de streak)
+├── readers (informações dos leitores)
+├── friendGroups (grupos de amigos)
+├── friendGroupMembers (membros dos grupos)
+└── users (authentication - display names)
+```
+
+### Performance Otimizations
+- **Índices otimizados** em campos de consulta frequente
+- **JOINs eficientes** para reduzir queries
+- **Busca em lotes** para display names
+- **Cache agressivo** com TTL inteligente
+
+## Fluxos de Uso
+
+### 1. Consulta de Ranking Global
+```
+1. Usuário acessa /ranking/global
+2. Sistema verifica cache
+3. Se cache válido → retorna dados
+4. Se cache expirado → consulta DB + atualiza cache
+5. Retorna top 100 + info de cache
+```
+
+### 2. Criação de Grupo de Amigos
+```
+1. Usuário cria grupo (POST /groups)
+2. Sistema gera ID único do grupo
+3. Criador vira primeiro membro
+4. Usuário adiciona amigos (POST /groups/:id/members)
+5. Membros podem ver ranking do grupo
+```
+
+### 3. Competição em Grupo
+```
+1. Membros leem diariamente
+2. Streaks são calculados automaticamente
+3. Ranking do grupo é atualizado em tempo real
+4. Posições são exibidas com informações completas
+```
+
+## Regras de Negócio
+
+### Ranking Global
+- **Elegibilidade**: Streak atual > 0 AND atividade nos últimos 7 dias
+- **Ordenação**: 1º por currentStreak, 2º por maxStreak
+- **Limite**: Top 100 leitores
+- **Privacidade**: Emails mascarados (ex: jo***@gmail.com)
+
+### Grupos de Amigos
+- **Criação**: Qualquer usuário autenticado pode criar
+- **Limites**: Padrão 50 membros, máximo 200
+- **Permissões**: Qualquer membro pode convidar novos membros
+- **Visibilidade**: Grupos públicos ou privados
+
+### Cálculo de Posições
+- **Atividade**: Leitores inativos por >30 dias são excluídos do cálculo de posição
+- **Empates**: Resolvidos por maxStreak, depois por antiguidade
+- **Atualização**: Tempo real para grupos, cache para global
+
+## Considerações de Segurança
+
+### Autenticação
+- **JWT obrigatório** para rotas de grupos
+- **Público** para ranking global (sem auth)
+- **Verificação de membros** para grupos privados
+
+### Privacidade
+- **Mascaramento de emails** em todas as respostas
+- **Display names** opcionais dos usuários
+- **Grupos privados** só visíveis para membros
+
+### Rate Limiting
+- **Limite por usuário** para criação de grupos
+- **Throttling** em operações de adição de membros
+- **Cache** para reduzir carga no banco
+
+## Monitoramento e Métricas
+
+### Performance Metrics
+- **Cache hit rate** (~95% esperado)
+- **Tempo de resposta** ranking global (<200ms com cache)
+- **Tempo de regeneração** de cache (2-5 segundos)
+
+### Business Metrics
+- **Número de grupos ativos** por período
+- **Tamanho médio dos grupos**
+- **Engagement** em competições de grupo
+- **Retenção** de usuários em rankings
+
+### Alertas
+- **Cache miss** excessivo (>10%)
+- **Latência alta** (>1s) em queries de ranking
+- **Falhas** na regeneração de cache
+- **Grupos órfãos** (sem membros ativos)
+
+## Roadmap e Melhorias
+
+### Próximas Funcionalidades
+- **Notificações** de mudanças no ranking
+- **Histórico** de posições ao longo do tempo
+- **Conquistas** e badges para grupos
+- **Exportação** de rankings em CSV
+
+### Otimizações Planejadas
+- **Cache de grupos** para rankings específicos
+- **Paginação** para grupos com muitos membros
+- **Filtros avançados** por período de tempo
+- **API GraphQL** para consultas complexas
+
+### Considerações Futuras
+- **Rankings por categoria** de conteúdo
+- **Ligas e divisões** baseadas em performance
+- **Integração** com sistema de recompensas
+- **Analytics** avançadas de engajamento

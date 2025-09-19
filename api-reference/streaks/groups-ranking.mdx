@@ -1,0 +1,323 @@
+---
+title: 'Ranking do Grupo'
+openapi: 'GET /streaks/groups/:groupId/ranking'
+---
+
+## Descrição
+
+Obtém o ranking de streaks dos membros de um grupo específico. Exibe todos os membros ordenados por streak atual, incluindo aqueles que ainda não possuem streak ativo.
+
+## Autenticação
+
+<Note>
+  Esta rota requer autenticação JWT. Para grupos privados, o usuário deve ser membro do grupo.
+</Note>
+
+## Path Parameters
+
+<ParamField path="groupId" type="string" required>
+  ID único do grupo cujo ranking será exibido
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="group" type="object">
+      Informações básicas do grupo
+      <Expandable title="group properties">
+        <ResponseField name="groupId" type="string">
+          ID único do grupo
+        </ResponseField>
+
+        <ResponseField name="groupName" type="string">
+          Nome do grupo
+        </ResponseField>
+
+        <ResponseField name="description" type="string">
+          Descrição do grupo (pode ser null)
+        </ResponseField>
+
+        <ResponseField name="isPublic" type="boolean">
+          Se o grupo é público ou privado
+        </ResponseField>
+
+        <ResponseField name="ownerEmail" type="string">
+          Email mascarado do dono do grupo
+        </ResponseField>
+
+        <ResponseField name="memberCount" type="number">
+          Número total de membros no grupo
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="ranking" type="array">
+      Lista de membros ordenados por streak
+      <Expandable title="member ranking">
+        <ResponseField name="position" type="number">
+          Posição no ranking do grupo (1, 2, 3...)
+        </ResponseField>
+
+        <ResponseField name="displayName" type="string">
+          Nome de exibição do membro ou "Leitor Anônimo"
+        </ResponseField>
+
+        <ResponseField name="email" type="string">
+          Email mascarado do membro
+        </ResponseField>
+
+        <ResponseField name="currentStreak" type="number">
+          Streak atual do membro
+        </ResponseField>
+
+        <ResponseField name="maxStreak" type="number">
+          Maior streak já alcançado pelo membro
+        </ResponseField>
+
+        <ResponseField name="lastInteractionDate" type="string">
+          Data da última interação em formato brasileiro (pode ser null)
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="lastUpdated" type="string">
+      Timestamp ISO da última atualização do ranking
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --request GET \
+  --url 'https://backend.testeswaffle.org/streaks/groups/abc123xyz0/ranking' \
+  --header 'Authorization: Bearer SEU_JWT_TOKEN'
+```
+
+```javascript JavaScript
+const groupId = 'abc123xyz0';
+const response = await fetch(`https://backend.testeswaffle.org/streaks/groups/${groupId}/ranking`, {
+  headers: {
+    'Authorization': 'Bearer SEU_JWT_TOKEN'
+  }
+});
+const data = await response.json();
+console.log(data);
+```
+
+```python Python
+import requests
+
+group_id = 'abc123xyz0'
+headers = {
+    'Authorization': 'Bearer SEU_JWT_TOKEN'
+}
+
+response = requests.get(
+    f'https://backend.testeswaffle.org/streaks/groups/{group_id}/ranking',
+    headers=headers
+)
+data = response.json()
+print(data)
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Ranking Completo
+{
+  "success": true,
+  "data": {
+    "group": {
+      "groupId": "abc123xyz0",
+      "groupName": "Leitores do Escritório",
+      "description": "Grupo da nossa equipe para competir nos streaks",
+      "isPublic": false,
+      "ownerEmail": "us***@exemplo.com",
+      "memberCount": 5
+    },
+    "ranking": [
+      {
+        "position": 1,
+        "displayName": "João Silva",
+        "email": "jo***@gmail.com",
+        "currentStreak": 45,
+        "maxStreak": 67,
+        "lastInteractionDate": "19/01/2025 08:30:15"
+      },
+      {
+        "position": 2,
+        "displayName": "Maria Santos",
+        "email": "ma***@empresa.com",
+        "currentStreak": 32,
+        "maxStreak": 32,
+        "lastInteractionDate": "19/01/2025 07:22:10"
+      },
+      {
+        "position": 3,
+        "displayName": "Carlos Oliveira",
+        "email": "ca***@empresa.com",
+        "currentStreak": 18,
+        "maxStreak": 25,
+        "lastInteractionDate": "18/01/2025 22:45:33"
+      },
+      {
+        "position": 4,
+        "displayName": "Ana Costa",
+        "email": "an***@empresa.com",
+        "currentStreak": 5,
+        "maxStreak": 12,
+        "lastInteractionDate": "19/01/2025 06:15:20"
+      },
+      {
+        "position": 5,
+        "displayName": "Leitor Anônimo",
+        "email": "no***@exemplo.com",
+        "currentStreak": 0,
+        "maxStreak": 0,
+        "lastInteractionDate": null
+      }
+    ],
+    "lastUpdated": "2025-01-19T11:45:30.000Z"
+  }
+}
+```
+
+```json Grupo Vazio
+{
+  "success": true,
+  "data": {
+    "group": {
+      "groupId": "def456uvw1",
+      "groupName": "Grupo Novo",
+      "description": null,
+      "isPublic": true,
+      "ownerEmail": "ow***@exemplo.com",
+      "memberCount": 0
+    },
+    "ranking": [],
+    "lastUpdated": "2025-01-19T11:45:30.000Z"
+  }
+}
+```
+
+```json Erro - Grupo não encontrado
+{
+  "success": false,
+  "error": "Grupo não encontrado"
+}
+```
+
+```json Erro - Acesso negado
+{
+  "success": false,
+  "error": "Você não tem permissão para ver este grupo privado"
+}
+```
+
+</ResponseExample>
+
+## Regras de Acesso
+
+### Grupos Públicos (`isPublic = true`)
+- Qualquer usuário autenticado pode ver o ranking
+- Não precisa ser membro do grupo
+- Ideal para grupos de comunidade ou competições abertas
+
+### Grupos Privados (`isPublic = false`)
+- Apenas membros ativos podem ver o ranking
+- Sistema verifica se usuário está na tabela `friendGroupMembers`
+- Status `isActive = 1` obrigatório
+
+## Características do Ranking
+
+### Ordenação
+1. **Streak atual** (decrescente)
+2. **Streak máximo** (decrescente como critério de desempate)
+3. **Ordem de adição** (membros mais antigos primeiro em empates)
+
+### Inclusão de Membros
+
+#### Com Streak Ativo
+- Aparecem primeiro no ranking
+- Dados completos de streak e interação
+- Ordenados por performance
+
+#### Sem Streak (currentStreak = 0)
+- Aparecem no final do ranking
+- `lastInteractionDate` como `null`
+- Ainda contam como membros do grupo
+
+#### Membros Inativos no Sistema
+- Emails que ainda não têm conta no sistema de streaks
+- Aparecem como "Leitor Anônimo"
+- `currentStreak` e `maxStreak` como 0
+
+### Formatação de Dados
+
+#### Timestamps
+- `lastInteractionDate` em formato brasileiro (DD/MM/AAAA HH:MM:SS)
+- Timezone de São Paulo aplicado
+- `null` para usuários sem interações
+
+#### Emails Mascarados
+- Primeiros 2 caracteres + asteriscos
+- Mesmo padrão do ranking global
+- Privacidade preservada
+
+#### Display Names
+- Buscados do banco de autenticação
+- Fallback para "Leitor Anônimo"
+- Nomes reais quando disponíveis
+
+## Performance
+
+### Otimizações
+- Query com JOINs otimizados
+- Índices em `groupId` e `memberEmail`
+- Busca de display names em lotes
+
+### Limitações
+- Grupos com muitos membros (>100) podem ter latência maior
+- Cache não implementado (dados sempre atualizados)
+- Timeout de 30 segundos para grupos muito grandes
+
+## Casos de Uso
+
+### Dashboard do Grupo
+```javascript
+// Destacar posição do usuário atual
+const userPosition = data.ranking.find(member => 
+  member.email === maskCurrentUserEmail()
+);
+```
+
+### Estatísticas do Grupo
+```javascript
+// Calcular métricas do grupo
+const activeMembers = data.ranking.filter(m => m.currentStreak > 0);
+const avgStreak = activeMembers.reduce((sum, m) => sum + m.currentStreak, 0) / activeMembers.length;
+const topStreak = Math.max(...data.ranking.map(m => m.currentStreak));
+```
+
+### Detecção de Inatividade
+```javascript
+// Identificar membros inativos
+const inactiveMembers = data.ranking.filter(m => 
+  m.currentStreak === 0 || !m.lastInteractionDate
+);
+```
+
+## Próximas Funcionalidades
+
+Possíveis melhorias futuras:
+- **Cache**: Cache do ranking para grupos grandes
+- **Filtros**: Filtrar por período de atividade
+- **Exportação**: Download do ranking em CSV
+- **Notificações**: Alertas de mudanças no ranking

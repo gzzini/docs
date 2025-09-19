@@ -1,0 +1,245 @@
+---
+title: 'Listar Grupos do Usuário'
+openapi: 'GET /streaks/groups'
+---
+
+## Descrição
+
+Lista todos os grupos de amigos dos quais o usuário autenticado é membro. Retorna informações detalhadas sobre cada grupo, incluindo contagem de membros e status de proprietário.
+
+## Autenticação
+
+<Note>
+  Esta rota requer autenticação JWT. Retorna apenas grupos onde o usuário é membro ativo.
+</Note>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="properties">
+    <ResponseField name="groups" type="array">
+      Lista de grupos do usuário
+      <Expandable title="group object">
+        <ResponseField name="groupId" type="string">
+          ID único do grupo
+        </ResponseField>
+
+        <ResponseField name="groupName" type="string">
+          Nome do grupo
+        </ResponseField>
+
+        <ResponseField name="description" type="string">
+          Descrição do grupo (pode ser null)
+        </ResponseField>
+
+        <ResponseField name="ownerEmail" type="string">
+          Email do dono do grupo
+        </ResponseField>
+
+        <ResponseField name="isPublic" type="number">
+          Se o grupo é público (1) ou privado (0)
+        </ResponseField>
+
+        <ResponseField name="maxMembers" type="number">
+          Limite máximo de membros
+        </ResponseField>
+
+        <ResponseField name="memberCount" type="number">
+          Número atual de membros ativos
+        </ResponseField>
+
+        <ResponseField name="isOwner" type="boolean">
+          Se o usuário atual é o dono do grupo
+        </ResponseField>
+
+        <ResponseField name="createdAt" type="number">
+          Timestamp de criação do grupo
+        </ResponseField>
+
+        <ResponseField name="joinedAt" type="number">
+          Timestamp de quando o usuário entrou no grupo
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="totalGroups" type="number">
+      Total de grupos retornados
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl --request GET \
+  --url 'https://backend.testeswaffle.org/streaks/groups' \
+  --header 'Authorization: Bearer SEU_JWT_TOKEN'
+```
+
+```javascript JavaScript
+const response = await fetch('https://backend.testeswaffle.org/streaks/groups', {
+  headers: {
+    'Authorization': 'Bearer SEU_JWT_TOKEN'
+  }
+});
+const data = await response.json();
+console.log(data);
+```
+
+```python Python
+import requests
+
+headers = {
+    'Authorization': 'Bearer SEU_JWT_TOKEN'
+}
+
+response = requests.get(
+    'https://backend.testeswaffle.org/streaks/groups',
+    headers=headers
+)
+data = response.json()
+print(data)
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Sucesso
+{
+  "success": true,
+  "data": {
+    "groups": [
+      {
+        "groupId": "abc123xyz0",
+        "groupName": "Leitores do Escritório",
+        "description": "Grupo da nossa equipe para competir nos streaks",
+        "ownerEmail": "usuario@exemplo.com",
+        "isPublic": 0,
+        "maxMembers": 20,
+        "memberCount": 8,
+        "isOwner": true,
+        "createdAt": 1642680000,
+        "joinedAt": 1642680000
+      },
+      {
+        "groupId": "def456uvw1",
+        "groupName": "Família Silva",
+        "description": null,
+        "ownerEmail": "pai@silva.com",
+        "isPublic": 0,
+        "maxMembers": 10,
+        "memberCount": 4,
+        "isOwner": false,
+        "createdAt": 1642650000,
+        "joinedAt": 1642680500
+      },
+      {
+        "groupId": "ghi789rst2",
+        "groupName": "Amigos da Faculdade",
+        "description": "Grupo público dos ex-colegas de faculdade",
+        "ownerEmail": "joao@exemplo.com",
+        "isPublic": 1,
+        "maxMembers": 50,
+        "memberCount": 23,
+        "isOwner": false,
+        "createdAt": 1642600000,
+        "joinedAt": 1642700000
+      }
+    ],
+    "totalGroups": 3
+  }
+}
+```
+
+```json Usuário sem grupos
+{
+  "success": true,
+  "data": {
+    "groups": [],
+    "totalGroups": 0
+  }
+}
+```
+
+```json Erro de autenticação
+{
+  "success": false,
+  "error": "Token inválido ou expirado"
+}
+```
+
+</ResponseExample>
+
+## Características
+
+### Ordenação
+- Grupos ordenados por `updatedAt` decrescente
+- Grupos com atividade recente aparecem primeiro
+- Grupos criados recentemente têm prioridade
+
+### Informações Incluídas
+
+#### Status do Usuário
+- **isOwner**: Indica se pode gerenciar o grupo
+- **joinedAt**: Quando o usuário entrou no grupo
+- Diferencia entre grupos próprios e grupos onde foi convidado
+
+#### Métricas do Grupo
+- **memberCount**: Calculado em tempo real
+- **maxMembers**: Limite configurado pelo dono
+- **isPublic**: Visibilidade do grupo
+
+### Filtros Aplicados
+- Apenas grupos onde `isActive = 1` (membro ativo)
+- Usuário deve estar presente na tabela `friendGroupMembers`
+- Grupos deletados ou arquivados não aparecem
+
+## Casos de Uso
+
+### Dashboard de Grupos
+```javascript
+// Separar grupos próprios de grupos convidados
+const ownGroups = data.groups.filter(g => g.isOwner);
+const joinedGroups = data.groups.filter(g => !g.isOwner);
+```
+
+### Verificar Limites
+```javascript
+// Verificar se grupo está próximo do limite
+const nearLimit = data.groups.filter(g => 
+  g.memberCount / g.maxMembers > 0.8
+);
+```
+
+### Estatísticas
+```javascript
+// Calcular estatísticas do usuário
+const totalMembersInAllGroups = data.groups.reduce(
+  (sum, group) => sum + group.memberCount, 0
+);
+```
+
+## Performance
+
+### Otimizações
+- Query com JOIN otimizado
+- Contagem de membros em lote
+- Índices em `memberEmail` e `groupId`
+
+### Límites
+- Não há limite de grupos por usuário
+- Response típico: 5-15 grupos por usuário
+- Tempo de resposta: ~100-300ms
+
+## Próximas Ações
+
+Com a lista de grupos, você pode:
+
+1. **Ver ranking**: `GET /streaks/groups/:groupId/ranking`
+2. **Adicionar membros**: `POST /streaks/groups/:groupId/members` (se for dono)
+3. **Gerenciar grupo**: Operações baseadas em `isOwner`
