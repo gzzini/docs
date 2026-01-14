@@ -1,0 +1,218 @@
+---
+title: "Listar Tickets"
+api: "GET https://sac-waffle-v2.theo-110.workers.dev/support"
+description: "Lista tickets de suporte com filtragem e paginação"
+---
+
+## Descrição
+
+Retorna uma lista paginada de tickets de suporte com opções de filtragem. Requer autenticação.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="status" type="string" default="open">
+  Filtrar por status do ticket
+  
+  Valores aceitos:
+  - `open` - Tickets abertos
+  - `in_progress` - Em atendimento
+  - `closed` - Fechados
+  - `deleted` - Excluídos
+</ParamField>
+
+<ParamField query="main" type="string">
+  Filtrar por categoria principal
+</ParamField>
+
+<ParamField query="issue" type="string">
+  Filtrar por assunto
+</ParamField>
+
+<ParamField query="newsletter" type="string">
+  Filtrar por newsletter
+</ParamField>
+
+<ParamField query="tagId" type="number">
+  Filtrar por ID da tag
+</ParamField>
+
+<ParamField query="page" type="number" default="1">
+  Número da página
+</ParamField>
+
+<ParamField query="limit" type="number" default="10">
+  Número de itens por página (máximo 100)
+</ParamField>
+
+<ParamField query="sort" type="string" default="desc">
+  Ordem de classificação
+  
+  Valores aceitos:
+  - `asc` - Crescente (mais antigos primeiro)
+  - `desc` - Decrescente (mais recentes primeiro)
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados da resposta">
+    <ResponseField name="tickets" type="array">
+      Lista de tickets
+      
+      <Expandable title="Estrutura do ticket">
+        <ResponseField name="id" type="number">
+          ID do ticket
+        </ResponseField>
+        
+        <ResponseField name="main" type="string">
+          Categoria principal
+        </ResponseField>
+        
+        <ResponseField name="issue" type="string">
+          Assunto
+        </ResponseField>
+        
+        <ResponseField name="description" type="string">
+          Descrição
+        </ResponseField>
+        
+        <ResponseField name="status" type="string">
+          Status atual
+        </ResponseField>
+        
+        <ResponseField name="email" type="string">
+          Email do solicitante
+        </ResponseField>
+        
+        <ResponseField name="newsletter" type="string">
+          Newsletter relacionada
+        </ResponseField>
+        
+        <ResponseField name="createdAt" type="string">
+          Data de criação
+        </ResponseField>
+        
+        <ResponseField name="updatedAt" type="string">
+          Última atualização
+        </ResponseField>
+        
+        <ResponseField name="tags" type="array">
+          Tags associadas
+        </ResponseField>
+        
+        <ResponseField name="anexos" type="array">
+          Anexos do ticket
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    
+    <ResponseField name="pagination" type="object">
+      <Expandable title="Informações de paginação">
+        <ResponseField name="total" type="number">
+          Total de tickets
+        </ResponseField>
+        
+        <ResponseField name="page" type="number">
+          Página atual
+        </ResponseField>
+        
+        <ResponseField name="limit" type="number">
+          Itens por página
+        </ResponseField>
+        
+        <ResponseField name="totalPages" type="number">
+          Total de páginas
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash Básico
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+```bash Com Filtros
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support?status=open&main=Técnico&page=1&limit=20&sort=desc" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "data": {
+    "tickets": [
+      {
+        "id": 12345,
+        "main": "Técnico",
+        "issue": "Erro no login",
+        "description": "Não consigo fazer login na plataforma",
+        "status": "open",
+        "email": "usuario@exemplo.com",
+        "newsletter": "the news",
+        "createdAt": "2024-01-14T10:00:00Z",
+        "updatedAt": "2024-01-14T10:00:00Z",
+        "tags": [
+          {
+            "id": 1,
+            "name": "urgente",
+            "color": "#FF0000"
+          }
+        ],
+        "anexos": []
+      },
+      {
+        "id": 12344,
+        "main": "Financeiro",
+        "issue": "Cobrança duplicada",
+        "description": "Fui cobrado duas vezes este mês",
+        "status": "in_progress",
+        "email": "cliente@exemplo.com",
+        "newsletter": "the bizness",
+        "createdAt": "2024-01-13T15:30:00Z",
+        "updatedAt": "2024-01-14T08:00:00Z",
+        "tags": [],
+        "anexos": [
+          {
+            "id": 1,
+            "nomeArquivo": "comprovante.pdf",
+            "tamanhoArquivo": 524288
+          }
+        ]
+      }
+    ],
+    "pagination": {
+      "total": 42,
+      "page": 1,
+      "limit": 20,
+      "totalPages": 3
+    }
+  }
+}
+```
+
+```json Error
+{
+  "success": false,
+  "message": "Token inválido ou expirado"
+}
+```
+
+</ResponseExample>

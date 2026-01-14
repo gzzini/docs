@@ -1,0 +1,120 @@
+---
+title: "Atualizar Status do Ticket"
+api: "PATCH https://sac-waffle-v2.theo-110.workers.dev/support/{id}/status"
+description: "Atualiza o status de um ou múltiplos tickets"
+---
+
+## Descrição
+
+Atualiza o status de um ticket específico ou múltiplos tickets de uma vez. Suporta operações em lote. Requer autenticação.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  `application/json`
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="id" type="number">
+  ID do ticket (ignorado se `support_ids` for fornecido no body)
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="status" type="string" required>
+  Novo status para o(s) ticket(s)
+  
+  Valores aceitos:
+  - `open` - Reabrir ticket
+  - `in_progress` - Marcar como em andamento
+  - `closed` - Fechar ticket
+</ParamField>
+
+<ParamField body="support_ids" type="array">
+  Array de IDs para atualização em lote
+  
+  Quando fornecido, o parâmetro `id` no path é ignorado
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+  Mensagem descritiva do resultado
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados da operação">
+    <ResponseField name="updated" type="number">
+      Número de tickets atualizados
+    </ResponseField>
+    
+    <ResponseField name="ids" type="array">
+      IDs dos tickets atualizados
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash Único Ticket
+curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/12345/status" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "closed"
+  }'
+```
+
+```bash Múltiplos Tickets
+curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/0/status" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "in_progress",
+    "support_ids": [12345, 12346, 12347]
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success - Único
+{
+  "success": true,
+  "message": "Status do ticket atualizado com sucesso",
+  "data": {
+    "updated": 1,
+    "ids": [12345]
+  }
+}
+```
+
+```json Success - Múltiplo
+{
+  "success": true,
+  "message": "Status de 3 tickets atualizado com sucesso",
+  "data": {
+    "updated": 3,
+    "ids": [12345, 12346, 12347]
+  }
+}
+```
+
+```json Error
+{
+  "success": false,
+  "message": "Status inválido. Status válidos: open, in_progress, closed"
+}
+```
+
+</ResponseExample>

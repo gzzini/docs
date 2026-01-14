@@ -1,0 +1,133 @@
+---
+title: "SAC/Support API"
+sidebarTitle: "Introdução"
+description: "API completa para gerenciamento de tickets de suporte e atendimento ao cliente"
+---
+
+## Visão Geral
+
+A API do SAC (Sistema de Atendimento ao Cliente) fornece endpoints completos para gerenciar tickets de suporte, mensagens, anexos e respostas rápidas. Esta API permite criar, atualizar, listar e gerenciar todo o fluxo de atendimento ao cliente.
+
+## Base URL
+
+```
+https://sac-waffle-v2.theo-110.workers.dev
+```
+
+## Autenticação
+
+A maioria dos endpoints requer autenticação via JWT token. Endpoints públicos estão claramente indicados.
+
+### Headers Obrigatórios
+
+```http
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+## Recursos Principais
+
+### 1. Tickets de Suporte
+- Criar e gerenciar tickets
+- Upload de anexos
+- Sistema de mensagens
+- Tags e categorização
+- Status e priorização
+
+### 2. Respostas Rápidas
+- Templates predefinidos
+- Categorias organizadas
+- Contador de uso
+- Gestão de conteúdo
+
+### 3. Relatórios e Métricas
+- Exportação de dados
+- Análise de desempenho
+- Resumos estatísticos
+
+### 4. Operações em Lote
+- Atualização múltipla de status
+- Exclusão em massa
+- Mensagens em lote
+
+## Status de Tickets
+
+Os tickets podem ter os seguintes status:
+
+| Status | Descrição |
+|--------|-----------|
+| `open` | Ticket aberto aguardando resposta |
+| `in_progress` | Ticket em atendimento |
+| `closed` | Ticket fechado/resolvido |
+| `deleted` | Ticket excluído (soft delete) |
+
+## Limites e Restrições
+
+### Anexos
+- **Tamanho máximo**: 10MB por arquivo
+- **Tipos permitidos**: 
+  - Imagens: `image/jpeg`, `image/png`, `image/gif`, `image/webp`
+  - Documentos: `application/pdf`, `text/plain`
+  - Planilhas: `text/csv`, `application/vnd.ms-excel`, `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`
+
+### Paginação
+- **Limite padrão**: 10 itens por página
+- **Limite máximo**: 100 itens por página
+
+## Tratamento de Erros
+
+A API retorna erros padronizados no seguinte formato:
+
+```json
+{
+  "success": false,
+  "message": "Descrição do erro",
+  "error": "Código do erro (opcional)"
+}
+```
+
+### Códigos de Status HTTP
+
+| Código | Descrição |
+|--------|-----------|
+| `200` | Sucesso |
+| `201` | Criado com sucesso |
+| `400` | Requisição inválida |
+| `401` | Não autorizado |
+| `403` | Acesso negado |
+| `404` | Recurso não encontrado |
+| `500` | Erro interno do servidor |
+
+## Rate Limiting
+
+A API implementa rate limiting para proteção contra abuso:
+- **Limite**: 100 requisições por minuto por IP
+- **Headers de resposta**: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`
+
+## Exemplos de Uso
+
+### Criar um Ticket
+
+```bash
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support \
+  -H "Content-Type: application/json" \
+  -d '{
+    "main": "Técnico",
+    "issue": "Bug no sistema",
+    "description": "Descrição detalhada do problema",
+    "email": "usuario@exemplo.com"
+  }'
+```
+
+### Listar Tickets
+
+```bash
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support?status=open&page=1&limit=10" \
+  -H "Authorization: Bearer {token}"
+```
+
+## Suporte
+
+Para dúvidas ou problemas com a API, entre em contato:
+- Email: tech@waffle.com.br
+- Documentação: https://docs.waffle.com.br

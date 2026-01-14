@@ -1,0 +1,222 @@
+---
+title: "Obter Ticket"
+api: "GET https://sac-waffle-v2.theo-110.workers.dev/support/{id}"
+description: "Obtém os detalhes completos de um ticket específico"
+---
+
+## Descrição
+
+Retorna todos os detalhes de um ticket específico, incluindo mensagens, anexos e tags associadas. Requer autenticação.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="id" type="number" required>
+  ID único do ticket
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados completos do ticket">
+    <ResponseField name="id" type="number">
+      ID do ticket
+    </ResponseField>
+    
+    <ResponseField name="main" type="string">
+      Categoria principal
+    </ResponseField>
+    
+    <ResponseField name="issue" type="string">
+      Assunto do ticket
+    </ResponseField>
+    
+    <ResponseField name="description" type="string">
+      Descrição detalhada
+    </ResponseField>
+    
+    <ResponseField name="status" type="string">
+      Status atual
+    </ResponseField>
+    
+    <ResponseField name="priority" type="string">
+      Prioridade do ticket
+    </ResponseField>
+    
+    <ResponseField name="email" type="string">
+      Email do solicitante
+    </ResponseField>
+    
+    <ResponseField name="newsletter" type="string">
+      Newsletter relacionada
+    </ResponseField>
+    
+    <ResponseField name="wantReply" type="boolean">
+      Se o usuário deseja receber respostas por email
+    </ResponseField>
+    
+    <ResponseField name="createdAt" type="string">
+      Data de criação
+    </ResponseField>
+    
+    <ResponseField name="updatedAt" type="string">
+      Última atualização
+    </ResponseField>
+    
+    <ResponseField name="tags" type="array">
+      Tags associadas ao ticket
+      
+      <Expandable title="Estrutura da tag">
+        <ResponseField name="id" type="number">
+          ID da tag
+        </ResponseField>
+        
+        <ResponseField name="name" type="string">
+          Nome da tag
+        </ResponseField>
+        
+        <ResponseField name="color" type="string">
+          Cor da tag (hexadecimal)
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    
+    <ResponseField name="anexos" type="array">
+      Anexos do ticket
+      
+      <Expandable title="Estrutura do anexo">
+        <ResponseField name="id" type="number">
+          ID do anexo
+        </ResponseField>
+        
+        <ResponseField name="nomeArquivo" type="string">
+          Nome do arquivo
+        </ResponseField>
+        
+        <ResponseField name="tipoArquivo" type="string">
+          Tipo MIME do arquivo
+        </ResponseField>
+        
+        <ResponseField name="tamanhoArquivo" type="number">
+          Tamanho em bytes
+        </ResponseField>
+        
+        <ResponseField name="createdAt" type="string">
+          Data de upload
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    
+    <ResponseField name="mensagens" type="array">
+      Histórico de mensagens
+      
+      <Expandable title="Estrutura da mensagem">
+        <ResponseField name="id" type="number">
+          ID da mensagem
+        </ResponseField>
+        
+        <ResponseField name="conteudo" type="string">
+          Conteúdo da mensagem
+        </ResponseField>
+        
+        <ResponseField name="remetente" type="string">
+          Quem enviou (usuário ou suporte)
+        </ResponseField>
+        
+        <ResponseField name="createdAt" type="string">
+          Data de envio
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/12345" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "data": {
+    "id": 12345,
+    "main": "Técnico",
+    "issue": "Erro no login",
+    "description": "Não consigo fazer login na plataforma. Aparece erro 500.",
+    "status": "in_progress",
+    "priority": "high",
+    "email": "usuario@exemplo.com",
+    "newsletter": "the news",
+    "wantReply": true,
+    "createdAt": "2024-01-14T10:00:00Z",
+    "updatedAt": "2024-01-14T14:30:00Z",
+    "tags": [
+      {
+        "id": 1,
+        "name": "urgente",
+        "color": "#FF0000"
+      },
+      {
+        "id": 3,
+        "name": "bug",
+        "color": "#FFA500"
+      }
+    ],
+    "anexos": [
+      {
+        "id": 1,
+        "nomeArquivo": "erro_screenshot.png",
+        "tipoArquivo": "image/png",
+        "tamanhoArquivo": 245760,
+        "createdAt": "2024-01-14T10:00:00Z"
+      }
+    ],
+    "mensagens": [
+      {
+        "id": 1,
+        "conteudo": "Estamos analisando o problema reportado.",
+        "remetente": "suporte",
+        "createdAt": "2024-01-14T11:00:00Z"
+      },
+      {
+        "id": 2,
+        "conteudo": "Identificamos o erro. Uma correção está sendo implementada.",
+        "remetente": "suporte",
+        "createdAt": "2024-01-14T14:30:00Z"
+      }
+    ]
+  }
+}
+```
+
+```json Not Found
+{
+  "success": false,
+  "message": "Ticket não encontrado"
+}
+```
+
+```json Unauthorized
+{
+  "success": false,
+  "message": "Token inválido ou expirado"
+}
+```
+
+</ResponseExample>

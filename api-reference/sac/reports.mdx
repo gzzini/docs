@@ -1,0 +1,261 @@
+---
+title: "Relatórios e Métricas"
+api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/relatorios"
+description: "Gera relatórios e métricas do sistema de suporte"
+---
+
+## Descrição
+
+Endpoints para geração de relatórios detalhados, exportação de dados e visualização de métricas do sistema de suporte.
+
+## Endpoints Disponíveis
+
+### Gerar Relatório Completo
+
+`POST /support/relatorios`
+
+Gera um relatório detalhado com filtros personalizados.
+
+#### Body Parameters
+
+<ParamField body="dataInicio" type="string" required>
+  Data de início (formato: YYYY-MM-DD)
+</ParamField>
+
+<ParamField body="dataFim" type="string" required>
+  Data de fim (formato: YYYY-MM-DD)
+</ParamField>
+
+<ParamField body="filtros" type="object">
+  <Expandable title="Opções de filtro">
+    <ParamField body="status" type="array">
+      Array de status para incluir
+    </ParamField>
+    
+    <ParamField body="categorias" type="array">
+      Array de categorias principais
+    </ParamField>
+    
+    <ParamField body="newsletters" type="array">
+      Array de newsletters
+    </ParamField>
+    
+    <ParamField body="tags" type="array">
+      Array de IDs de tags
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="formato" type="string" default="json">
+  Formato do relatório
+  
+  Valores aceitos:
+  - `json` - Dados estruturados
+  - `csv` - Planilha
+  - `pdf` - Documento formatado
+</ParamField>
+
+### Resumo Rápido
+
+`GET /support/relatorios/resumo`
+
+Retorna um resumo rápido das métricas atuais.
+
+### Exportar Tickets
+
+`GET /support/export`
+
+Exporta tickets em formato CSV.
+
+#### Query Parameters
+
+<ParamField query="status" type="string">
+  Filtrar por status
+</ParamField>
+
+<ParamField query="dataInicio" type="string">
+  Data inicial (YYYY-MM-DD)
+</ParamField>
+
+<ParamField query="dataFim" type="string">
+  Data final (YYYY-MM-DD)
+</ParamField>
+
+### Métricas em Tempo Real
+
+`GET /support/metrics`
+
+Retorna métricas em tempo real do sistema.
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Estrutura do Relatório">
+    <ResponseField name="periodo" type="object">
+      Período analisado
+    </ResponseField>
+    
+    <ResponseField name="estatisticas" type="object">
+      <Expandable title="Estatísticas gerais">
+        <ResponseField name="totalTickets" type="number">
+          Total de tickets no período
+        </ResponseField>
+        
+        <ResponseField name="ticketsResolvidos" type="number">
+          Tickets resolvidos
+        </ResponseField>
+        
+        <ResponseField name="ticketsAbertos" type="number">
+          Tickets em aberto
+        </ResponseField>
+        
+        <ResponseField name="tempoMedioResolucao" type="string">
+          Tempo médio de resolução
+        </ResponseField>
+        
+        <ResponseField name="satisfacaoMedia" type="number">
+          Índice de satisfação (0-100)
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    
+    <ResponseField name="distribuicao" type="object">
+      <Expandable title="Distribuição de tickets">
+        <ResponseField name="porCategoria" type="object">
+          Tickets por categoria
+        </ResponseField>
+        
+        <ResponseField name="porNewsletter" type="object">
+          Tickets por newsletter
+        </ResponseField>
+        
+        <ResponseField name="porDia" type="array">
+          Volume diário
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    
+    <ResponseField name="performance" type="object">
+      <Expandable title="Indicadores de performance">
+        <ResponseField name="sla" type="object">
+          Cumprimento de SLA
+        </ResponseField>
+        
+        <ResponseField name="primeiraResposta" type="string">
+          Tempo médio primeira resposta
+        </ResponseField>
+        
+        <ResponseField name="respostasRapidas" type="number">
+          Uso de respostas rápidas
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash Relatório Completo
+curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "dataInicio": "2024-01-01",
+    "dataFim": "2024-01-31",
+    "filtros": {
+      "status": ["closed", "open"],
+      "categorias": ["Técnico", "Financeiro"]
+    },
+    "formato": "json"
+  }'
+```
+
+```bash Resumo Rápido
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/resumo" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+```bash Exportar CSV
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/export?status=closed&dataInicio=2024-01-01&dataFim=2024-01-31" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -o tickets_export.csv
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Relatório JSON
+{
+  "success": true,
+  "data": {
+    "periodo": {
+      "inicio": "2024-01-01",
+      "fim": "2024-01-31"
+    },
+    "estatisticas": {
+      "totalTickets": 342,
+      "ticketsResolvidos": 298,
+      "ticketsAbertos": 44,
+      "tempoMedioResolucao": "4h 32min",
+      "satisfacaoMedia": 87.5
+    },
+    "distribuicao": {
+      "porCategoria": {
+        "Técnico": 156,
+        "Financeiro": 89,
+        "Editorial": 67,
+        "Outros": 30
+      },
+      "porNewsletter": {
+        "the news": 145,
+        "the bizness": 78,
+        "the champs": 45,
+        "health times": 38,
+        "rising": 22,
+        "goget": 14
+      },
+      "porDia": [
+        {"data": "2024-01-01", "total": 12},
+        {"data": "2024-01-02", "total": 15},
+        {"data": "2024-01-03", "total": 8}
+      ]
+    },
+    "performance": {
+      "sla": {
+        "cumprido": 285,
+        "naoComprido": 57,
+        "percentual": 83.3
+      },
+      "primeiraResposta": "1h 15min",
+      "respostasRapidas": 189
+    }
+  }
+}
+```
+
+```json Resumo Rápido
+{
+  "success": true,
+  "data": {
+    "ticketsHoje": 23,
+    "ticketsAbertos": 44,
+    "ticketsUrgentes": 5,
+    "tempoMedioResposta": "45min",
+    "agentesMaisAtivos": [
+      {"nome": "joao@suporte.com", "tickets": 15},
+      {"nome": "maria@suporte.com", "tickets": 12}
+    ],
+    "categoriasPopulares": [
+      {"categoria": "Técnico", "percentual": 45.6},
+      {"categoria": "Financeiro", "percentual": 26.0}
+    ]
+  }
+}
+```
+
+</ResponseExample>

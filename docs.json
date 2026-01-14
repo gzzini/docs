@@ -189,6 +189,20 @@
               "api-reference/subscription/get-summary",
               "api-reference/subscription/get-subscriber"
             ]
+          },
+          {
+            "group": "SAC/Support API",
+            "pages": [
+              "api-reference/sac/introduction",
+              "api-reference/sac/create-ticket",
+              "api-reference/sac/list-tickets",
+              "api-reference/sac/get-ticket",
+              "api-reference/sac/update-ticket-status",
+              "api-reference/sac/add-message",
+              "api-reference/sac/quick-replies",
+              "api-reference/sac/attachments",
+              "api-reference/sac/reports"
+            ]
           }
         ]
       }

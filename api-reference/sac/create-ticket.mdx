@@ -1,0 +1,162 @@
+---
+title: "Criar Ticket"
+api: "POST https://sac-waffle-v2.theo-110.workers.dev/support"
+description: "Cria um novo ticket de suporte"
+---
+
+## Descrição
+
+Endpoint público para criar um novo ticket de suporte. Aceita tanto JSON quanto multipart/form-data para permitir upload de anexos.
+
+## Headers
+
+<ParamField header="Content-Type" type="string" required>
+  `application/json` ou `multipart/form-data` (quando incluir anexos)
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="main" type="string" required>
+  Categoria principal do ticket
+  
+  Valores aceitos:
+  - `Técnico`
+  - `Financeiro`
+  - `Editorial`
+  - `Outros`
+</ParamField>
+
+<ParamField body="issue" type="string" required>
+  Assunto ou problema específico
+</ParamField>
+
+<ParamField body="description" type="string" required>
+  Descrição detalhada do problema ou solicitação
+</ParamField>
+
+<ParamField body="email" type="string">
+  Email do usuário para receber atualizações
+</ParamField>
+
+<ParamField body="newsletter" type="string">
+  Newsletter relacionada ao ticket
+  
+  Valores aceitos:
+  - `the news`
+  - `the bizness`
+  - `the champs`
+  - `health times`
+  - `rising`
+  - `goget`
+</ParamField>
+
+<ParamField body="arquivos" type="file[]">
+  Array de arquivos anexos (somente via multipart/form-data)
+  
+  - Tamanho máximo: 10MB por arquivo
+  - Tipos permitidos: imagens, PDFs, documentos de texto, planilhas
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+  Mensagem descritiva do resultado
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados do ticket criado">
+    <ResponseField name="id" type="number">
+      ID único do ticket
+    </ResponseField>
+    
+    <ResponseField name="main" type="string">
+      Categoria principal
+    </ResponseField>
+    
+    <ResponseField name="issue" type="string">
+      Assunto do ticket
+    </ResponseField>
+    
+    <ResponseField name="description" type="string">
+      Descrição completa
+    </ResponseField>
+    
+    <ResponseField name="status" type="string">
+      Status atual do ticket (inicialmente `open`)
+    </ResponseField>
+    
+    <ResponseField name="email" type="string">
+      Email do solicitante
+    </ResponseField>
+    
+    <ResponseField name="newsletter" type="string">
+      Newsletter relacionada
+    </ResponseField>
+    
+    <ResponseField name="createdAt" type="string">
+      Data de criação (ISO 8601)
+    </ResponseField>
+    
+    <ResponseField name="anexos" type="array">
+      Lista de anexos incluídos
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash JSON
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support \
+  -H "Content-Type: application/json" \
+  -d '{
+    "main": "Técnico",
+    "issue": "Erro no login",
+    "description": "Não consigo fazer login na plataforma. Aparece erro 500.",
+    "email": "usuario@exemplo.com",
+    "newsletter": "the news"
+  }'
+```
+
+```bash Multipart
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support \
+  -F "main=Técnico" \
+  -F "issue=Bug no sistema" \
+  -F "description=Segue print do erro anexado" \
+  -F "email=usuario@exemplo.com" \
+  -F "arquivos=@/path/to/screenshot.png"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "message": "Ticket criado com sucesso",
+  "data": {
+    "id": 12345,
+    "main": "Técnico",
+    "issue": "Erro no login",
+    "description": "Não consigo fazer login na plataforma. Aparece erro 500.",
+    "status": "open",
+    "email": "usuario@exemplo.com",
+    "newsletter": "the news",
+    "createdAt": "2024-01-14T10:00:00Z",
+    "anexos": []
+  }
+}
+```
+
+```json Error
+{
+  "success": false,
+  "message": "Campos obrigatórios faltando (main, issue, description)"
+}
+```
+
+</ResponseExample>

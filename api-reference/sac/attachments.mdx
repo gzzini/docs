@@ -1,0 +1,196 @@
+---
+title: "Anexos"
+api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/{id}/anexos"
+description: "Gerencia anexos de tickets de suporte"
+---
+
+## Descrição
+
+Sistema completo para upload, download e gerenciamento de arquivos anexados aos tickets de suporte.
+
+## Endpoints Disponíveis
+
+### Upload de Anexo
+
+`POST /support/{id}/anexos`
+
+Faz upload de um ou múltiplos arquivos para um ticket.
+
+#### Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  `multipart/form-data`
+</ParamField>
+
+#### Form Data
+
+<ParamField body="arquivo" type="file" required>
+  Arquivo para upload
+  
+  Restrições:
+  - Tamanho máximo: 10MB
+  - Tipos permitidos:
+    - Imagens: `image/jpeg`, `image/png`, `image/gif`, `image/webp`
+    - Documentos: `application/pdf`, `text/plain`
+    - Planilhas: `text/csv`, `application/vnd.ms-excel`, `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`
+</ParamField>
+
+<ParamField body="mensagemId" type="number">
+  ID da mensagem para associar o anexo
+</ParamField>
+
+### Listar Anexos
+
+`GET /support/{id}/anexos`
+
+Lista todos os anexos de um ticket.
+
+### Download de Anexo
+
+`GET /support/anexos/{attachmentId}/download`
+
+Faz download de um arquivo específico.
+
+### Excluir Anexo
+
+`DELETE /support/anexos/{attachmentId}`
+
+Remove um anexo do ticket e do armazenamento.
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object/array">
+  <Expandable title="Estrutura do Anexo">
+    <ResponseField name="id" type="number">
+      ID do anexo
+    </ResponseField>
+    
+    <ResponseField name="supportId" type="number">
+      ID do ticket
+    </ResponseField>
+    
+    <ResponseField name="mensagemId" type="number">
+      ID da mensagem associada
+    </ResponseField>
+    
+    <ResponseField name="nomeArquivo" type="string">
+      Nome original do arquivo
+    </ResponseField>
+    
+    <ResponseField name="caminhoArquivo" type="string">
+      Caminho no armazenamento
+    </ResponseField>
+    
+    <ResponseField name="tipoArquivo" type="string">
+      Tipo MIME
+    </ResponseField>
+    
+    <ResponseField name="tamanhoArquivo" type="number">
+      Tamanho em bytes
+    </ResponseField>
+    
+    <ResponseField name="createdAt" type="string">
+      Data de upload
+    </ResponseField>
+    
+    <ResponseField name="downloadUrl" type="string">
+      URL temporária para download
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash Upload
+curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/12345/anexos" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -F "arquivo=@/path/to/document.pdf" \
+  -F "mensagemId=567"
+```
+
+```bash Listar
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/12345/anexos" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+```bash Download
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/anexos/789/download" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -o arquivo_baixado.pdf
+```
+
+```bash Excluir
+curl -X DELETE "https://sac-waffle-v2.theo-110.workers.dev/support/anexos/789" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Upload Success
+{
+  "success": true,
+  "message": "Arquivo enviado com sucesso",
+  "data": {
+    "id": 789,
+    "supportId": 12345,
+    "mensagemId": 567,
+    "nomeArquivo": "comprovante.pdf",
+    "caminhoArquivo": "support/12345/2024-01-14/uuid_comprovante.pdf",
+    "tipoArquivo": "application/pdf",
+    "tamanhoArquivo": 245760,
+    "createdAt": "2024-01-14T15:30:00Z"
+  }
+}
+```
+
+```json Lista de Anexos
+{
+  "success": true,
+  "data": [
+    {
+      "id": 789,
+      "supportId": 12345,
+      "nomeArquivo": "comprovante.pdf",
+      "tipoArquivo": "application/pdf",
+      "tamanhoArquivo": 245760,
+      "createdAt": "2024-01-14T15:30:00Z",
+      "downloadUrl": "https://sac-waffle-v2.theo-110.workers.dev/support/anexos/789/download"
+    },
+    {
+      "id": 790,
+      "supportId": 12345,
+      "nomeArquivo": "screenshot_erro.png",
+      "tipoArquivo": "image/png",
+      "tamanhoArquivo": 512000,
+      "createdAt": "2024-01-14T15:35:00Z",
+      "downloadUrl": "https://sac-waffle-v2.theo-110.workers.dev/support/anexos/790/download"
+    }
+  ]
+}
+```
+
+```json Error - Arquivo Muito Grande
+{
+  "success": false,
+  "message": "Arquivo muito grande. Tamanho máximo permitido: 10MB"
+}
+```
+
+```json Error - Tipo Não Permitido
+{
+  "success": false,
+  "message": "Tipo de arquivo não permitido. Tipos aceitos: imagens, PDFs, documentos de texto e planilhas"
+}
+```
+
+</ResponseExample>

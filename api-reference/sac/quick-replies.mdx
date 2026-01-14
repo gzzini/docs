@@ -1,0 +1,191 @@
+---
+title: "Respostas Rápidas"
+api: "GET https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies"
+description: "Gerencia templates de respostas rápidas para suporte"
+---
+
+## Descrição
+
+Sistema de templates de respostas pré-definidas para agilizar o atendimento. Permite criar, editar, categorizar e reutilizar mensagens padrão.
+
+## Endpoints Disponíveis
+
+### Listar Respostas Rápidas
+
+`GET /support/quick-replies`
+
+#### Query Parameters
+
+<ParamField query="categoria" type="string">
+  Filtrar por categoria
+</ParamField>
+
+<ParamField query="busca" type="string">
+  Buscar no título ou conteúdo
+</ParamField>
+
+<ParamField query="page" type="number" default="1">
+  Número da página
+</ParamField>
+
+<ParamField query="limit" type="number" default="10">
+  Itens por página
+</ParamField>
+
+### Criar Resposta Rápida
+
+`POST /support/quick-replies`
+
+#### Body Parameters
+
+<ParamField body="titulo" type="string" required>
+  Título da resposta rápida
+</ParamField>
+
+<ParamField body="conteudo" type="string" required>
+  Conteúdo do template
+</ParamField>
+
+<ParamField body="categoria" type="string" required>
+  Categoria da resposta
+  
+  Valores comuns:
+  - `saudacao` - Mensagens de boas-vindas
+  - `despedida` - Mensagens de encerramento
+  - `tecnico` - Respostas técnicas
+  - `financeiro` - Respostas financeiras
+  - `geral` - Respostas gerais
+</ParamField>
+
+<ParamField body="tags" type="array">
+  Tags para facilitar busca
+</ParamField>
+
+### Usar Resposta Rápida
+
+`POST /support/quick-replies/{quickReplyId}/usar`
+
+Incrementa o contador de uso e retorna o conteúdo formatado.
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object/array">
+  <Expandable title="Estrutura da Resposta Rápida">
+    <ResponseField name="id" type="number">
+      ID único
+    </ResponseField>
+    
+    <ResponseField name="titulo" type="string">
+      Título da resposta
+    </ResponseField>
+    
+    <ResponseField name="conteudo" type="string">
+      Conteúdo do template
+    </ResponseField>
+    
+    <ResponseField name="categoria" type="string">
+      Categoria
+    </ResponseField>
+    
+    <ResponseField name="tags" type="array">
+      Lista de tags
+    </ResponseField>
+    
+    <ResponseField name="usageCount" type="number">
+      Número de vezes utilizada
+    </ResponseField>
+    
+    <ResponseField name="lastUsedAt" type="string">
+      Última vez utilizada
+    </ResponseField>
+    
+    <ResponseField name="createdBy" type="string">
+      Criado por
+    </ResponseField>
+    
+    <ResponseField name="createdAt" type="string">
+      Data de criação
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash Listar
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies?categoria=tecnico" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+```bash Criar
+curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "titulo": "Problema de Login",
+    "conteudo": "Olá! Lamentamos o problema com seu login. Por favor, tente limpar o cache do navegador e os cookies. Se o problema persistir, clique em 'Esqueci minha senha' para redefini-la.",
+    "categoria": "tecnico",
+    "tags": ["login", "senha", "acesso"]
+  }'
+```
+
+```bash Usar
+curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies/123/usar" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Lista de Respostas
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "titulo": "Boas-vindas",
+      "conteudo": "Olá! Bem-vindo ao suporte. Como posso ajudar?",
+      "categoria": "saudacao",
+      "tags": ["inicio", "welcome"],
+      "usageCount": 150,
+      "lastUsedAt": "2024-01-14T10:00:00Z",
+      "createdBy": "admin@waffle.com.br",
+      "createdAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": 2,
+      "titulo": "Problema de Login",
+      "conteudo": "Lamentamos o problema com seu login...",
+      "categoria": "tecnico",
+      "tags": ["login", "senha"],
+      "usageCount": 89,
+      "lastUsedAt": "2024-01-14T09:30:00Z",
+      "createdBy": "joao@waffle.com.br",
+      "createdAt": "2024-01-05T10:00:00Z"
+    }
+  ],
+  "pagination": {
+    "total": 25,
+    "page": 1,
+    "limit": 10,
+    "totalPages": 3
+  }
+}
+```
+
+```json Resposta Utilizada
+{
+  "success": true,
+  "message": "Resposta rápida utilizada com sucesso",
+  "data": {
+    "conteudo": "Olá! Lamentamos o problema com seu login. Por favor, tente limpar o cache do navegador e os cookies. Se o problema persistir, clique em 'Esqueci minha senha' para redefini-la.",
+    "usageCount": 90
+  }
+}
+```
+
+</ResponseExample>
