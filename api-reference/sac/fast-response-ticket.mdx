@@ -1,0 +1,151 @@
+---
+title: "Fast Response para Ticket"
+api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/{id}/fast-response"
+description: "Gera resposta de IA para um ticket específico"
+---
+
+## Descrição
+
+Gera resposta automática com IA para um ticket existente, com opção de salvar a resposta e enviar por email.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  `application/json`
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="id" type="number" required>
+  ID do ticket
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="salvar" type="boolean" default="false">
+  Se deve salvar a resposta como mensagem no ticket
+</ParamField>
+
+<ParamField body="autor" type="string" default="IA Assistant">
+  Identificação do autor da mensagem
+</ParamField>
+
+<ParamField body="enviar_email" type="boolean" default="false">
+  Se deve enviar a resposta por email ao usuário
+  
+  **Nota:** Funciona apenas se o ticket tem email e `salvar=true`
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Status da operação
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados da resposta">
+    <ResponseField name="ticket_id" type="number">
+      ID do ticket processado
+    </ResponseField>
+    
+    <ResponseField name="resposta" type="string">
+      Resposta gerada pela IA
+    </ResponseField>
+    
+    <ResponseField name="confianca" type="number">
+      Nível de confiança (0.0 a 1.0)
+    </ResponseField>
+    
+    <ResponseField name="baseado_em_similares" type="boolean">
+      Se usou tickets similares como base
+    </ResponseField>
+    
+    <ResponseField name="tickets_similares_usados" type="number">
+      Quantidade de tickets similares usados
+    </ResponseField>
+    
+    <ResponseField name="salvo" type="boolean">
+      Se a resposta foi salva no ticket
+    </ResponseField>
+    
+    <ResponseField name="email_enviado" type="boolean">
+      Se o email foi enviado
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash Preview Apenas
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support/12345/fast-response \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+```bash Salvar Resposta
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support/12345/fast-response \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "salvar": true,
+    "autor": "Suporte IA"
+  }'
+```
+
+```bash Salvar e Enviar Email
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support/12345/fast-response \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "salvar": true,
+    "autor": "Suporte IA",
+    "enviar_email": true
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Preview
+{
+  "success": true,
+  "data": {
+    "ticket_id": 12345,
+    "resposta": "Olá! Verificamos seu problema de login. O erro 500 indica um problema temporário em nossos servidores. Por favor, tente novamente em alguns minutos. Se persistir, use a opção 'Esqueci minha senha'.",
+    "confianca": 0.92,
+    "baseado_em_similares": true,
+    "tickets_similares_usados": 5,
+    "salvo": false
+  }
+}
+```
+
+```json Resposta Salva com Email
+{
+  "success": true,
+  "data": {
+    "ticket_id": 12345,
+    "resposta": "Agradecemos seu contato. Identificamos o problema com sua assinatura e já corrigimos. Você deve receber as próximas edições normalmente.",
+    "confianca": 0.88,
+    "baseado_em_similares": true,
+    "tickets_similares_usados": 4,
+    "salvo": true,
+    "email_enviado": true
+  }
+}
+```
+
+```json Error - Ticket Não Encontrado
+{
+  "success": false,
+  "message": "Ticket nao encontrado"
+}
+```
+
+</ResponseExample>

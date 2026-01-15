@@ -1,0 +1,188 @@
+---
+title: "Registrar Agente"
+api: "POST https://sac-waffle-v2.theo-110.workers.dev/openai/agents"
+description: "Cria um novo agente com configuração customizada"
+---
+
+## Descrição
+
+Registra um novo agente com system prompt, modelo e tools customizados para casos de uso específicos.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  `application/json`
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="name" type="string" required>
+  Nome único do agente
+  
+  **Regras:**
+  - Sem espaços (use hífens ou underscores)
+  - Letras, números e hífens
+  - Máximo 50 caracteres
+  - Exemplo: `content-writer`, `sales_assistant`
+</ParamField>
+
+<ParamField body="systemPrompt" type="string" required>
+  Instruções do sistema para o agente
+  
+  **Dicas para um bom system prompt:**
+  - Defina claramente o papel do agente
+  - Especifique tom e estilo de comunicação
+  - Inclua conhecimento do domínio
+  - Estabeleça limites e diretrizes
+</ParamField>
+
+<ParamField body="description" type="string">
+  Descrição do propósito do agente
+</ParamField>
+
+<ParamField body="model" type="string" default="gpt-4o-mini">
+  Modelo GPT a usar
+  
+  Opções:
+  - `gpt-4o-mini` - Rápido e econômico
+  - `gpt-4o` - Mais avançado
+  - `gpt-4-turbo` - Versão anterior
+  - `gpt-3.5-turbo` - Legacy
+</ParamField>
+
+<ParamField body="temperature" type="number" default="0.7">
+  Temperatura para respostas (0.0 a 2.0)
+  
+  Valores recomendados:
+  - `0.0-0.3` - Tarefas factuais
+  - `0.4-0.7` - Uso geral
+  - `0.8-1.5` - Conteúdo criativo
+</ParamField>
+
+<ParamField body="maxTokens" type="number" default="4096">
+  Limite máximo de tokens
+</ParamField>
+
+<ParamField body="tools" type="array">
+  Lista de tools disponíveis para o agente
+  
+  **Exemplo:**
+  ```json
+  ["get_current_date", "format_json"]
+  ```
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Status da operação
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+  Mensagem de confirmação
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados do agente criado">
+    <ResponseField name="name" type="string">
+      Nome do agente
+    </ResponseField>
+    
+    <ResponseField name="description" type="string">
+      Descrição do agente
+    </ResponseField>
+    
+    <ResponseField name="model" type="string">
+      Modelo configurado
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash Agente de Conteúdo
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/agents \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "content-writer",
+    "description": "Escritor de conteúdo para newsletters",
+    "systemPrompt": "Você é um escritor especializado em newsletters digitais. Crie conteúdo envolvente, conciso e informativo. Use títulos chamativos, parágrafos curtos e linguagem acessível. Sempre em português brasileiro.",
+    "model": "gpt-4o-mini",
+    "temperature": 0.8,
+    "maxTokens": 2000
+  }'
+```
+
+```bash Agente Técnico
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/agents \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "tech-support",
+    "description": "Suporte técnico especializado",
+    "systemPrompt": "Você é um especialista em suporte técnico. Resolva problemas de forma clara e metódica. Sempre peça detalhes antes de sugerir soluções. Use linguagem técnica quando apropriado, mas explique termos complexos.",
+    "model": "gpt-4o",
+    "temperature": 0.3,
+    "maxTokens": 3000,
+    "tools": ["get_current_date"]
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "message": "Agente 'content-writer' registrado com sucesso",
+  "data": {
+    "name": "content-writer",
+    "description": "Escritor de conteúdo para newsletters",
+    "model": "gpt-4o-mini"
+  }
+}
+```
+
+```json Error - Nome Duplicado
+{
+  "success": false,
+  "error": "Agente com nome 'content-writer' já existe"
+}
+```
+
+```json Error - Validação
+{
+  "success": false,
+  "error": "Nome e systemPrompt são obrigatórios"
+}
+```
+
+</ResponseExample>
+
+## Exemplo de System Prompt Eficaz
+
+```text
+Você é um assistente de vendas da empresa XYZ.
+
+Conhecimento:
+- Produtos: Software de gestão empresarial
+- Público: PMEs brasileiras
+- Diferenciais: Integração fiscal, suporte 24/7
+
+Diretrizes:
+- Seja consultivo, não pushy
+- Entenda a necessidade antes de propor
+- Use casos de sucesso quando relevante
+- Sempre colete contato para follow-up
+
+Tom:
+- Profissional mas acessível
+- Evite jargões técnicos excessivos
+- Use exemplos práticos
+```

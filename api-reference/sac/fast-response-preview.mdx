@@ -1,0 +1,141 @@
+---
+title: "Fast Response Preview"
+api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/fast-response"
+description: "Gera resposta de IA sem criar ticket (preview)"
+---
+
+## Descrição
+
+Endpoint público para gerar uma resposta automática usando IA sem criar um ticket. Útil para preview em formulários antes de submeter.
+
+## Headers
+
+<ParamField header="Content-Type" type="string" required>
+  `application/json`
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="id" type="number">
+  ID do ticket existente
+  
+  **Nota:** Se fornecido, busca automaticamente issue e description do banco
+</ParamField>
+
+<ParamField body="issue" type="string" conditionally-required>
+  Assunto ou problema principal
+  
+  **Obrigatório** se `id` não for fornecido
+</ParamField>
+
+<ParamField body="description" type="string" conditionally-required>
+  Descrição detalhada do problema
+  
+  **Obrigatório** se `id` não for fornecido
+</ParamField>
+
+<ParamField body="main" type="string">
+  Categoria principal
+  
+  Valores aceitos:
+  - `Técnico`
+  - `Financeiro`
+  - `Editorial`
+  - `Outros`
+</ParamField>
+
+<ParamField body="newsletter" type="string">
+  Newsletter relacionada
+  
+  Valores aceitos:
+  - `the news`
+  - `the bizness`
+  - `the champs`
+  - `health times`
+  - `rising`
+  - `goget`
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados da resposta">
+    <ResponseField name="response" type="string">
+      Resposta gerada pela IA
+    </ResponseField>
+    
+    <ResponseField name="confidence" type="number">
+      Nível de confiança (0.0 a 1.0)
+      
+      **Interpretação:**
+      - `> 0.8` - Alta confiança
+      - `0.5 - 0.8` - Confiança média
+      - `< 0.5` - Baixa confiança
+    </ResponseField>
+    
+    <ResponseField name="basedOnSimilar" type="boolean">
+      Se a resposta foi baseada em tickets similares
+    </ResponseField>
+    
+    <ResponseField name="similarTicketsUsed" type="number">
+      Quantidade de tickets similares utilizados
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash Com ID do Ticket
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support/fast-response \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": 12345
+  }'
+```
+
+```bash Sem ID (Manual)
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support/fast-response \
+  -H "Content-Type: application/json" \
+  -d '{
+    "issue": "Erro ao fazer login",
+    "description": "Quando tento fazer login, aparece erro 500 e não consigo acessar.",
+    "main": "Técnico",
+    "newsletter": "the news"
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "data": {
+    "response": "Olá! Entendo sua frustração com o erro 500 ao fazer login. Este é um erro do servidor que estamos monitorando. Sugiro:\n\n1. Tente usar outro navegador ou modo anônimo\n2. Verifique se está usando o email correto\n3. Use a opção 'Esqueci minha senha' para redefinir\n\nSe o problema persistir, nossa equipe técnica está investigando.",
+    "confidence": 0.85,
+    "basedOnSimilar": true,
+    "similarTicketsUsed": 3
+  }
+}
+```
+
+```json Error - Dados Faltando
+{
+  "success": false,
+  "message": "Issue e description sao obrigatorios (ou forneça um ID válido)"
+}
+```
+
+```json Error - Ticket Não Encontrado
+{
+  "success": false,
+  "message": "Ticket nao encontrado"
+}
+```
+
+</ResponseExample>

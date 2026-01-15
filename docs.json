@@ -199,7 +199,9 @@
               "api-reference/sac/get-ticket",
               "api-reference/sac/update-ticket-status",
               "api-reference/sac/add-message",
-              "api-reference/sac/fast-response",
+              "api-reference/sac/fast-response-preview",
+              "api-reference/sac/fast-response-ticket",
+              "api-reference/sac/fast-response-batch",
               "api-reference/sac/quick-replies",
               "api-reference/sac/attachments",
               "api-reference/sac/reports"
@@ -209,10 +211,12 @@
             "group": "OpenAI API",
             "pages": [
               "api-reference/openai/introduction",
+              "api-reference/openai/resources",
               "api-reference/openai/chat",
-              "api-reference/openai/chat-with-tools",
-              "api-reference/openai/agents",
-              "api-reference/openai/chat-with-mcp"
+              "api-reference/openai/chat-tools",
+              "api-reference/openai/chat-mcp",
+              "api-reference/openai/agent-use",
+              "api-reference/openai/agent-register"
             ]
           }
         ]

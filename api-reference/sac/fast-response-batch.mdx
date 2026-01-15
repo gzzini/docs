@@ -1,0 +1,250 @@
+---
+title: "Fast Response em Lote"
+api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/fast-response/lote"
+description: "Processa múltiplos tickets com IA simultaneamente"
+---
+
+## Descrição
+
+Gera respostas automáticas com IA para múltiplos tickets de uma vez, com opção de salvar e enviar emails em massa.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  `application/json`
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="support_ids" type="array" required>
+  Array de IDs de tickets para processar
+  
+  **Limites:**
+  - Mínimo: 1 ticket
+  - Máximo: 50 tickets por requisição
+</ParamField>
+
+<ParamField body="salvar" type="boolean" default="false">
+  Se deve salvar as respostas nos tickets
+</ParamField>
+
+<ParamField body="autor" type="string" default="IA Assistant">
+  Identificação do autor para todas as mensagens
+</ParamField>
+
+<ParamField body="enviar_email" type="boolean" default="false">
+  Se deve enviar emails para tickets com email cadastrado
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Status da operação
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados do processamento">
+    <ResponseField name="modo" type="string">
+      Modo de operação
+      
+      Valores:
+      - `lote_preview` - Apenas gera respostas
+      - `lote_com_salvamento` - Salva as respostas
+    </ResponseField>
+    
+    <ResponseField name="tickets_processados" type="number">
+      Total de tickets processados
+    </ResponseField>
+    
+    <ResponseField name="sucesso" type="number">
+      Tickets processados com sucesso (modo preview)
+    </ResponseField>
+    
+    <ResponseField name="salvos" type="number">
+      Tickets com respostas salvas (modo salvamento)
+    </ResponseField>
+    
+    <ResponseField name="falhas" type="number">
+      Tickets que falharam
+    </ResponseField>
+    
+    <ResponseField name="respostas" type="array">
+      Lista de respostas geradas (modo preview)
+      
+      <Expandable title="Estrutura da resposta">
+        <ResponseField name="ticket_id" type="number">
+          ID do ticket
+        </ResponseField>
+        
+        <ResponseField name="resposta" type="string">
+          Resposta gerada
+        </ResponseField>
+        
+        <ResponseField name="confianca" type="number">
+          Nível de confiança
+        </ResponseField>
+        
+        <ResponseField name="baseado_em_similares" type="boolean">
+          Se usou similares
+        </ResponseField>
+        
+        <ResponseField name="tickets_similares_usados" type="number">
+          Quantidade de similares
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    
+    <ResponseField name="resultados" type="array">
+      Resultados detalhados (modo salvamento)
+      
+      <Expandable title="Estrutura do resultado">
+        <ResponseField name="ticket_id" type="number">
+          ID do ticket
+        </ResponseField>
+        
+        <ResponseField name="sucesso" type="boolean">
+          Se foi processado com sucesso
+        </ResponseField>
+        
+        <ResponseField name="resposta_salva" type="boolean">
+          Se a resposta foi salva
+        </ResponseField>
+        
+        <ResponseField name="email_enviado" type="boolean">
+          Se o email foi enviado
+        </ResponseField>
+        
+        <ResponseField name="confianca" type="number">
+          Nível de confiança
+        </ResponseField>
+        
+        <ResponseField name="erro" type="string">
+          Mensagem de erro (se houver)
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash Preview em Lote
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support/fast-response/lote \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "support_ids": [12345, 12346, 12347],
+    "salvar": false
+  }'
+```
+
+```bash Salvar em Lote
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support/fast-response/lote \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "support_ids": [12345, 12346, 12347, 12348, 12349],
+    "salvar": true,
+    "autor": "Suporte Automático",
+    "enviar_email": true
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Preview em Lote
+{
+  "success": true,
+  "data": {
+    "modo": "lote_preview",
+    "tickets_processados": 3,
+    "sucesso": 3,
+    "falhas": 0,
+    "respostas": [
+      {
+        "ticket_id": 12345,
+        "resposta": "Olá! Vejo que está com problemas no login. Sugiro limpar o cache e tentar novamente.",
+        "confianca": 0.88,
+        "baseado_em_similares": true,
+        "tickets_similares_usados": 4
+      },
+      {
+        "ticket_id": 12346,
+        "resposta": "Sobre sua cobrança duplicada, já identificamos o erro e o reembolso será processado.",
+        "confianca": 0.95,
+        "baseado_em_similares": true,
+        "tickets_similares_usados": 7
+      },
+      {
+        "ticket_id": 12347,
+        "resposta": "Seu cancelamento foi processado com sucesso. Você receberá a confirmação por email.",
+        "confianca": 0.76,
+        "baseado_em_similares": false,
+        "tickets_similares_usados": 0
+      }
+    ]
+  }
+}
+```
+
+```json Salvamento em Lote
+{
+  "success": true,
+  "data": {
+    "modo": "lote_com_salvamento",
+    "tickets_processados": 5,
+    "salvos": 4,
+    "falhas": 1,
+    "resultados": [
+      {
+        "ticket_id": 12345,
+        "sucesso": true,
+        "resposta_salva": true,
+        "email_enviado": true,
+        "confianca": 0.91
+      },
+      {
+        "ticket_id": 12346,
+        "sucesso": true,
+        "resposta_salva": true,
+        "email_enviado": false,
+        "confianca": 0.83
+      },
+      {
+        "ticket_id": 12347,
+        "sucesso": true,
+        "resposta_salva": true,
+        "email_enviado": true,
+        "confianca": 0.79
+      },
+      {
+        "ticket_id": 12348,
+        "sucesso": true,
+        "resposta_salva": true,
+        "email_enviado": true,
+        "confianca": 0.85
+      },
+      {
+        "ticket_id": 12349,
+        "sucesso": false,
+        "erro": "Confiança muito baixa para salvar automaticamente"
+      }
+    ]
+  }
+}
+```
+
+```json Error - Limite Excedido
+{
+  "success": false,
+  "message": "Maximo de 50 tickets por lote"
+}
+```
+
+</ResponseExample>

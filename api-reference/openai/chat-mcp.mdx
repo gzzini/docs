@@ -1,0 +1,172 @@
+---
+title: "Chat with MCP"
+api: "POST https://sac-waffle-v2.theo-110.workers.dev/openai/chat-with-mcp"
+description: "Chat com Model Context Protocol para contexto dinâmico"
+---
+
+## Descrição
+
+Model Context Protocol (MCP) permite adicionar contexto dinâmico às conversas com IA. Útil para incluir dados em tempo real, configurações específicas ou informações que mudam frequentemente.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  `application/json`
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="prompt" type="string" required>
+  Mensagem ou prompt para processar com contexto
+</ParamField>
+
+<ParamField body="systemPrompt" type="string">
+  Instruções do sistema
+</ParamField>
+
+<ParamField body="model" type="string" default="gpt-4o-mini">
+  Modelo GPT a usar
+</ParamField>
+
+<ParamField body="contextProviders" type="array">
+  Lista de provedores de contexto
+  
+  <Expandable title="Estrutura do Provider">
+    <ParamField body="name" type="string" required>
+      Nome identificador do provider
+    </ParamField>
+    
+    <ParamField body="content" type="string" required>
+      Conteúdo do contexto
+      
+      **Exemplos:**
+      - Dados do usuário
+      - Configurações atuais
+      - Métricas recentes
+      - Histórico relevante
+    </ParamField>
+    
+    <ParamField body="priority" type="number">
+      Prioridade do contexto (maior = mais importante)
+      
+      **Valores:**
+      - `0-10`: Baixa prioridade
+      - `11-50`: Média prioridade
+      - `51-100`: Alta prioridade
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="maxContextLength" type="number" default="10000">
+  Tamanho máximo do contexto em caracteres
+  
+  **Considerações:**
+  - Contexto muito grande consome mais tokens
+  - Prioridade determina o que incluir se exceder limite
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Status da operação
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados da resposta">
+    <ResponseField name="content" type="string">
+      Resposta gerada com contexto aplicado
+    </ResponseField>
+    
+    <ResponseField name="usage" type="object">
+      <Expandable title="Estatísticas de uso">
+        <ResponseField name="promptTokens" type="number">
+          Tokens no prompt (incluindo contexto)
+        </ResponseField>
+        
+        <ResponseField name="completionTokens" type="number">
+          Tokens na resposta
+        </ResponseField>
+        
+        <ResponseField name="totalTokens" type="number">
+          Total consumido
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    
+    <ResponseField name="finishReason" type="string">
+      Motivo do término
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash Contexto de Usuário
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/chat-with-mcp \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Qual o status da minha conta?",
+    "contextProviders": [
+      {
+        "name": "user_data",
+        "content": "Usuário: João Silva\nAssinatura: The News\nStatus: Ativa\nPróxima cobrança: 15/02/2024\nStreak: 45 dias",
+        "priority": 100
+      }
+    ]
+  }'
+```
+
+```bash Múltiplos Contextos
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/chat-with-mcp \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Analise meu desempenho",
+    "contextProviders": [
+      {
+        "name": "metrics",
+        "content": "Taxa abertura: 65%, Taxa cliques: 18%",
+        "priority": 80
+      },
+      {
+        "name": "history",
+        "content": "Leitor desde Jan/2023, 5 indicações",
+        "priority": 60
+      }
+    ],
+    "maxContextLength": 15000
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "data": {
+    "content": "Olá João! Sua conta está ativa e em dia. Próxima cobrança em 15/02/2024. Parabéns pelos 45 dias de streak!",
+    "usage": {
+      "promptTokens": 95,
+      "completionTokens": 32,
+      "totalTokens": 127
+    },
+    "finishReason": "stop"
+  }
+}
+```
+
+```json Error
+{
+  "success": false,
+  "error": "Prompt é obrigatório"
+}
+```
+
+</ResponseExample>

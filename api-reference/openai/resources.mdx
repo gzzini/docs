@@ -1,0 +1,74 @@
+---
+title: "Listar Recursos"
+api: "GET https://sac-waffle-v2.theo-110.workers.dev/openai/resources"
+description: "Lista todos os agentes e tools disponíveis"
+---
+
+## Descrição
+
+Retorna uma lista de todos os agentes e tools registrados no sistema.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Status da operação
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Recursos disponíveis">
+    <ResponseField name="agents" type="array">
+      Lista de agentes registrados
+      
+      **Agentes padrão:**
+      - `support-assistant` - Assistente de suporte
+      - `analytics-assistant` - Análise de dados
+    </ResponseField>
+    
+    <ResponseField name="tools" type="array">
+      Lista de tools disponíveis
+      
+      **Tools padrão:**
+      - `get_current_date` - Obtém data/hora atual
+      - `format_json` - Formata e valida JSON
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl -X GET https://sac-waffle-v2.theo-110.workers.dev/openai/resources \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json
+{
+  "success": true,
+  "data": {
+    "agents": [
+      "support-assistant",
+      "analytics-assistant",
+      "content-writer",
+      "tech-support"
+    ],
+    "tools": [
+      "get_current_date",
+      "format_json",
+      "calculate_price",
+      "search_database"
+    ]
+  }
+}
+```
+
+</ResponseExample>

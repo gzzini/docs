@@ -1,0 +1,148 @@
+---
+title: "Usar Agente"
+api: "POST https://sac-waffle-v2.theo-110.workers.dev/openai/agent/{agentName}"
+description: "Chat usando agente pré-configurado"
+---
+
+## Descrição
+
+Executa chat usando um agente pré-configurado com system prompt e configurações específicas.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  `application/json`
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="agentName" type="string" required>
+  Nome do agente a usar
+  
+  **Agentes pré-configurados:**
+  - `support-assistant` - Assistente de suporte ao cliente
+  - `analytics-assistant` - Assistente de análise de dados
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="prompt" type="string" required>
+  Mensagem para o agente processar
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Status da operação
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados da resposta">
+    <ResponseField name="agent" type="string">
+      Nome do agente usado
+    </ResponseField>
+    
+    <ResponseField name="content" type="string">
+      Resposta gerada pelo agente
+    </ResponseField>
+    
+    <ResponseField name="toolResults" type="array">
+      Resultados de tools executadas (se aplicável)
+    </ResponseField>
+    
+    <ResponseField name="usage" type="object">
+      <Expandable title="Estatísticas de uso">
+        <ResponseField name="promptTokens" type="number">
+          Tokens no prompt
+        </ResponseField>
+        
+        <ResponseField name="completionTokens" type="number">
+          Tokens na resposta
+        </ResponseField>
+        
+        <ResponseField name="totalTokens" type="number">
+          Total de tokens
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    
+    <ResponseField name="finishReason" type="string">
+      Motivo do término
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash Support Assistant
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/agent/support-assistant \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Como funciona o programa de indicações?"
+  }'
+```
+
+```bash Analytics Assistant
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/agent/analytics-assistant \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Analise estes dados: Opens 45%, Clicks 12%"
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Support Assistant
+{
+  "success": true,
+  "data": {
+    "agent": "support-assistant",
+    "content": "olá! o programa de indicações do waffle é super simples!\n\nvocê compartilha seu link único com amigos e quando eles se inscrevem, vocês dois ganham benefícios:\n\n- você acumula pontos para trocar por prêmios\n- seu amigo ganha desconto ou período grátis\n- quanto mais indica, mais recompensas\n\ncada newsletter tem suas próprias vantagens. quer começar a indicar?",
+    "toolResults": [],
+    "usage": {
+      "promptTokens": 142,
+      "completionTokens": 98,
+      "totalTokens": 240
+    },
+    "finishReason": "stop"
+  }
+}
+```
+
+```json Analytics Assistant
+{
+  "success": true,
+  "data": {
+    "agent": "analytics-assistant",
+    "content": "## Análise de Engajamento\n\n### Métricas:\n- **Taxa de Abertura: 45%** ✅ Excelente (2x média)\n- **Taxa de Cliques: 12%** ✅ Muito Bom (4x média)\n- **CTR (Click-to-Open): 26.7%** 🎆 Excepcional\n\n### Insights:\n1. Alto engajamento indica conteúdo relevante\n2. CTR de 26.7% mostra forte call-to-action\n3. Audiência qualificada e interessada\n\n### Recomendações:\n- Mantenha a estratégia atual\n- Teste segmentação para os 55% inativos\n- Considere aumentar frequência",
+    "toolResults": [],
+    "usage": {
+      "promptTokens": 168,
+      "completionTokens": 142,
+      "totalTokens": 310
+    },
+    "finishReason": "stop"
+  }
+}
+```
+
+```json Error - Agente Não Encontrado
+{
+  "success": false,
+  "error": "Agente 'custom-agent' não encontrado",
+  "availableAgents": [
+    "support-assistant",
+    "analytics-assistant"
+  ]
+}
+```
+
+</ResponseExample>
