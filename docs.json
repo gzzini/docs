@@ -246,7 +246,8 @@
     "/api-reference/openapi/openapi.json",
     "/api-reference/openapi/referrals.json",
     "/api-reference/openapi/streaks.json",
-    "/api-reference/openapi/subscription.json"
+    "/api-reference/openapi/subscription.json",
+    "/api-reference/openapi/sac-openai.json"
   ],
   "logo": {
     "light": "https://app.thenewscc.com.br/thenews.webp",

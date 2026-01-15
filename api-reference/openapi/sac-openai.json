@@ -1,0 +1,1021 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "SAC & OpenAI APIs",
+    "description": "APIs para Sistema de Atendimento ao Cliente e integração com OpenAI",
+    "version": "1.0.0",
+    "contact": {
+      "email": "tech@waffle.com.br"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://sac-waffle-v2.theo-110.workers.dev",
+      "description": "Servidor de produção"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Token JWT obtido através da autenticação"
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "required": ["success", "message"],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "message": {
+            "type": "string",
+            "example": "Erro na requisição"
+          }
+        }
+      },
+      "Success": {
+        "type": "object",
+        "required": ["success"],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {},
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/support/fast-response": {
+      "post": {
+        "tags": ["SAC"],
+        "summary": "Fast Response Preview",
+        "description": "Gera resposta de IA sem criar ticket (público)",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer",
+                    "description": "ID do ticket existente"
+                  },
+                  "issue": {
+                    "type": "string",
+                    "description": "Assunto (obrigatório se id não fornecido)"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Descrição (obrigatório se id não fornecido)"
+                  },
+                  "main": {
+                    "type": "string",
+                    "enum": ["Técnico", "Financeiro", "Editorial", "Outros"]
+                  },
+                  "newsletter": {
+                    "type": "string",
+                    "enum": ["the news", "the bizness", "the champs", "health times", "rising", "goget"]
+                  }
+                },
+                "examples": {
+                  "com_id": {
+                    "summary": "Com ID do ticket",
+                    "value": {
+                      "id": 12345
+                    }
+                  },
+                  "manual": {
+                    "summary": "Manual (sem ID)",
+                    "value": {
+                      "issue": "Erro ao fazer login",
+                      "description": "Não consigo acessar minha conta",
+                      "main": "Técnico",
+                      "newsletter": "the news"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resposta gerada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/Success"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "response": {"type": "string"},
+                            "confidence": {"type": "number"},
+                            "basedOnSimilar": {"type": "boolean"},
+                            "similarTicketsUsed": {"type": "integer"}
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/Error"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/support/{id}/fast-response": {
+      "post": {
+        "tags": ["SAC"],
+        "summary": "Fast Response para Ticket",
+        "description": "Gera resposta de IA para ticket específico",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID do ticket"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "salvar": {
+                    "type": "boolean",
+                    "default": false
+                  },
+                  "autor": {
+                    "type": "string",
+                    "default": "IA Assistant"
+                  },
+                  "enviar_email": {
+                    "type": "boolean",
+                    "default": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resposta gerada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/Success"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "ticket_id": {"type": "integer"},
+                            "resposta": {"type": "string"},
+                            "confianca": {"type": "number"},
+                            "salvo": {"type": "boolean"},
+                            "email_enviado": {"type": "boolean"}
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/Error"}
+              }
+            }
+          },
+          "404": {
+            "description": "Ticket não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/Error"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/openai/chat": {
+      "post": {
+        "tags": ["OpenAI"],
+        "summary": "Chat Completion",
+        "description": "Executa chat completion básico",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["prompt"],
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "description": "Mensagem para o modelo"
+                  },
+                  "systemPrompt": {
+                    "type": "string",
+                    "description": "Instruções do sistema"
+                  },
+                  "model": {
+                    "type": "string",
+                    "default": "gpt-4o-mini",
+                    "enum": ["gpt-4o-mini", "gpt-4o", "gpt-4-turbo", "gpt-3.5-turbo"]
+                  },
+                  "temperature": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 2,
+                    "default": 0.7
+                  },
+                  "maxTokens": {
+                    "type": "integer",
+                    "default": 4096
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resposta gerada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/Success"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "content": {"type": "string"},
+                            "usage": {
+                              "type": "object",
+                              "properties": {
+                                "promptTokens": {"type": "integer"},
+                                "completionTokens": {"type": "integer"},
+                                "totalTokens": {"type": "integer"}
+                              }
+                            },
+                            "finishReason": {"type": "string"}
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/Error"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/openai/resources": {
+      "get": {
+        "tags": ["OpenAI"],
+        "summary": "Listar Recursos",
+        "description": "Lista agentes e tools disponíveis",
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Lista de recursos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/Success"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "agents": {
+                              "type": "array",
+                              "items": {"type": "string"}
+                            },
+                            "tools": {
+                              "type": "array",
+                              "items": {"type": "string"}
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/Error"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/openai/chat-with-tools": {
+      "post": {
+        "tags": ["OpenAI"],
+        "summary": "Chat com Tools",
+        "description": "Chat completion com suporte a function calling",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["prompt"],
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "description": "Mensagem para o modelo"
+                  },
+                  "systemPrompt": {
+                    "type": "string",
+                    "description": "Instruções do sistema"
+                  },
+                  "model": {
+                    "type": "string",
+                    "default": "gpt-4o-mini",
+                    "enum": ["gpt-4o-mini", "gpt-4o", "gpt-4-turbo", "gpt-3.5-turbo"]
+                  },
+                  "temperature": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 2,
+                    "default": 0.7
+                  },
+                  "tools": {
+                    "type": "array",
+                    "description": "Lista de tools disponíveis para o modelo",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "maxToolIterations": {
+                    "type": "integer",
+                    "default": 5,
+                    "description": "Máximo de iterações com tools"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resposta gerada com tools",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/Success"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "content": {"type": "string"},
+                            "toolCalls": {
+                              "type": "array",
+                              "items": {"type": "object"}
+                            },
+                            "usage": {
+                              "type": "object",
+                              "properties": {
+                                "promptTokens": {"type": "integer"},
+                                "completionTokens": {"type": "integer"},
+                                "totalTokens": {"type": "integer"}
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/Error"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/openai/chat-with-mcp": {
+      "post": {
+        "tags": ["OpenAI"],
+        "summary": "Chat com MCP",
+        "description": "Chat completion com Model Context Protocol para contexto dinâmico",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["prompt"],
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "description": "Mensagem para o modelo"
+                  },
+                  "systemPrompt": {
+                    "type": "string",
+                    "description": "Instruções do sistema"
+                  },
+                  "model": {
+                    "type": "string",
+                    "default": "gpt-4o-mini",
+                    "enum": ["gpt-4o-mini", "gpt-4o", "gpt-4-turbo", "gpt-3.5-turbo"]
+                  },
+                  "contextProviders": {
+                    "type": "array",
+                    "description": "Provedores de contexto MCP",
+                    "items": {"type": "string"}
+                  },
+                  "maxContextLength": {
+                    "type": "integer",
+                    "default": 10000,
+                    "description": "Comprimento máximo do contexto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resposta gerada com contexto MCP",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/Success"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "content": {"type": "string"},
+                            "contextUsed": {
+                              "type": "array",
+                              "items": {"type": "object"}
+                            },
+                            "usage": {
+                              "type": "object",
+                              "properties": {
+                                "promptTokens": {"type": "integer"},
+                                "completionTokens": {"type": "integer"},
+                                "totalTokens": {"type": "integer"}
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/Error"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/openai/agent/{agentName}": {
+      "post": {
+        "tags": ["OpenAI"],
+        "summary": "Usar Agente",
+        "description": "Chat usando agente pré-configurado",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "agentName",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Nome do agente"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["prompt"],
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "description": "Mensagem para o agente"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resposta do agente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/Success"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "content": {"type": "string"},
+                            "agentName": {"type": "string"},
+                            "usage": {
+                              "type": "object",
+                              "properties": {
+                                "promptTokens": {"type": "integer"},
+                                "completionTokens": {"type": "integer"},
+                                "totalTokens": {"type": "integer"}
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/Error"}
+              }
+            }
+          },
+          "404": {
+            "description": "Agente não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/Error"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/openai/agents": {
+      "post": {
+        "tags": ["OpenAI"],
+        "summary": "Registrar Agente",
+        "description": "Registra um novo agente dinamicamente",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "systemPrompt"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Nome do agente"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Descrição do agente"
+                  },
+                  "systemPrompt": {
+                    "type": "string",
+                    "description": "Prompt do sistema para o agente"
+                  },
+                  "model": {
+                    "type": "string",
+                    "default": "gpt-4o-mini",
+                    "enum": ["gpt-4o-mini", "gpt-4o", "gpt-4-turbo", "gpt-3.5-turbo"]
+                  },
+                  "temperature": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 2,
+                    "default": 0.7
+                  },
+                  "maxTokens": {
+                    "type": "integer",
+                    "default": 4096
+                  },
+                  "tools": {
+                    "type": "array",
+                    "description": "Tools disponíveis para o agente",
+                    "items": {"type": "object"}
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Agente registrado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/Success"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "agentName": {"type": "string"},
+                            "registered": {"type": "boolean"}
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/Error"}
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/Error"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/support/fast-response/lote": {
+      "post": {
+        "tags": ["SAC"],
+        "summary": "Fast Response em Lote",
+        "description": "Gera respostas de IA para múltiplos tickets",
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["ticket_ids"],
+                "properties": {
+                  "ticket_ids": {
+                    "type": "array",
+                    "items": {"type": "integer"},
+                    "description": "Lista de IDs dos tickets"
+                  },
+                  "salvar": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Se deve salvar as respostas"
+                  },
+                  "enviar_emails": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Se deve enviar emails"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Respostas geradas em lote",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/Success"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "total_processados": {"type": "integer"},
+                            "respostas": {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "ticket_id": {"type": "integer"},
+                                  "resposta": {"type": "string"},
+                                  "confianca": {"type": "number"},
+                                  "status": {"type": "string"}
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/Error"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/support": {
+      "get": {
+        "tags": ["SAC"],
+        "summary": "Listar Tickets",
+        "description": "Lista tickets com filtros",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {"type": "integer", "default": 1},
+            "description": "Página"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {"type": "integer", "default": 50},
+            "description": "Limite por página"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["pendente", "em_andamento", "aguardando_cliente", "resolvido", "fechado"]
+            },
+            "description": "Filtro por status"
+          },
+          {
+            "name": "newsletter",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["the news", "the bizness", "the champs", "health times", "rising", "goget"]
+            },
+            "description": "Filtro por newsletter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de tickets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/Success"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "tickets": {
+                              "type": "array",
+                              "items": {"type": "object"}
+                            },
+                            "pagination": {
+                              "type": "object",
+                              "properties": {
+                                "page": {"type": "integer"},
+                                "limit": {"type": "integer"},
+                                "total": {"type": "integer"}
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/Error"}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["SAC"],
+        "summary": "Criar Ticket",
+        "description": "Cria novo ticket de suporte (público)",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["issue", "description"],
+                "properties": {
+                  "issue": {"type": "string", "description": "Título do problema"},
+                  "description": {"type": "string", "description": "Descrição detalhada"},
+                  "email": {"type": "string", "format": "email", "description": "Email do usuário"},
+                  "name": {"type": "string", "description": "Nome do usuário"},
+                  "main": {
+                    "type": "string",
+                    "enum": ["Técnico", "Financeiro", "Editorial", "Outros"],
+                    "description": "Categoria principal"
+                  },
+                  "newsletter": {
+                    "type": "string",
+                    "enum": ["the news", "the bizness", "the champs", "health times", "rising", "goget"],
+                    "description": "Newsletter relacionada"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ticket criado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/Success"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "ticket_id": {"type": "integer"},
+                            "status": {"type": "string"}
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/Error"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/support/{id}": {
+      "get": {
+        "tags": ["SAC"],
+        "summary": "Obter Ticket",
+        "description": "Obtém ticket específico por ID",
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {"type": "integer"},
+            "description": "ID do ticket"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dados do ticket",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {"$ref": "#/components/schemas/Success"},
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "description": "Dados completos do ticket"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autorizado",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/Error"}
+              }
+            }
+          },
+          "404": {
+            "description": "Ticket não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/Error"}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
