@@ -199,6 +199,7 @@
               "api-reference/sac/get-ticket",
               "api-reference/sac/update-ticket-status",
               "api-reference/sac/add-message",
+              "api-reference/sac/fast-response",
               "api-reference/sac/quick-replies",
               "api-reference/sac/attachments",
               "api-reference/sac/reports"
