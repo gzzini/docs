@@ -18,12 +18,22 @@ O sistema Fast Response utiliza IA (OpenAI) para gerar respostas automáticas e 
 
 #### Body Parameters
 
-<ParamField body="issue" type="string" required>
-  Assunto ou problema principal
+<ParamField body="id" type="number">
+  ID do ticket existente
+  
+  **Nota:** Se fornecido, busca automaticamente issue e description do banco
 </ParamField>
 
-<ParamField body="description" type="string" required>
+<ParamField body="issue" type="string" conditionally-required>
+  Assunto ou problema principal
+  
+  **Obrigatório** se `id` não for fornecido
+</ParamField>
+
+<ParamField body="description" type="string" conditionally-required>
   Descrição detalhada do problema
+  
+  **Obrigatório** se `id` não for fornecido
 </ParamField>
 
 <ParamField body="main" type="string">
@@ -133,7 +143,15 @@ O sistema Fast Response utiliza IA (OpenAI) para gerar respostas automáticas e 
 
 <RequestExample>
 
-```bash Preview Simples
+```bash Preview com ID
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support/fast-response \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": 12345
+  }'
+```
+
+```bash Preview Manual
 curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support/fast-response \
   -H "Content-Type: application/json" \
   -d '{

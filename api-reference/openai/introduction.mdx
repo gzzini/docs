@@ -1,0 +1,168 @@
+---
+title: "OpenAI API Integration"
+sidebarTitle: "Introdução"
+description: "API de integração com OpenAI para chat, agents e tools"
+---
+
+## Visão Geral
+
+A API OpenAI fornece integração completa com GPT-4 e outros modelos da OpenAI, permitindo chat básico, function calling (tools), agentes pré-configurados e Model Context Protocol (MCP) para contextos dinâmicos.
+
+## Base URL
+
+```
+https://sac-waffle-v2.theo-110.workers.dev/openai
+```
+
+## Autenticação
+
+Todos os endpoints requerem autenticação JWT e permissões específicas.
+
+### Headers Obrigatórios
+
+```http
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+### Permissões Necessárias
+
+- `ai.view` - Visualizar e usar recursos de IA
+- `ai.edit` - Criar e modificar agentes e tools
+
+## Recursos Principais
+
+### 1. Chat Básico
+- Completions simples com GPT
+- Controle de temperatura e tokens
+- System prompts personalizados
+- Response format (JSON mode)
+
+### 2. Function Calling (Tools)
+- Tools internas pré-configuradas
+- Registro de tools customizadas
+- Iterações múltiplas de tools
+- Handlers assíncronos
+
+### 3. Agentes
+- Agentes pré-configurados
+- Registro dinâmico de agentes
+- System prompts especializados
+- Tools específicas por agente
+
+### 4. Model Context Protocol (MCP)
+- Contexto dinâmico para prompts
+- Providers customizados
+- Controle de tamanho de contexto
+- Priorização de informações
+
+## Modelos Disponíveis
+
+| Modelo | Descrição | Contexto | Custo |
+|--------|-----------|----------|-------|
+| `gpt-4o-mini` | Modelo padrão, rápido e econômico | 128k tokens | $ |
+| `gpt-4o` | Modelo mais avançado | 128k tokens | $$$ |
+| `gpt-4-turbo` | Modelo anterior, boa performance | 128k tokens | $$ |
+| `gpt-3.5-turbo` | Modelo legacy, mais barato | 16k tokens | $ |
+
+## Tools Internas Padrão
+
+### `get_current_date`
+Retorna data e hora atual no fuso de São Paulo
+
+### `format_json`
+Valida e formata strings JSON
+
+## Agentes Pré-configurados
+
+### `support-assistant`
+- Assistente de suporte ao cliente
+- Conhecimento sobre newsletters Waffle
+- Tom casual e amigável
+
+### `analytics-assistant`
+- Análise de métricas e dados
+- Geração de insights
+- Formatação de relatórios
+
+## Limites e Quotas
+
+| Recurso | Limite | Observação |
+|---------|--------|------------|
+| Max tokens por request | 4096 | Configurável |
+| Timeout | 60s | Por requisição |
+| Tool iterations | 5 | Máximo de chamadas |
+| MCP context | 10000 chars | Por provider |
+| Rate limit | 100/min | Por usuário |
+
+## Tratamento de Erros
+
+Todos os endpoints retornam erros padronizados:
+
+```json
+{
+  "success": false,
+  "error": "Descrição do erro"
+}
+```
+
+### Códigos de Status
+
+| Código | Descrição |
+|--------|-----------||
+| `200` | Sucesso |
+| `400` | Parâmetros inválidos |
+| `401` | Não autorizado |
+| `403` | Sem permissão |
+| `404` | Recurso não encontrado |
+| `429` | Rate limit excedido |
+| `500` | Erro interno |
+| `503` | OpenAI indisponível |
+
+## Custos e Billing
+
+O uso da API consome tokens da OpenAI. Monitore o uso através do campo `usage` nas respostas:
+
+```json
+{
+  "usage": {
+    "promptTokens": 150,
+    "completionTokens": 250,
+    "totalTokens": 400
+  }
+}
+```
+
+## Exemplos Rápidos
+
+### Chat Simples
+
+```bash
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/chat \
+  -H "Authorization: Bearer {token}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Explique o que é uma newsletter",
+    "model": "gpt-4o-mini"
+  }'
+```
+
+### Usar Agente
+
+```bash
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/agent/support-assistant \
+  -H "Authorization: Bearer {token}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Como funciona o programa de indicações?"
+  }'
+```
+
+## Melhores Práticas
+
+1. **Escolha o modelo apropriado**: Use `gpt-4o-mini` para a maioria dos casos
+2. **Controle a temperatura**: 0.0 para respostas determinísticas, 0.7-1.0 para criatividade
+3. **Limite tokens**: Defina `maxTokens` para controlar custos
+4. **Use agentes**: Para tarefas específicas, agentes são mais eficientes
+5. **Cache respostas**: Implemente cache para queries repetidas
+6. **Monitor de custos**: Acompanhe o `usage` para controlar gastos

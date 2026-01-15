@@ -1,0 +1,314 @@
+---
+title: "Chat with Tools"
+api: "POST https://sac-waffle-v2.theo-110.workers.dev/openai/chat-with-tools"
+description: "Chat com function calling para executar tools e ações"
+---
+
+## Descrição  
+
+Chat completion com suporte a function calling (tools). Permite que o modelo chame funções específicas para obter informações ou executar ações durante a conversa.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  `application/json`
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="prompt" type="string" required>
+  Mensagem ou prompt para o modelo processar
+</ParamField>
+
+<ParamField body="systemPrompt" type="string">
+  Instruções do sistema para configurar o comportamento
+</ParamField>
+
+<ParamField body="model" type="string" default="gpt-4o-mini">
+  Modelo GPT a ser usado
+  
+  **Recomendado para tools:**
+  - `gpt-4o-mini` - Bom custo-benefício
+  - `gpt-4o` - Melhor precisão em tools complexas
+</ParamField>
+
+<ParamField body="temperature" type="number" default="0.7">
+  Controla a criatividade (0.0 a 2.0)
+  
+  **Para tools:** Recomenda-se 0.3 ou menor para precisão
+</ParamField>
+
+<ParamField body="tools" type="array">
+  Lista de tools disponíveis para uso
+  
+  **Tools internas disponíveis:**
+  - `get_current_date` - Obtém data/hora atual
+  - `format_json` - Formata e valida JSON
+  
+  **Exemplo:**
+  ```json
+  ["get_current_date", "format_json"]
+  ```
+</ParamField>
+
+<ParamField body="maxToolIterations" type="number" default="5">
+  Número máximo de iterações de tools
+  
+  **Considerações:**
+  - Cada iteração consome tokens adicionais
+  - Evita loops infinitos
+  - 5 é suficiente para a maioria dos casos
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados da resposta">
+    <ResponseField name="content" type="string">
+      Resposta final gerada após processar tools
+    </ResponseField>
+    
+    <ResponseField name="toolResults" type="array">
+      Resultados das tools executadas
+      
+      <Expandable title="Estrutura do resultado">
+        <ResponseField name="toolName" type="string">
+          Nome da tool executada
+        </ResponseField>
+        
+        <ResponseField name="arguments" type="object">
+          Argumentos passados para a tool
+        </ResponseField>
+        
+        <ResponseField name="result" type="any">
+          Resultado retornado pela tool
+        </ResponseField>
+        
+        <ResponseField name="timestamp" type="number">
+          Timestamp da execução
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    
+    <ResponseField name="usage" type="object">
+      <Expandable title="Estatísticas de uso">
+        <ResponseField name="promptTokens" type="number">
+          Tokens usados no prompt
+        </ResponseField>
+        
+        <ResponseField name="completionTokens" type="number">
+          Tokens gerados
+        </ResponseField>
+        
+        <ResponseField name="totalTokens" type="number">
+          Total de tokens
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    
+    <ResponseField name="finishReason" type="string">
+      Motivo do término
+      
+      **Valores:**
+      - `stop` - Completou normalmente
+      - `tool_calls` - Finalizou após tools
+      - `length` - Limite de tokens
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash Com Data Atual
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/chat-with-tools \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Que dia é hoje? E que dia da semana?",
+    "tools": ["get_current_date"],
+    "temperature": 0.3
+  }'
+```
+
+```bash Formatar JSON
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/chat-with-tools \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Formate este JSON: {\"name\":\"João\",\"age\":30,\"city\":\"São Paulo\"}",
+    "tools": ["format_json"],
+    "model": "gpt-4o-mini"
+  }'
+```
+
+```bash Múltiplas Tools
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/chat-with-tools \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Crie um JSON com a data de hoje formatado corretamente",
+    "tools": ["get_current_date", "format_json"],
+    "maxToolIterations": 3
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Tool Simples
+{
+  "success": true,
+  "data": {
+    "content": "Hoje é segunda-feira, 15 de janeiro de 2024, às 14:30 no horário de São Paulo.",
+    "toolResults": [
+      {
+        "toolName": "get_current_date",
+        "arguments": {},
+        "result": {
+          "formatted": "15/01/2024 14:30:45, segunda-feira",
+          "iso": "2024-01-15T17:30:45.123Z",
+          "timestamp": 1705337445123
+        },
+        "timestamp": 1705337445000
+      }
+    ],
+    "usage": {
+      "promptTokens": 85,
+      "completionTokens": 125,
+      "totalTokens": 210
+    },
+    "finishReason": "stop"
+  }
+}
+```
+
+```json Múltiplas Execuções
+{
+  "success": true,
+  "data": {
+    "content": "Aqui está o JSON formatado com a data de hoje:\n```json\n{\n  \"data_atual\": {\n    \"dia\": 15,\n    \"mes\": 1,\n    \"ano\": 2024,\n    \"dia_semana\": \"segunda-feira\",\n    \"horario\": \"14:30:45\",\n    \"fuso\": \"America/Sao_Paulo\"\n  }\n}\n```",
+    "toolResults": [
+      {
+        "toolName": "get_current_date",
+        "arguments": {},
+        "result": {
+          "formatted": "15/01/2024 14:30:45, segunda-feira",
+          "iso": "2024-01-15T17:30:45.123Z",
+          "timestamp": 1705337445123
+        },
+        "timestamp": 1705337445000
+      },
+      {
+        "toolName": "format_json",
+        "arguments": {
+          "json_string": "{\"data_atual\":{\"dia\":15,\"mes\":1,\"ano\":2024,\"dia_semana\":\"segunda-feira\",\"horario\":\"14:30:45\",\"fuso\":\"America/Sao_Paulo\"}}"
+        },
+        "result": {
+          "valid": true,
+          "formatted": "{\n  \"data_atual\": {\n    \"dia\": 15,\n    \"mes\": 1,\n    \"ano\": 2024,\n    \"dia_semana\": \"segunda-feira\",\n    \"horario\": \"14:30:45\",\n    \"fuso\": \"America/Sao_Paulo\"\n  }\n}"
+        },
+        "timestamp": 1705337446000
+      }
+    ],
+    "usage": {
+      "promptTokens": 180,
+      "completionTokens": 285,
+      "totalTokens": 465
+    },
+    "finishReason": "stop"
+  }
+}
+```
+
+```json Erro - Tool Não Encontrada
+{
+  "success": true,
+  "data": {
+    "content": "Desculpe, não tenho acesso à tool 'weather_api' para obter informações do clima.",
+    "toolResults": [],
+    "usage": {
+      "promptTokens": 45,
+      "completionTokens": 25,
+      "totalTokens": 70
+    },
+    "finishReason": "stop"
+  }
+}
+```
+
+</ResponseExample>
+
+## Tools Customizadas
+
+Além das tools internas, você pode registrar tools customizadas através da API. Exemplo de estrutura:
+
+```javascript
+{
+  "name": "calculate_price",
+  "description": "Calcula o preço com desconto",
+  "parameters": [
+    {
+      "name": "price",
+      "type": "number",
+      "description": "Preço original",
+      "required": true
+    },
+    {
+      "name": "discount",
+      "type": "number",
+      "description": "Percentual de desconto",
+      "required": false
+    }
+  ],
+  "handler": async (args) => {
+    const finalPrice = args.price * (1 - (args.discount || 0) / 100);
+    return { originalPrice: args.price, discount: args.discount, finalPrice };
+  }
+}
+```
+
+## Use Cases Avançados
+
+### 📅 Assistente com Contexto Temporal
+```json
+{
+  "prompt": "Quantos dias faltam para o final do mês?",
+  "tools": ["get_current_date"],
+  "systemPrompt": "Sempre considere o calendário brasileiro e feriados"
+}
+```
+
+### 🔄 Processamento de Dados
+```json
+{
+  "prompt": "Pegue a data atual e crie um relatório em JSON",
+  "tools": ["get_current_date", "format_json"],
+  "maxToolIterations": 3
+}
+```
+
+### 🤖 Automação
+```json
+{
+  "prompt": "Verifique se hoje é dia útil e sugira tarefas apropriadas",
+  "tools": ["get_current_date"],
+  "temperature": 0.5
+}
+```
+
+## Limitações
+
+1. **Máximo 5 iterações** por padrão
+2. **Tools devem estar registradas** previamente
+3. **Cada iteração consome tokens** adicionais
+4. **Timeout de 60s** para toda a operação
+5. **Resultados grandes** podem exceder limite de contexto

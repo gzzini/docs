@@ -1,0 +1,349 @@
+---
+title: "Agents"
+api: "POST https://sac-waffle-v2.theo-110.workers.dev/openai/agent/{agentName}"
+description: "Chat usando agentes pré-configurados ou customizados"
+---
+
+## Descrição
+
+Agentes são configurações pré-definidas de modelo, system prompt e tools para tarefas específicas. Eles simplificam o uso da API para casos de uso comuns.
+
+## Endpoints Disponíveis
+
+### 1. Usar Agente Existente
+
+`POST /openai/agent/{agentName}`
+
+Executa chat usando um agente pré-configurado.
+
+#### Path Parameters
+
+<ParamField path="agentName" type="string" required>
+  Nome do agente a usar
+  
+  **Agentes pré-configurados:**
+  - `support-assistant` - Suporte ao cliente
+  - `analytics-assistant` - Análise de dados
+</ParamField>
+
+#### Body Parameters
+
+<ParamField body="prompt" type="string" required>
+  Mensagem para o agente processar
+</ParamField>
+
+### 2. Registrar Novo Agente
+
+`POST /openai/agents`
+
+Cria um novo agente com configuração customizada.
+
+#### Body Parameters
+
+<ParamField body="name" type="string" required>
+  Nome único do agente
+  
+  **Regras:**
+  - Sem espaços
+  - Letras, números e hífens
+  - Máximo 50 caracteres
+</ParamField>
+
+<ParamField body="systemPrompt" type="string" required>
+  Instruções do sistema para o agente
+  
+  **Dicas:**
+  - Seja específico sobre o comportamento
+  - Defina tom e estilo
+  - Inclua conhecimento do domínio
+</ParamField>
+
+<ParamField body="description" type="string">
+  Descrição do propósito do agente
+</ParamField>
+
+<ParamField body="model" type="string" default="gpt-4o-mini">
+  Modelo GPT a usar
+</ParamField>
+
+<ParamField body="temperature" type="number" default="0.7">
+  Temperatura para respostas (0.0 a 2.0)
+</ParamField>
+
+<ParamField body="maxTokens" type="number" default="4096">
+  Limite máximo de tokens
+</ParamField>
+
+<ParamField body="tools" type="array">
+  Lista de tools disponíveis para o agente
+  
+  **Exemplo:**
+  ```json
+  ["get_current_date", "format_json"]
+  ```
+</ParamField>
+
+### 3. Listar Recursos Disponíveis
+
+`GET /openai/resources`
+
+Lista todos os agentes e tools disponíveis.
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Status da operação
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados da resposta">
+    <ResponseField name="agent" type="string">
+      Nome do agente usado (quando aplicável)
+    </ResponseField>
+    
+    <ResponseField name="content" type="string">
+      Resposta gerada pelo agente
+    </ResponseField>
+    
+    <ResponseField name="toolResults" type="array">
+      Resultados de tools executadas
+    </ResponseField>
+    
+    <ResponseField name="usage" type="object">
+      Estatísticas de uso de tokens
+    </ResponseField>
+    
+    <ResponseField name="finishReason" type="string">
+      Motivo do término
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Agentes Pré-configurados
+
+### support-assistant
+
+**Propósito:** Assistente de suporte ao cliente do Waffle Group
+
+**Características:**
+- Tom casual e amigável
+- Conhecimento sobre newsletters
+- Responde em português brasileiro
+- Evita emojis excessivos
+
+**System Prompt:**
+```
+Você é um assistente de suporte do Waffle Group, empresa responsável 
+pelas newsletters The News, The Bizness, The Champs, entre outras.
+
+Diretrizes:
+- Seja amigável, informativo e acessível
+- Use linguagem casual mas profissional
+- Prefira letras minúsculas para manter o tom casual da marca
+- Evite emojis excessivos
+- Responda sempre em português brasileiro
+```
+
+### analytics-assistant
+
+**Propósito:** Análise de métricas e dados
+
+**Características:**
+- Foco em insights acionáveis
+- Visualização de dados
+- Análise estatística
+- Recomendações baseadas em dados
+
+<RequestExample>
+
+```bash Usar Support Assistant
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/agent/support-assistant \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Como funciona o programa de indicações?"
+  }'
+```
+
+```bash Usar Analytics Assistant
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/agent/analytics-assistant \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Analise estes dados de engajamento: Opens 45%, Clicks 12%, Unsub 0.5%"
+  }'
+```
+
+```bash Registrar Novo Agente
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/agents \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "content-writer",
+    "description": "Escritor de conteúdo para newsletters",
+    "systemPrompt": "Você é um escritor especializado em newsletters. Crie conteúdo envolvente, conciso e informativo. Use títulos chamativos e parágrafos curtos.",
+    "model": "gpt-4o-mini",
+    "temperature": 0.8,
+    "maxTokens": 2000
+  }'
+```
+
+```bash Listar Recursos
+curl -X GET https://sac-waffle-v2.theo-110.workers.dev/openai/resources \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Support Assistant Response
+{
+  "success": true,
+  "data": {
+    "agent": "support-assistant",
+    "content": "olá! o programa de indicações do waffle é super simples e vantajoso!\n\nfunciona assim:\n\n1. você compartilha seu link único de indicação com amigos\n2. quando eles se inscrevem usando seu link, vocês dois ganham benefícios\n3. você acumula pontos que podem ser trocados por prêmios exclusivos\n4. seus amigos ganham desconto ou período grátis inicial\n\ncada newsletter tem suas próprias recompensas, mas geralmente incluem:\n- meses grátis de assinatura\n- produtos exclusivos da marca\n- acesso antecipado a conteúdos\n\nvocê pode acompanhar suas indicações e pontos direto no seu painel. quanto mais amigos você indica, mais benefícios acumula!\n\nquer começar a indicar? posso te ajudar a encontrar seu link!",
+    "toolResults": [],
+    "usage": {
+      "promptTokens": 142,
+      "completionTokens": 198,
+      "totalTokens": 340
+    },
+    "finishReason": "stop"
+  }
+}
+```
+
+```json Analytics Assistant Response
+{
+  "success": true,
+  "data": {
+    "agent": "analytics-assistant",
+    "content": "## Análise de Engajamento\n\n### Métricas Atuais\n- **Taxa de Abertura:** 45% ✅ EXCELENTE\n- **Taxa de Cliques:** 12% ✅ MUITO BOM\n- **Taxa de Descadastro:** 0.5% ✅ SAUDÁVEL\n\n### Insights\n\n1. **Performance Geral:** Suas métricas estão acima da média da indústria\n   - Benchmark abertura: 20-25%\n   - Benchmark cliques: 2-5%\n   - Benchmark unsub: 0.5-1%\n\n2. **CTR (Click-to-Open):** 26.7%\n   - Indica excelente relevância do conteúdo\n   - Seus assinantes que abrem estão altamente engajados\n\n3. **Saúde da Lista:** Ótima\n   - Baixo unsubscribe indica satisfação\n   - Proporção saudável entre engajamento e retenção\n\n### Recomendações\n\n1. **Mantenha:** Continue com a estratégia atual de conteúdo\n2. **Teste A/B:** Experimente diferentes CTAs para aumentar cliques\n3. **Segmentação:** Considere criar grupos baseados em engajamento\n4. **Reativação:** Foque nos 55% que não abrem com campanhas especiais",
+    "toolResults": [],
+    "usage": {
+      "promptTokens": 168,
+      "completionTokens": 342,
+      "totalTokens": 510
+    },
+    "finishReason": "stop"
+  }
+}
+```
+
+```json Novo Agente Registrado
+{
+  "success": true,
+  "message": "Agente 'content-writer' registrado com sucesso",
+  "data": {
+    "name": "content-writer",
+    "description": "Escritor de conteúdo para newsletters",
+    "model": "gpt-4o-mini"
+  }
+}
+```
+
+```json Lista de Recursos
+{
+  "success": true,
+  "data": {
+    "agents": [
+      "support-assistant",
+      "analytics-assistant",
+      "content-writer"
+    ],
+    "tools": [
+      "get_current_date",
+      "format_json"
+    ]
+  }
+}
+```
+
+```json Erro - Agente Não Encontrado
+{
+  "success": false,
+  "error": "Agente 'sales-bot' não encontrado",
+  "availableAgents": [
+    "support-assistant",
+    "analytics-assistant"
+  ]
+}
+```
+
+</ResponseExample>
+
+## Criando Agentes Eficazes
+
+### 🎯 Defina Propósito Claro
+```json
+{
+  "name": "email-composer",
+  "systemPrompt": "Você é um especialista em escrever emails de resposta para suporte..."
+}
+```
+
+### 🌡️ Ajuste Temperatura
+- **0.0-0.3**: Tarefas factuais, respostas consistentes
+- **0.4-0.7**: Balanceado, uso geral
+- **0.8-1.5**: Criativo, geração de conteúdo
+
+### 🔧 Inclua Tools Relevantes
+```json
+{
+  "name": "report-generator",
+  "tools": ["get_current_date", "format_json"],
+  "systemPrompt": "Gere relatórios estruturados..."
+}
+```
+
+### 📝 System Prompt Eficaz
+```
+Você é [PAPEL/FUNÇÃO].
+
+Conhecimento:
+- [INFORMAÇÕES DO DOMÍNIO]
+- [CONTEXTO NECESSÁRIO]
+
+Diretrizes:
+- [REGRA 1]
+- [REGRA 2]
+
+Tom e Estilo:
+- [COMO COMUNICAR]
+- [O QUE EVITAR]
+```
+
+## Casos de Uso
+
+### 📧 Suporte ao Cliente
+```json
+{
+  "agent": "support-assistant",
+  "prompt": "Cliente reclamando de cobrança duplicada"
+}
+```
+
+### 📊 Análise de Dados
+```json
+{
+  "agent": "analytics-assistant",
+  "prompt": "Compare performance desta semana vs semana passada"
+}
+```
+
+### ✍️ Geração de Conteúdo
+```json
+{
+  "agent": "content-writer",
+  "prompt": "Escreva introdução para newsletter sobre tecnologia"
+}
+```
+
+## Melhores Práticas
+
+1. **Nomes descritivos**: Use nomes que indicam a função
+2. **System prompts detalhados**: Quanto mais específico, melhor
+3. **Temperature apropriada**: Ajuste conforme o caso de uso
+4. **Teste antes de produzir**: Valide comportamento do agente
+5. **Versionamento**: Mantenha histórico de mudanças em agentes

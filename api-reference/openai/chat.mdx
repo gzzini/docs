@@ -1,0 +1,262 @@
+---
+title: "Chat Completion"
+api: "POST https://sac-waffle-v2.theo-110.workers.dev/openai/chat"
+description: "Executa chat completion básico com OpenAI GPT"
+---
+
+## Descrição
+
+Endpoint para chat completion simples usando modelos GPT da OpenAI. Ideal para perguntas diretas, geração de texto e tarefas que não requerem tools ou contexto adicional.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  `application/json`
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="prompt" type="string" required>
+  Mensagem ou prompt para o modelo processar
+  
+  **Dicas:**
+  - Seja claro e específico
+  - Forneça contexto quando necessário
+  - Use exemplos para melhor resultado
+</ParamField>
+
+<ParamField body="systemPrompt" type="string">
+  Instruções do sistema para configurar o comportamento do modelo
+  
+  **Exemplo:**
+  ```
+  Você é um assistente útil que responde em português brasileiro.
+  Seja conciso e direto nas respostas.
+  ```
+</ParamField>
+
+<ParamField body="model" type="string" default="gpt-4o-mini">
+  Modelo GPT a ser usado
+  
+  **Opções:**
+  - `gpt-4o-mini` - Rápido e econômico (recomendado)
+  - `gpt-4o` - Mais avançado
+  - `gpt-4-turbo` - Versão anterior
+  - `gpt-3.5-turbo` - Legacy, mais barato
+</ParamField>
+
+<ParamField body="temperature" type="number" default="0.7">
+  Controla a criatividade das respostas (0.0 a 2.0)
+  
+  **Valores comuns:**
+  - `0.0` - Determinístico, sempre a mesma resposta
+  - `0.3` - Pouca variação
+  - `0.7` - Balanceado (padrão)
+  - `1.0` - Criativo
+  - `1.5+` - Muito criativo, pode ser imprevisível
+</ParamField>
+
+<ParamField body="maxTokens" type="number" default="4096">
+  Número máximo de tokens na resposta
+  
+  **Considerações:**
+  - 1 token ≈ 0.75 palavras
+  - Limitar reduz custos
+  - Máximo depende do modelo
+</ParamField>
+
+<ParamField body="responseFormat" type="object">
+  Formato da resposta (opcional)
+  
+  <Expandable title="Opções de formato">
+    <ParamField body="type" type="string">
+      Tipo de formato
+      
+      **Valores:**
+      - `text` - Texto livre (padrão)
+      - `json_object` - Força resposta em JSON válido
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados da resposta">
+    <ResponseField name="content" type="string">
+      Resposta gerada pelo modelo
+    </ResponseField>
+    
+    <ResponseField name="usage" type="object">
+      <Expandable title="Estatísticas de uso">
+        <ResponseField name="promptTokens" type="number">
+          Tokens usados no prompt
+        </ResponseField>
+        
+        <ResponseField name="completionTokens" type="number">
+          Tokens gerados na resposta
+        </ResponseField>
+        
+        <ResponseField name="totalTokens" type="number">
+          Total de tokens consumidos
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    
+    <ResponseField name="finishReason" type="string">
+      Motivo do término da geração
+      
+      **Valores:**
+      - `stop` - Completou normalmente
+      - `length` - Atingiu limite de tokens
+      - `content_filter` - Bloqueado por filtro
+      - `tool_calls` - Chamou uma tool (não aplicável aqui)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash Exemplo Básico
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/chat \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Explique o que é uma newsletter em 2 frases"
+  }'
+```
+
+```bash Com System Prompt
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/chat \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Como criar um componente React?",
+    "systemPrompt": "Você é um expert em React. Sempre inclua TypeScript e melhores práticas.",
+    "model": "gpt-4o-mini",
+    "temperature": 0.3
+  }'
+```
+
+```bash JSON Mode
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/chat \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Liste 3 benefícios de newsletters em formato JSON com campos: titulo e descricao",
+    "model": "gpt-4o-mini",
+    "responseFormat": {
+      "type": "json_object"
+    }
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Resposta Simples
+{
+  "success": true,
+  "data": {
+    "content": "Uma newsletter é uma publicação periódica enviada por email para assinantes com conteúdo relevante sobre temas específicos. Ela permite que empresas e criadores mantenham contato direto com seu público, compartilhando notícias, insights e atualizações de forma regular.",
+    "usage": {
+      "promptTokens": 18,
+      "completionTokens": 52,
+      "totalTokens": 70
+    },
+    "finishReason": "stop"
+  }
+}
+```
+
+```json Resposta JSON
+{
+  "success": true,
+  "data": {
+    "content": "{\"beneficios\":[{\"titulo\":\"Comunicação Direta\",\"descricao\":\"Permite contato direto com o público sem depender de algoritmos de redes sociais\"},{\"titulo\":\"Engajamento Alto\",\"descricao\":\"Emails têm taxas de abertura superiores a outras formas de comunicação digital\"},{\"titulo\":\"Construção de Autoridade\",\"descricao\":\"Estabelece expertise e credibilidade ao compartilhar conteúdo valioso regularmente\"}]}",
+    "usage": {
+      "promptTokens": 32,
+      "completionTokens": 98,
+      "totalTokens": 130
+    },
+    "finishReason": "stop"
+  }
+}
+```
+
+```json Erro - Prompt Faltando
+{
+  "success": false,
+  "error": "Prompt é obrigatório"
+}
+```
+
+```json Erro - Token Limit
+{
+  "success": true,
+  "data": {
+    "content": "[resposta parcial truncada...]",
+    "usage": {
+      "promptTokens": 50,
+      "completionTokens": 4096,
+      "totalTokens": 4146
+    },
+    "finishReason": "length"
+  }
+}
+```
+
+</ResponseExample>
+
+## Use Cases
+
+### 📝 Geração de Conteúdo
+```json
+{
+  "prompt": "Escreva um parágrafo sobre os benefícios de ler newsletters diárias",
+  "temperature": 0.8
+}
+```
+
+### 💡 Respostas Técnicas
+```json
+{
+  "prompt": "Explique o conceito de webhooks em programação",
+  "temperature": 0.3,
+  "maxTokens": 500
+}
+```
+
+### 📊 Análise de Dados
+```json
+{
+  "prompt": "Analise estes números de engajamento: Opens: 45%, Clicks: 12%, Unsubscribe: 0.5%",
+  "systemPrompt": "Você é um analista de marketing digital",
+  "model": "gpt-4o"
+}
+```
+
+### 🔄 Tradução
+```json
+{
+  "prompt": "Traduza para inglês: 'Nosso boletim informativo é enviado toda manhã'",
+  "temperature": 0.1
+}
+```
+
+## Dicas de Otimização
+
+1. **Reduza custos**: Use `gpt-4o-mini` sempre que possível
+2. **Cache respostas**: Implemente cache para prompts repetidos
+3. **Limite tokens**: Defina `maxTokens` apropriado para sua necessidade
+4. **Temperature baixa**: Para tarefas factuais, use 0.0-0.3
+5. **Batch requests**: Agrupe múltiplas perguntas em um prompt quando possível

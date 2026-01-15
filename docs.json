@@ -204,6 +204,16 @@
               "api-reference/sac/attachments",
               "api-reference/sac/reports"
             ]
+          },
+          {
+            "group": "OpenAI API",
+            "pages": [
+              "api-reference/openai/introduction",
+              "api-reference/openai/chat",
+              "api-reference/openai/chat-with-tools",
+              "api-reference/openai/agents",
+              "api-reference/openai/chat-with-mcp"
+            ]
           }
         ]
       }

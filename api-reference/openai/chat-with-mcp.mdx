@@ -1,0 +1,326 @@
+---
+title: "Chat with MCP"
+api: "POST https://sac-waffle-v2.theo-110.workers.dev/openai/chat-with-mcp"
+description: "Chat com Model Context Protocol para contexto dinâmico"
+---
+
+## Descrição
+
+Model Context Protocol (MCP) permite adicionar contexto dinâmico às conversas com IA. Útil para incluir dados em tempo real, configurações específicas ou informações que mudam frequentemente.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  `application/json`
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="prompt" type="string" required>
+  Mensagem ou prompt para processar com contexto
+</ParamField>
+
+<ParamField body="systemPrompt" type="string">
+  Instruções do sistema
+</ParamField>
+
+<ParamField body="model" type="string" default="gpt-4o-mini">
+  Modelo GPT a usar
+</ParamField>
+
+<ParamField body="contextProviders" type="array">
+  Lista de provedores de contexto
+  
+  <Expandable title="Estrutura do Provider">
+    <ParamField body="name" type="string" required>
+      Nome identificador do provider
+    </ParamField>
+    
+    <ParamField body="content" type="string" required>
+      Conteúdo do contexto
+      
+      **Exemplos:**
+      - Dados do usuário
+      - Configurações atuais
+      - Métricas recentes
+      - Histórico relevante
+    </ParamField>
+    
+    <ParamField body="priority" type="number">
+      Prioridade do contexto (maior = mais importante)
+      
+      **Valores:**
+      - `0-10`: Baixa prioridade
+      - `11-50`: Média prioridade
+      - `51-100`: Alta prioridade
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ParamField body="maxContextLength" type="number" default="10000">
+  Tamanho máximo do contexto em caracteres
+  
+  **Considerações:**
+  - Contexto muito grande consome mais tokens
+  - Prioridade determina o que incluir se exceder limite
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Status da operação
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados da resposta">
+    <ResponseField name="content" type="string">
+      Resposta gerada com contexto aplicado
+    </ResponseField>
+    
+    <ResponseField name="usage" type="object">
+      <Expandable title="Estatísticas de uso">
+        <ResponseField name="promptTokens" type="number">
+          Tokens no prompt (incluindo contexto)
+        </ResponseField>
+        
+        <ResponseField name="completionTokens" type="number">
+          Tokens na resposta
+        </ResponseField>
+        
+        <ResponseField name="totalTokens" type="number">
+          Total consumido
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    
+    <ResponseField name="finishReason" type="string">
+      Motivo do término
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash Contexto de Usuário
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/chat-with-mcp \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Qual o status da minha conta?",
+    "contextProviders": [
+      {
+        "name": "user_data",
+        "content": "Usuário: João Silva\nAssinatura: The News\nStatus: Ativa\nPróxima cobrança: 15/02/2024\nStreak: 45 dias",
+        "priority": 100
+      }
+    ]
+  }'
+```
+
+```bash Múltiplos Contextos
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/chat-with-mcp \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Analise meu desempenho e sugira melhorias",
+    "contextProviders": [
+      {
+        "name": "metrics",
+        "content": "Taxa de abertura: 65%\nTaxa de cliques: 18%\nArtigos lidos: 127\nÚltimos 30 dias",
+        "priority": 80
+      },
+      {
+        "name": "preferences",
+        "content": "Interesses: Tecnologia, Negócios\nHorário preferido: 7h\nFormato: Resumo",
+        "priority": 60
+      },
+      {
+        "name": "history",
+        "content": "Histórico: Leitor desde Jan/2023\nNewsletters assinadas: 3\nIndicações: 5",
+        "priority": 40
+      }
+    ],
+    "maxContextLength": 15000
+  }'
+```
+
+```bash Contexto de Sistema
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/chat-with-mcp \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "Gere um relatório de status",
+    "systemPrompt": "Você é um analista de sistemas. Gere relatórios concisos e técnicos.",
+    "contextProviders": [
+      {
+        "name": "system_status",
+        "content": "CPU: 45%\nMemória: 2.3GB/4GB\nRequests/min: 1250\nErros última hora: 3\nUptime: 99.98%",
+        "priority": 100
+      },
+      {
+        "name": "alerts",
+        "content": "Alertas ativos: 0\nÚltimo incidente: 3 dias atrás\nPróxima manutenção: 20/01/2024",
+        "priority": 75
+      }
+    ]
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Resposta com Contexto de Usuário
+{
+  "success": true,
+  "data": {
+    "content": "Olá João! Sua conta está em perfeito estado:\n\n✅ **Status:** Ativa\n📰 **Newsletter:** The News\n💳 **Próxima cobrança:** 15 de fevereiro de 2024\n🔥 **Streak atual:** 45 dias consecutivos - Parabéns!\n\nSua assinatura está funcionando perfeitamente e você tem mantido uma ótima sequência de leitura. Continue assim para desbloquear mais recompensas!",
+    "usage": {
+      "promptTokens": 95,
+      "completionTokens": 87,
+      "totalTokens": 182
+    },
+    "finishReason": "stop"
+  }
+}
+```
+
+```json Resposta com Múltiplos Contextos
+{
+  "success": true,
+  "data": {
+    "content": "## Análise de Desempenho\n\n### 🎆 Destaques\n- **Taxa de abertura de 65%** - Excepcional! 2.6x acima da média\n- **Taxa de cliques de 18%** - Engajamento muito alto\n- **127 artigos lidos** em 30 dias - Média de 4+ por dia\n- **Leitor veterano** com 2 anos de histórico\n\n### 💡 Sugestões de Melhoria\n\n1. **Maximize seu engajamento:**\n   - Com sua preferência por Tecnologia, explore nossa seção Tech Tuesday\n   - Considere assinar The Bizness para conteúdo de negócios\n\n2. **Otimize sua experiência:**\n   - Seu horário das 7h é perfeito para receber as newsletters\n   - Experimente o formato completo ocasionalmente para descobrir novos tópicos\n\n3. **Programa de indicações:**\n   - Com 5 indicações bem-sucedidas, você está próximo do próximo nível\n   - Mais 2 indicações desbloqueiam benefícios premium\n\nSeu perfil de leitura é exemplar! Continue explorando e compartilhando.",
+    "usage": {
+      "promptTokens": 198,
+      "completionTokens": 267,
+      "totalTokens": 465
+    },
+    "finishReason": "stop"
+  }
+}
+```
+
+```json Resposta de Sistema
+{
+  "success": true,
+  "data": {
+    "content": "## RELATÓRIO DE STATUS DO SISTEMA\n**Timestamp:** 2024-01-15T14:30:00Z\n\n### RECURSOS\n- CPU: 45% (Normal)\n- RAM: 2.3GB/4GB (57.5% - Ótimo)\n- Throughput: 1250 req/min (Dentro do esperado)\n\n### CONFIABILIDADE\n- Uptime: 99.98%\n- Erros (última hora): 3 (0.004% das requisições)\n- Último incidente: 72h atrás\n\n### STATUS OPERACIONAL\n✅ Sistema estável\n✅ Sem alertas críticos\nℹ️ Manutenção programada: 20/01/2024\n\n### RECOMENDAÇÕES\n- Monitorar uso de RAM se ultrapassar 75%\n- Preparar rollback para manutenção\n- Investigar os 3 erros para identificar padrão",
+    "usage": {
+      "promptTokens": 145,
+      "completionTokens": 189,
+      "totalTokens": 334
+    },
+    "finishReason": "stop"
+  }
+}
+```
+
+</ResponseExample>
+
+## Casos de Uso do MCP
+
+### 👤 Personalização por Usuário
+```json
+{
+  "contextProviders": [
+    {
+      "name": "user_profile",
+      "content": "Nome: Maria\nIdade: 28\nInteresses: Saúde, Bem-estar",
+      "priority": 100
+    }
+  ]
+}
+```
+
+### 📊 Dados em Tempo Real
+```json
+{
+  "contextProviders": [
+    {
+      "name": "live_metrics",
+      "content": "Visitantes online: 1,234\nVendas hoje: R$ 45,678\nTickets abertos: 23",
+      "priority": 90
+    }
+  ]
+}
+```
+
+### 📋 Histórico de Conversa
+```json
+{
+  "contextProviders": [
+    {
+      "name": "chat_history",
+      "content": "Msg1: Usuário perguntou sobre preços\nMsg2: Bot explicou planos\nMsg3: Usuário pediu desconto",
+      "priority": 80
+    }
+  ]
+}
+```
+
+### ⚙️ Configurações Dinâmicas
+```json
+{
+  "contextProviders": [
+    {
+      "name": "app_config",
+      "content": "Modo: Produção\nFeatures: A/B Test ativo\nLimites: 100 req/min",
+      "priority": 70
+    }
+  ]
+}
+```
+
+## Priorização de Contexto
+
+Quando o contexto total excede `maxContextLength`, o sistema prioriza:
+
+1. **Alta prioridade (51-100)**: Sempre incluído
+2. **Média prioridade (11-50)**: Incluído se houver espaço
+3. **Baixa prioridade (0-10)**: Incluído por último
+
+## Melhores Práticas
+
+### 🎯 Seja Específico
+```json
+{
+  "name": "user_metrics",
+  "content": "Opens: 45/50 (90%)\nClicks: 12/45 (26.7%)"
+}
+```
+
+### 📏 Mantenha Conciso
+- Evite contextos muito longos
+- Use formatos estruturados (JSON, listas)
+- Remova informações redundantes
+
+### ⚖️ Balance Prioridades
+- 100: Dados críticos (identidade, segurança)
+- 75: Informações principais
+- 50: Contexto útil
+- 25: Informações complementares
+
+### 🔄 Atualize Dinamicamente
+```javascript
+// Exemplo de contexto dinâmico
+const context = {
+  name: "real_time_data",
+  content: JSON.stringify({
+    timestamp: Date.now(),
+    activeUsers: getActiveUsers(),
+    systemLoad: getSystemLoad()
+  }),
+  priority: 90
+};
+```
+
+## Limitações
+
+1. **Tamanho máximo**: 10000 caracteres por padrão
+2. **Consumo de tokens**: Contexto conta para o limite
+3. **Latência**: Contextos grandes aumentam tempo de resposta
+4. **Custo**: Mais contexto = mais tokens = maior custo
