@@ -47,10 +47,26 @@ Content-Type: application/json
 - Contador de uso
 - Gestão de conteúdo
 
-### 4. Relatórios e Métricas
-- Exportação de dados
-- Análise de desempenho
-- Resumos estatísticos
+### 4. Relatórios e Métricas 📊
+Sistema completo de relatórios com cache de 2h para análise de performance do SAC.
+
+| Endpoint | Descrição |
+|----------|-----------|
+| [Dashboard](/api-reference/sac/reports-dashboard) | Métricas principais e visão geral |
+| [Detalhado](/api-reference/sac/reports-detailed) | Relatório completo com todos os filtros |
+| [Agentes](/api-reference/sac/reports-agents) | Performance individual dos agentes |
+| [Issues](/api-reference/sac/reports-issues) | Tendências e análise de issues |
+| [Cohorts](/api-reference/sac/reports-cohorts) | Análise de cohorts de tickets |
+| [Distribuição](/api-reference/sac/reports-distribution) | Distribuição por hora/dia/newsletter |
+| [Resumo](/api-reference/sac/reports-summary) | Resumo rápido (últimos 30 dias) |
+| [Comparativo](/api-reference/sac/reports-comparison) | Comparativo entre períodos |
+| [Série Temporal](/api-reference/sac/reports-timeseries) | Evolução temporal de tickets |
+| [Resolução](/api-reference/sac/reports-resolution) | Métricas de tempo de resolução |
+| [Filtros](/api-reference/sac/reports-filters) | Opções de filtros disponíveis |
+
+<Tip>
+  Todos os endpoints de relatórios utilizam **cache KV com TTL de 2 horas** para otimização de performance. Veja mais em [Relatórios - Visão Geral](/api-reference/sac/reports).
+</Tip>
 
 ### 5. Operações em Lote
 - Atualização múltipla de status

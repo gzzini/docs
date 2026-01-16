@@ -199,12 +199,29 @@
               "api-reference/sac/get-ticket",
               "api-reference/sac/update-ticket-status",
               "api-reference/sac/add-message",
+              "api-reference/sac/list-messages",
               "api-reference/sac/fast-response-preview",
               "api-reference/sac/fast-response-ticket",
               "api-reference/sac/fast-response-batch",
               "api-reference/sac/quick-replies",
               "api-reference/sac/attachments",
-              "api-reference/sac/reports"
+              {
+                "group": "Relatórios",
+                "pages": [
+                  "api-reference/sac/reports",
+                  "api-reference/sac/reports-dashboard",
+                  "api-reference/sac/reports-detailed",
+                  "api-reference/sac/reports-agents",
+                  "api-reference/sac/reports-issues",
+                  "api-reference/sac/reports-cohorts",
+                  "api-reference/sac/reports-distribution",
+                  "api-reference/sac/reports-summary",
+                  "api-reference/sac/reports-comparison",
+                  "api-reference/sac/reports-timeseries",
+                  "api-reference/sac/reports-resolution",
+                  "api-reference/sac/reports-filters"
+                ]
+              }
             ]
           },
           {

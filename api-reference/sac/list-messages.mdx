@@ -1,0 +1,261 @@
+---
+title: "Listar Mensagens"
+api: "GET https://sac-waffle-v2.theo-110.workers.dev/support/{id}/mensagens"
+description: "Lista o histórico de mensagens de um ticket com paginação"
+---
+
+## Descrição
+
+Retorna o histórico de mensagens de um ticket específico com suporte a paginação. Para mensagens que vieram por email, inclui o conteúdo HTML original. Ideal para conversas longas onde carregar todas as mensagens de uma vez seria ineficiente.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="id" type="number" required>
+  ID único do ticket
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="page" type="number" default="1">
+  Número da página (começa em 1)
+</ParamField>
+
+<ParamField query="limit" type="number" default="20">
+  Quantidade de mensagens por página (máximo: 100)
+</ParamField>
+
+<ParamField query="sort" type="string" default="asc">
+  Ordenação das mensagens:
+  - `asc` - Mais antigas primeiro (ordem cronológica)
+  - `desc` - Mais recentes primeiro
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados da resposta">
+    <ResponseField name="mensagens" type="array">
+      Lista de mensagens
+
+      <Expandable title="Estrutura da mensagem">
+        <ResponseField name="id" type="number">
+          ID único da mensagem
+        </ResponseField>
+
+        <ResponseField name="supportId" type="number">
+          ID do ticket
+        </ResponseField>
+
+        <ResponseField name="mensagem" type="string">
+          Conteúdo da mensagem em texto plano
+        </ResponseField>
+
+        <ResponseField name="autor" type="string">
+          Autor da mensagem (email ou identificador)
+        </ResponseField>
+
+        <ResponseField name="origem" type="string">
+          Origem da mensagem:
+          - `admin` - Enviada pela equipe de suporte
+          - `usuario` - Enviada pelo usuário via formulário
+          - `email` - Recebida por email (resposta do usuário)
+        </ResponseField>
+
+        <ResponseField name="status" type="string">
+          Status da mensagem: `Pendente`, `Respondido`, `Resolvido`
+        </ResponseField>
+
+        <ResponseField name="createdAt" type="string">
+          Data e hora de criação (ISO 8601)
+        </ResponseField>
+
+        <ResponseField name="anexos" type="array">
+          Anexos da mensagem
+
+          <Expandable title="Estrutura do anexo">
+            <ResponseField name="id" type="number">
+              ID do anexo
+            </ResponseField>
+
+            <ResponseField name="nomeArquivo" type="string">
+              Nome do arquivo
+            </ResponseField>
+
+            <ResponseField name="tipoArquivo" type="string">
+              Tipo MIME do arquivo
+            </ResponseField>
+
+            <ResponseField name="tamanhoArquivo" type="number">
+              Tamanho em bytes
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+
+        <ResponseField name="email" type="object">
+          Dados do email original (apenas para mensagens com `origem: "email"`)
+
+          <Expandable title="Estrutura do email">
+            <ResponseField name="html" type="string">
+              Conteúdo HTML original do email (inclui assinaturas, imagens inline, formatação completa)
+            </ResponseField>
+
+            <ResponseField name="assunto" type="string">
+              Assunto do email
+            </ResponseField>
+
+            <ResponseField name="de" type="string">
+              Remetente do email
+            </ResponseField>
+
+            <ResponseField name="dataRecebimento" type="string">
+              Data e hora de recebimento (ISO 8601)
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="pagination" type="object">
+      Informações de paginação
+
+      <Expandable title="Estrutura da paginação">
+        <ResponseField name="total" type="number">
+          Total de mensagens no ticket
+        </ResponseField>
+
+        <ResponseField name="page" type="number">
+          Página atual
+        </ResponseField>
+
+        <ResponseField name="limit" type="number">
+          Limite por página
+        </ResponseField>
+
+        <ResponseField name="totalPages" type="number">
+          Total de páginas disponíveis
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash Básico
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/5016/mensagens" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+```bash Com Paginação
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/5016/mensagens?page=2&limit=10" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+```bash Mais Recentes Primeiro
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/5016/mensagens?sort=desc&limit=5" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "data": {
+    "mensagens": [
+      {
+        "id": 101,
+        "supportId": 5016,
+        "mensagem": "Não recebi meus prêmios do programa de indicação.",
+        "autor": "usuario@exemplo.com",
+        "origem": "usuario",
+        "status": "Pendente",
+        "createdAt": "2026-01-16T10:00:00.000Z",
+        "anexos": [],
+        "email": null
+      },
+      {
+        "id": 102,
+        "supportId": 5016,
+        "mensagem": "Estamos analisando o problema relatado. Em breve teremos uma solução.",
+        "autor": "suporte@waffle.com.br",
+        "origem": "admin",
+        "status": "Respondido",
+        "createdAt": "2026-01-16T14:09:00.000Z",
+        "anexos": [],
+        "email": null
+      },
+      {
+        "id": 103,
+        "supportId": 5016,
+        "mensagem": "Ok, fico no aguardo.",
+        "autor": "usuario@exemplo.com",
+        "origem": "email",
+        "status": "Pendente",
+        "createdAt": "2026-01-16T16:05:00.000Z",
+        "anexos": [],
+        "email": {
+          "html": "<div dir=\"ltr\">Ok, fico no aguardo.<br><br><div class=\"gmail_signature\">Geraldo Mazzini<br>Tecnologia<br>+55 (41) 99858-2154<br><a href=\"https://thenewscc.com.br\">inscreva-se no the news</a></div></div><br><div class=\"gmail_quote\"><div>Em sex., 16 de jan. de 2026 às 14:09, waffle | suporte &lt;sac@resend.thenewscc.com.br&gt; escreveu:</div><blockquote>Nova resposta ao seu chamado<br><strong>Chamado #5016</strong>: Não recebi meus prêmios<hr>Estamos analisando o problema relatado. Em breve teremos uma solução.<hr>Para responder, basta responder a este email.</blockquote></div>",
+          "assunto": "Re: Suporte #5016 - Não recebi meus prêmios",
+          "de": "usuario@exemplo.com",
+          "dataRecebimento": "2026-01-16T16:05:19.586Z"
+        }
+      }
+    ],
+    "pagination": {
+      "total": 3,
+      "page": 1,
+      "limit": 20,
+      "totalPages": 1
+    }
+  }
+}
+```
+
+```json Not Found
+{
+  "success": false,
+  "message": "Ticket não encontrado"
+}
+```
+
+```json Unauthorized
+{
+  "success": false,
+  "message": "Token inválido ou expirado"
+}
+```
+
+</ResponseExample>
+
+## Notas
+
+<Note>
+  O campo `email` só está presente para mensagens com `origem: "email"`. Para mensagens criadas pelo formulário (`origem: "usuario"`) ou pela equipe (`origem: "admin"`), este campo será `null`.
+</Note>
+
+<Note>
+  O campo `email.html` contém o HTML completo e original do email, incluindo:
+  - Assinatura do remetente
+  - Imagens inline (como base64 ou referências)
+  - Histórico de emails anteriores (citações)
+  - Formatação original
+
+  Use este campo quando precisar exibir o email exatamente como foi recebido.
+</Note>
+
+<Tip>
+  Para conversas longas, use `sort=desc` para carregar as mensagens mais recentes primeiro, melhorando a experiência do usuário.
+</Tip>
