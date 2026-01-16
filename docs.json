@@ -135,76 +135,156 @@
             "group": "Referrals API",
             "pages": [
               "api-reference/referrals/introduction",
-              "api-reference/referrals/register",
-              "api-reference/referrals/login",
-              "api-reference/referrals/subscribe",
-              "api-reference/referrals/activate",
-              "api-reference/referrals/count-by-email",
-              "api-reference/referrals/resend",
-              "api-reference/referrals/export",
-              "api-reference/referrals/list",
-              "api-reference/referrals/delivery",
-              "api-reference/referrals/delivery-buttons",
-              "api-reference/referrals/ban",
-              "api-reference/referrals/banned-list",
-              "api-reference/referrals/check-fraud",
-              "api-reference/referrals/update-fraud"
+              {
+                "group": "Autenticação",
+                "pages": [
+                  "api-reference/referrals/register",
+                  "api-reference/referrals/login"
+                ]
+              },
+              {
+                "group": "Indicações",
+                "pages": [
+                  "api-reference/referrals/subscribe",
+                  "api-reference/referrals/activate",
+                  "api-reference/referrals/count-by-email",
+                  "api-reference/referrals/resend"
+                ]
+              },
+              {
+                "group": "Entrega de Prêmios",
+                "pages": [
+                  "api-reference/referrals/list",
+                  "api-reference/referrals/export",
+                  "api-reference/referrals/delivery",
+                  "api-reference/referrals/delivery-buttons"
+                ]
+              },
+              {
+                "group": "Anti-fraude",
+                "pages": [
+                  "api-reference/referrals/check-fraud",
+                  "api-reference/referrals/update-fraud",
+                  "api-reference/referrals/ban",
+                  "api-reference/referrals/banned-list"
+                ]
+              }
             ]
           },
           {
             "group": "Streaks API",
             "pages": [
               "api-reference/streaks/introduction",
-              "api-reference/streaks/register-read",
-              "api-reference/streaks/get-user-streak",
-              "api-reference/streaks/get-history",
-              "api-reference/streaks/add-ice-credits",
-              "api-reference/streaks/get-reading-dates",
-              "api-reference/streaks/save-share",
-              "api-reference/streaks/pixel-tracking",
-              "api-reference/streaks/get-missions",
-              "api-reference/streaks/update-gift-preferences",
-              "api-reference/streaks/complete-mission",
-              "api-reference/streaks/export-emails",
-              "api-reference/streaks/ranking-overview",
-              "api-reference/streaks/ranking-global",
-              "api-reference/streaks/ranking-with-position",
-              "api-reference/streaks/ranking-invalidate-cache",
-              "api-reference/streaks/groups-create",
-              "api-reference/streaks/groups-list",
-              "api-reference/streaks/groups-add-members",
-              "api-reference/streaks/groups-ranking",
-              "api-reference/streaks/get-ranking"
+              {
+                "group": "Leitura",
+                "pages": [
+                  "api-reference/streaks/register-read",
+                  "api-reference/streaks/pixel-tracking",
+                  "api-reference/streaks/get-reading-dates"
+                ]
+              },
+              {
+                "group": "Streaks",
+                "pages": [
+                  "api-reference/streaks/get-user-streak",
+                  "api-reference/streaks/get-history",
+                  "api-reference/streaks/add-ice-credits",
+                  "api-reference/streaks/save-share"
+                ]
+              },
+              {
+                "group": "Missões e Recompensas",
+                "pages": [
+                  "api-reference/streaks/get-missions",
+                  "api-reference/streaks/complete-mission",
+                  "api-reference/streaks/update-gift-preferences"
+                ]
+              },
+              {
+                "group": "Rankings",
+                "pages": [
+                  "api-reference/streaks/ranking-overview",
+                  "api-reference/streaks/ranking-global",
+                  "api-reference/streaks/ranking-with-position",
+                  "api-reference/streaks/get-ranking",
+                  "api-reference/streaks/ranking-invalidate-cache"
+                ]
+              },
+              {
+                "group": "Grupos de Amigos",
+                "pages": [
+                  "api-reference/streaks/groups-create",
+                  "api-reference/streaks/groups-list",
+                  "api-reference/streaks/groups-add-members",
+                  "api-reference/streaks/groups-ranking"
+                ]
+              },
+              {
+                "group": "Admin",
+                "pages": [
+                  "api-reference/streaks/export-emails"
+                ]
+              }
             ]
           },
           {
             "group": "Subscription API",
             "pages": [
               "api-reference/subscription/introduction",
-              "api-reference/subscription/subscribe",
-              "api-reference/subscription/subscribe-others",
-              "api-reference/subscription/referral-subscribe",
-              "api-reference/subscription/beehiiv-webhook",
-              "api-reference/subscription/get-metrics",
-              "api-reference/subscription/get-summary",
-              "api-reference/subscription/get-subscriber"
+              {
+                "group": "Inscrições",
+                "pages": [
+                  "api-reference/subscription/subscribe",
+                  "api-reference/subscription/subscribe-others",
+                  "api-reference/subscription/referral-subscribe"
+                ]
+              },
+              {
+                "group": "Métricas",
+                "pages": [
+                  "api-reference/subscription/get-metrics",
+                  "api-reference/subscription/get-summary",
+                  "api-reference/subscription/get-subscriber"
+                ]
+              },
+              {
+                "group": "Webhooks",
+                "pages": [
+                  "api-reference/subscription/beehiiv-webhook"
+                ]
+              }
             ]
           },
           {
             "group": "SAC/Support API",
             "pages": [
               "api-reference/sac/introduction",
-              "api-reference/sac/create-ticket",
-              "api-reference/sac/list-tickets",
-              "api-reference/sac/get-ticket",
-              "api-reference/sac/update-ticket-status",
-              "api-reference/sac/add-message",
-              "api-reference/sac/list-messages",
-              "api-reference/sac/fast-response-preview",
-              "api-reference/sac/fast-response-ticket",
-              "api-reference/sac/fast-response-batch",
-              "api-reference/sac/quick-replies",
-              "api-reference/sac/attachments",
+              {
+                "group": "Tickets",
+                "pages": [
+                  "api-reference/sac/create-ticket",
+                  "api-reference/sac/list-tickets",
+                  "api-reference/sac/get-ticket",
+                  "api-reference/sac/update-ticket-status"
+                ]
+              },
+              {
+                "group": "Mensagens",
+                "pages": [
+                  "api-reference/sac/list-messages",
+                  "api-reference/sac/add-message",
+                  "api-reference/sac/attachments"
+                ]
+              },
+              {
+                "group": "Fast Response (IA)",
+                "pages": [
+                  "api-reference/sac/fast-response-preview",
+                  "api-reference/sac/fast-response-ticket",
+                  "api-reference/sac/fast-response-batch",
+                  "api-reference/sac/quick-replies"
+                ]
+              },
               {
                 "group": "Relatórios",
                 "pages": [
@@ -229,11 +309,21 @@
             "pages": [
               "api-reference/openai/introduction",
               "api-reference/openai/resources",
-              "api-reference/openai/chat",
-              "api-reference/openai/chat-tools",
-              "api-reference/openai/chat-mcp",
-              "api-reference/openai/agent-use",
-              "api-reference/openai/agent-register"
+              {
+                "group": "Chat",
+                "pages": [
+                  "api-reference/openai/chat",
+                  "api-reference/openai/chat-tools",
+                  "api-reference/openai/chat-mcp"
+                ]
+              },
+              {
+                "group": "Agentes",
+                "pages": [
+                  "api-reference/openai/agent-use",
+                  "api-reference/openai/agent-register"
+                ]
+              }
             ]
           }
         ]
