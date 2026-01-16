@@ -1,0 +1,799 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "SAC Reports API",
+    "description": "API para relatórios avançados do sistema de suporte (SAC) com cache KV de 2 horas",
+    "version": "2.0.0",
+    "contact": {
+      "name": "Waffle Tech Team",
+      "email": "tech@waffle.com.br"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://sac-waffle-v2.theo-110.workers.dev",
+      "description": "Production"
+    }
+  ],
+  "paths": {
+    "/support/relatorios/dashboard": {
+      "get": {
+        "operationId": "getDashboard",
+        "summary": "Dashboard Geral",
+        "description": "Retorna métricas principais do dashboard com cache de 2h",
+        "tags": ["Reports"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {"$ref": "#/components/parameters/dataInicio"},
+          {"$ref": "#/components/parameters/dataFim"},
+          {"$ref": "#/components/parameters/main"},
+          {"$ref": "#/components/parameters/issue"},
+          {"$ref": "#/components/parameters/status"},
+          {"$ref": "#/components/parameters/newsletter"},
+          {"$ref": "#/components/parameters/agente"},
+          {"$ref": "#/components/parameters/agruparPor"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Dashboard metrics",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/DashboardResponse"}
+              }
+            }
+          },
+          "400": {"$ref": "#/components/responses/BadRequest"},
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/support/relatorios/detalhado": {
+      "post": {
+        "operationId": "getDetailedReport",
+        "summary": "Relatório Detalhado",
+        "description": "Gera relatório completo com todos os filtros e métricas",
+        "tags": ["Reports"],
+        "security": [{"bearerAuth": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/DetailedReportRequest"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Detailed report",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/DetailedReportResponse"}
+              }
+            }
+          },
+          "400": {"$ref": "#/components/responses/BadRequest"},
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/support/relatorios/agentes": {
+      "get": {
+        "operationId": "getAgentPerformance",
+        "summary": "Performance de Agentes",
+        "description": "Retorna métricas de performance por agente",
+        "tags": ["Reports"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {"$ref": "#/components/parameters/dataInicio"},
+          {"$ref": "#/components/parameters/dataFim"},
+          {"$ref": "#/components/parameters/main"},
+          {"$ref": "#/components/parameters/newsletter"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Agent performance metrics",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/AgentPerformanceResponse"}
+              }
+            }
+          },
+          "400": {"$ref": "#/components/responses/BadRequest"},
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/support/relatorios/issues": {
+      "get": {
+        "operationId": "getIssueTrends",
+        "summary": "Tendências de Issues",
+        "description": "Retorna tendências de issues ao longo do tempo",
+        "tags": ["Reports"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {"$ref": "#/components/parameters/dataInicio"},
+          {"$ref": "#/components/parameters/dataFim"},
+          {"$ref": "#/components/parameters/main"},
+          {"$ref": "#/components/parameters/agruparPor"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Issue trends",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/IssueTrendsResponse"}
+              }
+            }
+          },
+          "400": {"$ref": "#/components/responses/BadRequest"},
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/support/relatorios/cohorts": {
+      "get": {
+        "operationId": "getCohortAnalysis",
+        "summary": "Análise de Cohorts",
+        "description": "Retorna análise de cohorts (grupos de tickets por período)",
+        "tags": ["Reports"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {"$ref": "#/components/parameters/dataInicio"},
+          {"$ref": "#/components/parameters/dataFim"},
+          {"$ref": "#/components/parameters/agruparPor"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Cohort analysis",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/CohortAnalysisResponse"}
+              }
+            }
+          },
+          "400": {"$ref": "#/components/responses/BadRequest"},
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/support/relatorios/distribuicao": {
+      "get": {
+        "operationId": "getDistribution",
+        "summary": "Distribuição de Tickets",
+        "description": "Retorna distribuição de tickets por hora, dia da semana e newsletter",
+        "tags": ["Reports"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {"$ref": "#/components/parameters/dataInicio"},
+          {"$ref": "#/components/parameters/dataFim"},
+          {"$ref": "#/components/parameters/main"},
+          {"$ref": "#/components/parameters/newsletter"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Ticket distribution",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/DistributionResponse"}
+              }
+            }
+          },
+          "400": {"$ref": "#/components/responses/BadRequest"},
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/support/relatorios/resumo": {
+      "get": {
+        "operationId": "getQuickSummary",
+        "summary": "Resumo Rápido",
+        "description": "Retorna resumo dos últimos 30 dias",
+        "tags": ["Reports"],
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Quick summary",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/DashboardResponse"}
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/support/relatorios/comparativo": {
+      "get": {
+        "operationId": "getComparison",
+        "summary": "Comparativo entre Períodos",
+        "description": "Compara métricas entre dois períodos",
+        "tags": ["Reports"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {"$ref": "#/components/parameters/dataInicio"},
+          {"$ref": "#/components/parameters/dataFim"},
+          {
+            "name": "comparar_com",
+            "in": "query",
+            "description": "Tipo de comparação",
+            "schema": {
+              "type": "string",
+              "enum": ["periodo_anterior", "mesmo_periodo_ano_anterior"],
+              "default": "periodo_anterior"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comparison data",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/ComparisonResponse"}
+              }
+            }
+          },
+          "400": {"$ref": "#/components/responses/BadRequest"},
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/support/relatorios/serie-temporal": {
+      "get": {
+        "operationId": "getTimeSeries",
+        "summary": "Série Temporal",
+        "description": "Retorna série temporal de tickets com status detalhado",
+        "tags": ["Reports"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {"$ref": "#/components/parameters/dataInicio"},
+          {"$ref": "#/components/parameters/dataFim"},
+          {"$ref": "#/components/parameters/main"},
+          {"$ref": "#/components/parameters/status"},
+          {"$ref": "#/components/parameters/agruparPor"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Time series data",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/TimeSeriesResponse"}
+              }
+            }
+          },
+          "400": {"$ref": "#/components/responses/BadRequest"},
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/support/relatorios/resolucao": {
+      "get": {
+        "operationId": "getResolutionMetrics",
+        "summary": "Métricas de Resolução",
+        "description": "Retorna métricas detalhadas de resolução de tickets",
+        "tags": ["Reports"],
+        "security": [{"bearerAuth": []}],
+        "parameters": [
+          {"$ref": "#/components/parameters/dataInicio"},
+          {"$ref": "#/components/parameters/dataFim"},
+          {"$ref": "#/components/parameters/main"},
+          {"$ref": "#/components/parameters/status"}
+        ],
+        "responses": {
+          "200": {
+            "description": "Resolution metrics",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/ResolutionMetricsResponse"}
+              }
+            }
+          },
+          "400": {"$ref": "#/components/responses/BadRequest"},
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/support/relatorios/filtros": {
+      "get": {
+        "operationId": "getAvailableFilters",
+        "summary": "Filtros Disponíveis",
+        "description": "Retorna todos os filtros disponíveis para relatórios",
+        "tags": ["Reports"],
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Available filters",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/FiltersResponse"}
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    },
+    "/support/relatorios/cache/config": {
+      "get": {
+        "operationId": "getCacheConfig",
+        "summary": "Configuração do Cache",
+        "description": "Retorna informações sobre a configuração do cache",
+        "tags": ["Reports"],
+        "security": [{"bearerAuth": []}],
+        "responses": {
+          "200": {
+            "description": "Cache configuration",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/CacheConfigResponse"}
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized"}
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "parameters": {
+      "dataInicio": {
+        "name": "data_inicio",
+        "in": "query",
+        "description": "Data de início (YYYY-MM-DD)",
+        "schema": {"type": "string", "format": "date"}
+      },
+      "dataFim": {
+        "name": "data_fim",
+        "in": "query",
+        "description": "Data de fim (YYYY-MM-DD)",
+        "schema": {"type": "string", "format": "date"}
+      },
+      "main": {
+        "name": "main",
+        "in": "query",
+        "description": "Categoria principal",
+        "schema": {"type": "string"}
+      },
+      "issue": {
+        "name": "issue",
+        "in": "query",
+        "description": "Issue específico",
+        "schema": {"type": "string"}
+      },
+      "status": {
+        "name": "status",
+        "in": "query",
+        "description": "Status do ticket",
+        "schema": {
+          "type": "string",
+          "enum": ["open", "in_progress", "resolved", "closed"]
+        }
+      },
+      "newsletter": {
+        "name": "newsletter",
+        "in": "query",
+        "description": "Newsletter relacionada",
+        "schema": {"type": "string"}
+      },
+      "agente": {
+        "name": "agente",
+        "in": "query",
+        "description": "Email do agente",
+        "schema": {"type": "string", "format": "email"}
+      },
+      "agruparPor": {
+        "name": "agrupar_por",
+        "in": "query",
+        "description": "Agrupamento temporal",
+        "schema": {
+          "type": "string",
+          "enum": ["hora", "dia", "semana", "mes", "ano"],
+          "default": "dia"
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Requisição inválida",
+        "content": {
+          "application/json": {
+            "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Não autorizado",
+        "content": {
+          "application/json": {
+            "schema": {"$ref": "#/components/schemas/ErrorResponse"}
+          }
+        }
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean", "example": false},
+          "message": {"type": "string"}
+        }
+      },
+      "CacheInfo": {
+        "type": "object",
+        "properties": {
+          "hit": {"type": "boolean"},
+          "age": {"type": "integer", "description": "Idade do cache em segundos"},
+          "expiresIn": {"type": "integer", "description": "Tempo até expiração em segundos"}
+        }
+      },
+      "Periodo": {
+        "type": "object",
+        "properties": {
+          "inicio": {"type": "string", "format": "date"},
+          "fim": {"type": "string", "format": "date"}
+        }
+      },
+      "TimeSeriesDataPoint": {
+        "type": "object",
+        "properties": {
+          "periodo": {"type": "string"},
+          "total": {"type": "integer"},
+          "abertos": {"type": "integer"},
+          "emProgresso": {"type": "integer"},
+          "resolvidos": {"type": "integer"},
+          "fechados": {"type": "integer"}
+        }
+      },
+      "ResolutionMetrics": {
+        "type": "object",
+        "properties": {
+          "tempoMedioResolucao": {"type": "string", "example": "4h 32min"},
+          "tempoMedianoResolucao": {"type": "string", "example": "2h 15min"},
+          "tempoMinimoResolucao": {"type": "string", "example": "5min"},
+          "tempoMaximoResolucao": {"type": "string", "example": "5d 12h"},
+          "taxaResolucaoPrimeiroContato": {"type": "number", "example": 45.2},
+          "taxaResolucaoGeral": {"type": "number", "example": 80.4},
+          "ticketsResolvidos": {"type": "integer"},
+          "ticketsPendentes": {"type": "integer"},
+          "ticketsEmProgresso": {"type": "integer"}
+        }
+      },
+      "DashboardData": {
+        "type": "object",
+        "properties": {
+          "totalTickets": {"type": "integer"},
+          "ticketsByStatus": {
+            "type": "object",
+            "additionalProperties": {"type": "integer"}
+          },
+          "ticketsByCategory": {
+            "type": "object",
+            "additionalProperties": {"type": "integer"}
+          },
+          "resolutionMetrics": {"$ref": "#/components/schemas/ResolutionMetrics"},
+          "ticketTrend": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/TimeSeriesDataPoint"}
+          },
+          "periodo": {"$ref": "#/components/schemas/Periodo"},
+          "geradoEm": {"type": "string", "format": "date-time"}
+        }
+      },
+      "DashboardResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "data": {"$ref": "#/components/schemas/DashboardData"},
+          "cache": {"$ref": "#/components/schemas/CacheInfo"}
+        }
+      },
+      "DetailedReportRequest": {
+        "type": "object",
+        "required": ["data_inicio", "data_fim"],
+        "properties": {
+          "data_inicio": {"type": "string", "format": "date"},
+          "data_fim": {"type": "string", "format": "date"},
+          "main": {"type": "string"},
+          "issue": {"type": "string"},
+          "status": {"type": "string"},
+          "newsletter": {"type": "string"},
+          "agente": {"type": "string"},
+          "tag_id": {"type": "integer"},
+          "agrupar_por": {
+            "type": "string",
+            "enum": ["hora", "dia", "semana", "mes", "ano"]
+          },
+          "incluir_agentes": {"type": "boolean"},
+          "incluir_tendencias": {"type": "boolean"},
+          "incluir_cohorts": {"type": "boolean"},
+          "comparar_periodo_anterior": {"type": "boolean"}
+        }
+      },
+      "DetailedReportResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "data": {
+            "type": "object",
+            "properties": {
+              "dashboard": {"$ref": "#/components/schemas/DashboardData"},
+              "agentPerformance": {
+                "type": "array",
+                "items": {"$ref": "#/components/schemas/AgentPerformance"}
+              },
+              "issueTrends": {
+                "type": "array",
+                "items": {"$ref": "#/components/schemas/IssueTrend"}
+              },
+              "distribution": {"$ref": "#/components/schemas/Distribution"}
+            }
+          },
+          "cache": {"$ref": "#/components/schemas/CacheInfo"}
+        }
+      },
+      "AgentPerformance": {
+        "type": "object",
+        "properties": {
+          "agente": {"type": "string"},
+          "ticketsRespondidos": {"type": "integer"},
+          "ticketsResolvidos": {"type": "integer"},
+          "tempoMedioResposta": {"type": "string"},
+          "tempoMedioResolucao": {"type": "string"},
+          "taxaResolucao": {"type": "number"},
+          "satisfacao": {"type": "number", "nullable": true},
+          "mensagensEnviadas": {"type": "integer"}
+        }
+      },
+      "AgentPerformanceResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "data": {
+            "type": "object",
+            "properties": {
+              "agentes": {
+                "type": "array",
+                "items": {"$ref": "#/components/schemas/AgentPerformance"}
+              },
+              "periodo": {"$ref": "#/components/schemas/Periodo"}
+            }
+          },
+          "cache": {"$ref": "#/components/schemas/CacheInfo"}
+        }
+      },
+      "IssueTrend": {
+        "type": "object",
+        "properties": {
+          "issue": {"type": "string"},
+          "main": {"type": "string"},
+          "total": {"type": "integer"},
+          "tendencia": {
+            "type": "string",
+            "enum": ["subindo", "descendo", "estavel"]
+          },
+          "variacaoPercentual": {"type": "number"},
+          "porPeriodo": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/TimeSeriesDataPoint"}
+          }
+        }
+      },
+      "IssueTrendsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "data": {
+            "type": "object",
+            "properties": {
+              "issues": {
+                "type": "array",
+                "items": {"$ref": "#/components/schemas/IssueTrend"}
+              },
+              "periodo": {"$ref": "#/components/schemas/Periodo"}
+            }
+          },
+          "cache": {"$ref": "#/components/schemas/CacheInfo"}
+        }
+      },
+      "CohortData": {
+        "type": "object",
+        "properties": {
+          "periodo": {"type": "string"},
+          "ticketsCriados": {"type": "integer"},
+          "ticketsResolvidos": {"type": "integer"},
+          "tempoMedioResolucao": {"type": "string"},
+          "taxaResolucao": {"type": "number"},
+          "retencao": {"type": "number"}
+        }
+      },
+      "CohortAnalysisResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "data": {
+            "type": "object",
+            "properties": {
+              "cohorts": {
+                "type": "array",
+                "items": {"$ref": "#/components/schemas/CohortData"}
+              },
+              "periodo": {"$ref": "#/components/schemas/Periodo"},
+              "agrupamento": {"type": "string"}
+            }
+          },
+          "cache": {"$ref": "#/components/schemas/CacheInfo"}
+        }
+      },
+      "HourDistribution": {
+        "type": "object",
+        "properties": {
+          "hora": {"type": "integer", "minimum": 0, "maximum": 23},
+          "total": {"type": "integer"}
+        }
+      },
+      "DayOfWeekDistribution": {
+        "type": "object",
+        "properties": {
+          "dia": {"type": "integer", "minimum": 0, "maximum": 6},
+          "nome": {"type": "string"},
+          "total": {"type": "integer"}
+        }
+      },
+      "NewsletterDistribution": {
+        "type": "object",
+        "properties": {
+          "newsletter": {"type": "string"},
+          "total": {"type": "integer"},
+          "percentual": {"type": "number"}
+        }
+      },
+      "Distribution": {
+        "type": "object",
+        "properties": {
+          "porHora": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/HourDistribution"}
+          },
+          "porDiaSemana": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/DayOfWeekDistribution"}
+          },
+          "porNewsletter": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/NewsletterDistribution"}
+          }
+        }
+      },
+      "DistributionResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "data": {
+            "type": "object",
+            "properties": {
+              "distribuicao": {"$ref": "#/components/schemas/Distribution"},
+              "periodo": {"$ref": "#/components/schemas/Periodo"}
+            }
+          },
+          "cache": {"$ref": "#/components/schemas/CacheInfo"}
+        }
+      },
+      "ComparisonResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "data": {
+            "type": "object",
+            "properties": {
+              "atual": {"$ref": "#/components/schemas/DashboardData"},
+              "anterior": {"$ref": "#/components/schemas/DashboardData"},
+              "variacao": {
+                "type": "object",
+                "properties": {
+                  "totalTickets": {"type": "number"},
+                  "taxaResolucao": {"type": "number"}
+                }
+              }
+            }
+          },
+          "cache": {"$ref": "#/components/schemas/CacheInfo"}
+        }
+      },
+      "TimeSeriesResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "data": {
+            "type": "object",
+            "properties": {
+              "serie": {
+                "type": "array",
+                "items": {"$ref": "#/components/schemas/TimeSeriesDataPoint"}
+              },
+              "periodo": {"$ref": "#/components/schemas/Periodo"},
+              "agrupamento": {"type": "string"}
+            }
+          },
+          "cache": {"$ref": "#/components/schemas/CacheInfo"}
+        }
+      },
+      "ResolutionMetricsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "data": {
+            "type": "object",
+            "properties": {
+              "metricas": {"$ref": "#/components/schemas/ResolutionMetrics"},
+              "periodo": {"$ref": "#/components/schemas/Periodo"}
+            }
+          }
+        }
+      },
+      "CategoryWithIssues": {
+        "type": "object",
+        "properties": {
+          "main": {"type": "string"},
+          "issues": {
+            "type": "array",
+            "items": {"type": "string"}
+          }
+        }
+      },
+      "FiltersResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "data": {
+            "type": "object",
+            "properties": {
+              "categorias": {
+                "type": "array",
+                "items": {"$ref": "#/components/schemas/CategoryWithIssues"}
+              },
+              "agentes": {
+                "type": "array",
+                "items": {"type": "string"}
+              },
+              "newsletters": {
+                "type": "array",
+                "items": {"type": "string"}
+              },
+              "status": {
+                "type": "array",
+                "items": {"type": "string"}
+              },
+              "agrupamentos": {
+                "type": "array",
+                "items": {"type": "string"}
+              }
+            }
+          },
+          "cache": {"$ref": "#/components/schemas/CacheInfo"}
+        }
+      },
+      "CacheConfigResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "data": {
+            "type": "object",
+            "properties": {
+              "ttlSeconds": {"type": "integer", "example": 7200},
+              "ttlFormatted": {"type": "string", "example": "2 horas"},
+              "keyPrefix": {"type": "string", "example": "sac_report:"},
+              "timeoutMs": {"type": "integer", "example": 100}
+            }
+          }
+        }
+      }
+    }
+  }
+}

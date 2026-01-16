@@ -1,261 +1,679 @@
 ---
 title: "Relatórios e Métricas"
-api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/relatorios"
-description: "Gera relatórios e métricas do sistema de suporte"
+api: "GET https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/dashboard"
+description: "API completa para geração de relatórios avançados do SAC com cache de 2h"
 ---
 
-## Descrição
+## Visão Geral
 
-Endpoints para geração de relatórios detalhados, exportação de dados e visualização de métricas do sistema de suporte.
+A API de relatórios do SAC fornece endpoints completos para análise de dados, métricas de performance, tendências e distribuição de tickets. Todos os endpoints de relatórios utilizam **cache KV com TTL de 2 horas** para otimização de performance.
+
+### Características
+
+- **Cache inteligente**: Respostas cacheadas por 2 horas no Cloudflare KV
+- **Filtros avançados**: Data, categoria, issue, status, newsletter, agente
+- **Agrupamento temporal**: Por hora, dia, semana, mês ou ano
+- **Métricas de cache**: Headers indicam hit/miss e tempo de expiração
+
+### Headers de Cache
+
+Todas as respostas incluem informações sobre o cache:
+
+```http
+X-Cache: HIT | MISS
+X-Cache-Age: 300s
+X-Cache-Expires-In: 7200s
+X-Cache-Key: sac_report:dashboard:...
+```
+
+---
 
 ## Endpoints Disponíveis
 
-### Gerar Relatório Completo
+### 1. Dashboard Geral
 
-`POST /support/relatorios`
+`GET /support/relatorios/dashboard`
 
-Gera um relatório detalhado com filtros personalizados.
+Retorna métricas principais do dashboard.
 
-#### Body Parameters
+<ParamField query="data_inicio" type="string">
+  Data de início (formato: YYYY-MM-DD). Padrão: 30 dias atrás
+</ParamField>
 
-<ParamField body="dataInicio" type="string" required>
+<ParamField query="data_fim" type="string">
+  Data de fim (formato: YYYY-MM-DD). Padrão: hoje
+</ParamField>
+
+<ParamField query="main" type="string">
+  Filtrar por categoria principal
+</ParamField>
+
+<ParamField query="issue" type="string">
+  Filtrar por issue específico
+</ParamField>
+
+<ParamField query="status" type="string">
+  Filtrar por status: `open`, `in_progress`, `resolved`, `closed`
+</ParamField>
+
+<ParamField query="newsletter" type="string">
+  Filtrar por newsletter
+</ParamField>
+
+<ParamField query="agente" type="string">
+  Filtrar por email do agente
+</ParamField>
+
+<ParamField query="agrupar_por" type="string" default="dia">
+  Agrupamento: `hora`, `dia`, `semana`, `mes`, `ano`
+</ParamField>
+
+---
+
+### 2. Relatório Detalhado
+
+`POST /support/relatorios/detalhado`
+
+Gera um relatório completo com todos os filtros e métricas.
+
+<ParamField body="data_inicio" type="string" required>
   Data de início (formato: YYYY-MM-DD)
 </ParamField>
 
-<ParamField body="dataFim" type="string" required>
+<ParamField body="data_fim" type="string" required>
   Data de fim (formato: YYYY-MM-DD)
 </ParamField>
 
-<ParamField body="filtros" type="object">
-  <Expandable title="Opções de filtro">
-    <ParamField body="status" type="array">
-      Array de status para incluir
-    </ParamField>
-    
-    <ParamField body="categorias" type="array">
-      Array de categorias principais
-    </ParamField>
-    
-    <ParamField body="newsletters" type="array">
-      Array de newsletters
-    </ParamField>
-    
-    <ParamField body="tags" type="array">
-      Array de IDs de tags
-    </ParamField>
-  </Expandable>
+<ParamField body="main" type="string">
+  Filtrar por categoria principal
 </ParamField>
 
-<ParamField body="formato" type="string" default="json">
-  Formato do relatório
-  
-  Valores aceitos:
-  - `json` - Dados estruturados
-  - `csv` - Planilha
-  - `pdf` - Documento formatado
+<ParamField body="issue" type="string">
+  Filtrar por issue específico
 </ParamField>
 
-### Resumo Rápido
-
-`GET /support/relatorios/resumo`
-
-Retorna um resumo rápido das métricas atuais.
-
-### Exportar Tickets
-
-`GET /support/export`
-
-Exporta tickets em formato CSV.
-
-#### Query Parameters
-
-<ParamField query="status" type="string">
+<ParamField body="status" type="string">
   Filtrar por status
 </ParamField>
 
-<ParamField query="dataInicio" type="string">
-  Data inicial (YYYY-MM-DD)
+<ParamField body="newsletter" type="string">
+  Filtrar por newsletter
 </ParamField>
 
-<ParamField query="dataFim" type="string">
-  Data final (YYYY-MM-DD)
+<ParamField body="agente" type="string">
+  Filtrar por email do agente
 </ParamField>
 
-### Métricas em Tempo Real
+<ParamField body="tag_id" type="number">
+  Filtrar por ID da tag
+</ParamField>
 
-`GET /support/metrics`
+<ParamField body="agrupar_por" type="string" default="dia">
+  Agrupamento temporal
+</ParamField>
 
-Retorna métricas em tempo real do sistema.
+<ParamField body="incluir_agentes" type="boolean" default="false">
+  Incluir métricas por agente
+</ParamField>
 
-## Response
+<ParamField body="incluir_tendencias" type="boolean" default="false">
+  Incluir tendências de issues
+</ParamField>
 
-<ResponseField name="success" type="boolean" required>
-  Indica se a operação foi bem-sucedida
-</ResponseField>
+<ParamField body="incluir_cohorts" type="boolean" default="false">
+  Incluir análise de cohorts
+</ParamField>
 
-<ResponseField name="data" type="object">
-  <Expandable title="Estrutura do Relatório">
-    <ResponseField name="periodo" type="object">
-      Período analisado
-    </ResponseField>
-    
-    <ResponseField name="estatisticas" type="object">
-      <Expandable title="Estatísticas gerais">
-        <ResponseField name="totalTickets" type="number">
-          Total de tickets no período
-        </ResponseField>
-        
-        <ResponseField name="ticketsResolvidos" type="number">
-          Tickets resolvidos
-        </ResponseField>
-        
-        <ResponseField name="ticketsAbertos" type="number">
-          Tickets em aberto
-        </ResponseField>
-        
-        <ResponseField name="tempoMedioResolucao" type="string">
-          Tempo médio de resolução
-        </ResponseField>
-        
-        <ResponseField name="satisfacaoMedia" type="number">
-          Índice de satisfação (0-100)
-        </ResponseField>
-      </Expandable>
-    </ResponseField>
-    
-    <ResponseField name="distribuicao" type="object">
-      <Expandable title="Distribuição de tickets">
-        <ResponseField name="porCategoria" type="object">
-          Tickets por categoria
-        </ResponseField>
-        
-        <ResponseField name="porNewsletter" type="object">
-          Tickets por newsletter
-        </ResponseField>
-        
-        <ResponseField name="porDia" type="array">
-          Volume diário
-        </ResponseField>
-      </Expandable>
-    </ResponseField>
-    
-    <ResponseField name="performance" type="object">
-      <Expandable title="Indicadores de performance">
-        <ResponseField name="sla" type="object">
-          Cumprimento de SLA
-        </ResponseField>
-        
-        <ResponseField name="primeiraResposta" type="string">
-          Tempo médio primeira resposta
-        </ResponseField>
-        
-        <ResponseField name="respostasRapidas" type="number">
-          Uso de respostas rápidas
-        </ResponseField>
-      </Expandable>
-    </ResponseField>
-  </Expandable>
-</ResponseField>
+<ParamField body="comparar_periodo_anterior" type="boolean" default="false">
+  Comparar com período anterior
+</ParamField>
+
+---
+
+### 3. Performance de Agentes
+
+`GET /support/relatorios/agentes`
+
+Retorna métricas de performance por agente.
+
+<ParamField query="data_inicio" type="string">
+  Data de início
+</ParamField>
+
+<ParamField query="data_fim" type="string">
+  Data de fim
+</ParamField>
+
+**Métricas incluídas:**
+- Tickets respondidos
+- Tickets resolvidos
+- Tempo médio de resposta
+- Tempo médio de resolução
+- Taxa de resolução
+- Mensagens enviadas
+
+---
+
+### 4. Tendências de Issues
+
+`GET /support/relatorios/issues`
+
+Retorna tendências de issues ao longo do tempo.
+
+<ParamField query="data_inicio" type="string">
+  Data de início
+</ParamField>
+
+<ParamField query="data_fim" type="string">
+  Data de fim
+</ParamField>
+
+<ParamField query="main" type="string">
+  Filtrar por categoria principal
+</ParamField>
+
+<ParamField query="agrupar_por" type="string" default="dia">
+  Agrupamento temporal
+</ParamField>
+
+**Dados incluídos:**
+- Nome do issue
+- Categoria principal
+- Total no período
+- Tendência (subindo/descendo/estável)
+- Variação percentual vs período anterior
+- Série temporal
+
+---
+
+### 5. Análise de Cohorts
+
+`GET /support/relatorios/cohorts`
+
+Retorna análise de cohorts (grupos de tickets por período).
+
+<ParamField query="data_inicio" type="string">
+  Data de início
+</ParamField>
+
+<ParamField query="data_fim" type="string">
+  Data de fim
+</ParamField>
+
+<ParamField query="agrupar_por" type="string" default="mes">
+  Agrupamento: `semana`, `mes`, `ano`
+</ParamField>
+
+**Dados incluídos:**
+- Período do cohort
+- Tickets criados
+- Tickets resolvidos
+- Tempo médio de resolução
+- Taxa de resolução
+- Taxa de retenção
+
+---
+
+### 6. Distribuição de Tickets
+
+`GET /support/relatorios/distribuicao`
+
+Retorna distribuição de tickets por hora, dia da semana e newsletter.
+
+<ParamField query="data_inicio" type="string">
+  Data de início
+</ParamField>
+
+<ParamField query="data_fim" type="string">
+  Data de fim
+</ParamField>
+
+**Dados incluídos:**
+- Distribuição por hora do dia (0-23)
+- Distribuição por dia da semana (Dom-Sáb)
+- Distribuição por newsletter (com percentuais)
+
+---
+
+### 7. Resumo Rápido
+
+`GET /support/relatorios/resumo`
+
+Retorna resumo dos últimos 30 dias (sem parâmetros necessários).
+
+---
+
+### 8. Comparativo entre Períodos
+
+`GET /support/relatorios/comparativo`
+
+Compara métricas entre dois períodos.
+
+<ParamField query="data_inicio" type="string">
+  Data de início do período atual
+</ParamField>
+
+<ParamField query="data_fim" type="string">
+  Data de fim do período atual
+</ParamField>
+
+<ParamField query="comparar_com" type="string" default="periodo_anterior">
+  Tipo de comparação:
+  - `periodo_anterior` - Mesmo número de dias antes
+  - `mesmo_periodo_ano_anterior` - Mesmo período do ano passado
+</ParamField>
+
+---
+
+### 9. Série Temporal
+
+`GET /support/relatorios/serie-temporal`
+
+Retorna série temporal de tickets com status detalhado.
+
+<ParamField query="data_inicio" type="string">
+  Data de início
+</ParamField>
+
+<ParamField query="data_fim" type="string">
+  Data de fim
+</ParamField>
+
+<ParamField query="agrupar_por" type="string" default="dia">
+  Agrupamento temporal
+</ParamField>
+
+---
+
+### 10. Métricas de Resolução
+
+`GET /support/relatorios/resolucao`
+
+Retorna métricas detalhadas de resolução de tickets.
+
+<ParamField query="data_inicio" type="string">
+  Data de início
+</ParamField>
+
+<ParamField query="data_fim" type="string">
+  Data de fim
+</ParamField>
+
+**Métricas incluídas:**
+- Tempo médio de resolução
+- Tempo mediano de resolução
+- Tempo mínimo e máximo
+- Taxa de resolução no primeiro contato
+- Taxa de resolução geral
+- Contagem por status
+
+---
+
+### 11. Filtros Disponíveis
+
+`GET /support/relatorios/filtros`
+
+Retorna todos os filtros disponíveis para relatórios.
+
+**Dados retornados:**
+- Categorias e issues disponíveis
+- Lista de agentes
+- Newsletters cadastradas
+- Status possíveis
+- Opções de agrupamento
+
+---
+
+### 12. Configuração do Cache
+
+`GET /support/relatorios/cache/config`
+
+Retorna informações sobre a configuração do cache.
+
+---
+
+## Exemplos de Uso
 
 <RequestExample>
 
-```bash Relatório Completo
-curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios" \
-  -H "Authorization: Bearer seu_token_jwt" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "dataInicio": "2024-01-01",
-    "dataFim": "2024-01-31",
-    "filtros": {
-      "status": ["closed", "open"],
-      "categorias": ["Técnico", "Financeiro"]
-    },
-    "formato": "json"
-  }'
-```
-
-```bash Resumo Rápido
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/resumo" \
+```bash Dashboard
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/dashboard?data_inicio=2024-01-01&data_fim=2024-01-31&agrupar_por=dia" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
-```bash Exportar CSV
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/export?status=closed&dataInicio=2024-01-01&dataFim=2024-01-31" \
+```bash Relatório Detalhado
+curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/detalhado" \
   -H "Authorization: Bearer seu_token_jwt" \
-  -o tickets_export.csv
+  -H "Content-Type: application/json" \
+  -d '{
+    "data_inicio": "2024-01-01",
+    "data_fim": "2024-01-31",
+    "main": "Programa de indicação e prêmios",
+    "agrupar_por": "dia",
+    "incluir_agentes": true,
+    "incluir_tendencias": true
+  }'
+```
+
+```bash Performance de Agentes
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/agentes?data_inicio=2024-01-01&data_fim=2024-01-31" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+```bash Tendências de Issues
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/issues?data_inicio=2024-01-01&data_fim=2024-01-31&agrupar_por=semana" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+```bash Comparativo
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/comparativo?data_inicio=2024-01-01&data_fim=2024-01-31&comparar_com=periodo_anterior" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+```bash Filtros Disponíveis
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/filtros" \
+  -H "Authorization: Bearer seu_token_jwt"
 ```
 
 </RequestExample>
 
 <ResponseExample>
 
-```json Relatório JSON
+```json Dashboard
 {
   "success": true,
   "data": {
+    "totalTickets": 342,
+    "ticketsByStatus": {
+      "open": 44,
+      "in_progress": 23,
+      "resolved": 198,
+      "closed": 77
+    },
+    "ticketsByCategory": {
+      "Programa de indicação e prêmios": 156,
+      "Streak (pontuação diária)": 89,
+      "Problemas de recebimento das edições e cadastro": 97
+    },
+    "resolutionMetrics": {
+      "tempoMedioResolucao": "4h 32min",
+      "tempoMedianoResolucao": "2h 15min",
+      "tempoMinimoResolucao": "5min",
+      "tempoMaximoResolucao": "5d 12h",
+      "taxaResolucaoPrimeiroContato": 45.2,
+      "taxaResolucaoGeral": 80.4,
+      "ticketsResolvidos": 275,
+      "ticketsPendentes": 44,
+      "ticketsEmProgresso": 23
+    },
+    "ticketTrend": [
+      {"periodo": "2024-01-01", "total": 12, "abertos": 3, "emProgresso": 2, "resolvidos": 5, "fechados": 2},
+      {"periodo": "2024-01-02", "total": 15, "abertos": 4, "emProgresso": 3, "resolvidos": 6, "fechados": 2}
+    ],
     "periodo": {
       "inicio": "2024-01-01",
       "fim": "2024-01-31"
     },
-    "estatisticas": {
-      "totalTickets": 342,
-      "ticketsResolvidos": 298,
-      "ticketsAbertos": 44,
-      "tempoMedioResolucao": "4h 32min",
-      "satisfacaoMedia": 87.5
-    },
-    "distribuicao": {
-      "porCategoria": {
-        "Técnico": 156,
-        "Financeiro": 89,
-        "Editorial": 67,
-        "Outros": 30
-      },
-      "porNewsletter": {
-        "the news": 145,
-        "the bizness": 78,
-        "the champs": 45,
-        "health times": 38,
-        "rising": 22,
-        "goget": 14
-      },
-      "porDia": [
-        {"data": "2024-01-01", "total": 12},
-        {"data": "2024-01-02", "total": 15},
-        {"data": "2024-01-03", "total": 8}
-      ]
-    },
-    "performance": {
-      "sla": {
-        "cumprido": 285,
-        "naoComprido": 57,
-        "percentual": 83.3
-      },
-      "primeiraResposta": "1h 15min",
-      "respostasRapidas": 189
-    }
+    "geradoEm": "2024-01-15T10:30:00.000Z"
+  },
+  "cache": {
+    "hit": false
   }
 }
 ```
 
-```json Resumo Rápido
+```json Performance de Agentes
 {
   "success": true,
   "data": {
-    "ticketsHoje": 23,
-    "ticketsAbertos": 44,
-    "ticketsUrgentes": 5,
-    "tempoMedioResposta": "45min",
-    "agentesMaisAtivos": [
-      {"nome": "joao@suporte.com", "tickets": 15},
-      {"nome": "maria@suporte.com", "tickets": 12}
+    "agentes": [
+      {
+        "agente": "joao@suporte.com",
+        "ticketsRespondidos": 89,
+        "ticketsResolvidos": 72,
+        "tempoMedioResposta": "45min",
+        "tempoMedioResolucao": "3h 20min",
+        "taxaResolucao": 80.9,
+        "satisfacao": null,
+        "mensagensEnviadas": 234
+      },
+      {
+        "agente": "maria@suporte.com",
+        "ticketsRespondidos": 67,
+        "ticketsResolvidos": 58,
+        "tempoMedioResposta": "1h 10min",
+        "tempoMedioResolucao": "4h 15min",
+        "taxaResolucao": 86.6,
+        "satisfacao": null,
+        "mensagensEnviadas": 189
+      }
     ],
-    "categoriasPopulares": [
-      {"categoria": "Técnico", "percentual": 45.6},
-      {"categoria": "Financeiro", "percentual": 26.0}
-    ]
+    "periodo": {
+      "inicio": "2024-01-01",
+      "fim": "2024-01-31"
+    }
+  },
+  "cache": {
+    "hit": true,
+    "age": 300,
+    "expiresIn": 6900
+  }
+}
+```
+
+```json Tendências de Issues
+{
+  "success": true,
+  "data": {
+    "issues": [
+      {
+        "issue": "Não recebi meus pontos de indicação",
+        "main": "Programa de indicação e prêmios",
+        "total": 78,
+        "tendencia": "subindo",
+        "variacaoPercentual": 15.3,
+        "porPeriodo": [
+          {"periodo": "2024-W01", "total": 18},
+          {"periodo": "2024-W02", "total": 22},
+          {"periodo": "2024-W03", "total": 19},
+          {"periodo": "2024-W04", "total": 19}
+        ]
+      },
+      {
+        "issue": "Streak não está contando",
+        "main": "Streak (pontuação diária)",
+        "total": 45,
+        "tendencia": "descendo",
+        "variacaoPercentual": -8.2,
+        "porPeriodo": [
+          {"periodo": "2024-W01", "total": 15},
+          {"periodo": "2024-W02", "total": 12},
+          {"periodo": "2024-W03", "total": 10},
+          {"periodo": "2024-W04", "total": 8}
+        ]
+      }
+    ],
+    "periodo": {
+      "inicio": "2024-01-01",
+      "fim": "2024-01-31"
+    }
+  },
+  "cache": {
+    "hit": false
+  }
+}
+```
+
+```json Distribuição
+{
+  "success": true,
+  "data": {
+    "distribuicao": {
+      "porHora": [
+        {"hora": 0, "total": 5},
+        {"hora": 1, "total": 3},
+        {"hora": 8, "total": 45},
+        {"hora": 9, "total": 62},
+        {"hora": 10, "total": 58}
+      ],
+      "porDiaSemana": [
+        {"dia": 0, "nome": "Domingo", "total": 23},
+        {"dia": 1, "nome": "Segunda", "total": 67},
+        {"dia": 2, "nome": "Terca", "total": 72},
+        {"dia": 3, "nome": "Quarta", "total": 68},
+        {"dia": 4, "nome": "Quinta", "total": 65},
+        {"dia": 5, "nome": "Sexta", "total": 35},
+        {"dia": 6, "nome": "Sabado", "total": 12}
+      ],
+      "porNewsletter": [
+        {"newsletter": "the news", "total": 145, "percentual": 42.4},
+        {"newsletter": "the bizness", "total": 78, "percentual": 22.8},
+        {"newsletter": "the champs", "total": 45, "percentual": 13.2},
+        {"newsletter": "health times", "total": 38, "percentual": 11.1},
+        {"newsletter": "rising", "total": 22, "percentual": 6.4},
+        {"newsletter": "goget", "total": 14, "percentual": 4.1}
+      ]
+    },
+    "periodo": {
+      "inicio": "2024-01-01",
+      "fim": "2024-01-31"
+    }
+  },
+  "cache": {
+    "hit": false
+  }
+}
+```
+
+```json Comparativo
+{
+  "success": true,
+  "data": {
+    "atual": {
+      "totalTickets": 342,
+      "ticketsByStatus": {"open": 44, "in_progress": 23, "resolved": 198, "closed": 77},
+      "resolutionMetrics": {
+        "taxaResolucaoGeral": 80.4
+      }
+    },
+    "anterior": {
+      "totalTickets": 298,
+      "ticketsByStatus": {"open": 38, "in_progress": 19, "resolved": 176, "closed": 65},
+      "resolutionMetrics": {
+        "taxaResolucaoGeral": 80.9
+      }
+    },
+    "variacao": {
+      "totalTickets": 14.8,
+      "taxaResolucao": -0.6
+    }
+  },
+  "cache": {
+    "hit": false
+  }
+}
+```
+
+```json Filtros Disponíveis
+{
+  "success": true,
+  "data": {
+    "categorias": [
+      {
+        "main": "Programa de indicação e prêmios",
+        "issues": [
+          "Não recebi meus pontos de indicação",
+          "Não consigo resgatar meu prêmio",
+          "Meu link de indicação não funciona"
+        ]
+      },
+      {
+        "main": "Streak (pontuação diária)",
+        "issues": [
+          "Streak não está contando",
+          "Perdi meu streak injustamente",
+          "Pontos não estão aparecendo"
+        ]
+      },
+      {
+        "main": "Problemas de recebimento das edições e cadastro",
+        "issues": [
+          "Não estou recebendo a newsletter",
+          "Email está indo para spam",
+          "Quero trocar meu email"
+        ]
+      }
+    ],
+    "agentes": [
+      "joao@suporte.com",
+      "maria@suporte.com",
+      "pedro@suporte.com"
+    ],
+    "newsletters": [
+      "the news",
+      "the bizness",
+      "the champs",
+      "health times",
+      "rising",
+      "goget"
+    ],
+    "status": ["open", "in_progress", "resolved", "closed"],
+    "agrupamentos": ["hora", "dia", "semana", "mes", "ano"]
+  },
+  "cache": {
+    "hit": true,
+    "age": 1200,
+    "expiresIn": 6000
+  }
+}
+```
+
+```json Cache Config
+{
+  "success": true,
+  "data": {
+    "ttlSeconds": 7200,
+    "ttlFormatted": "2 horas",
+    "keyPrefix": "sac_report:",
+    "timeoutMs": 100
   }
 }
 ```
 
 </ResponseExample>
+
+---
+
+## Categorias Principais (main)
+
+Os tickets são organizados nas seguintes categorias:
+
+| Categoria | Descrição |
+|-----------|-----------|
+| `Programa de indicação e prêmios` | Dúvidas e problemas com o sistema de indicações |
+| `Streak (pontuação diária)` | Issues relacionados ao sistema de streaks |
+| `Problemas de recebimento das edições e cadastro` | Problemas com entrega de newsletters |
+
+---
+
+## Cache e Performance
+
+### Configuração do Cache
+
+- **TTL**: 2 horas (7200 segundos)
+- **Storage**: Cloudflare KV
+- **Invalidação**: Automática após operações de escrita em tickets
+
+### Quando o Cache é Invalidado
+
+O cache é automaticamente invalidado quando:
+- Um novo ticket é criado
+- O status de um ticket é alterado
+- Um ticket é deletado
+- Uma mensagem é adicionada
+
+### Forçar Refresh
+
+Para ignorar o cache e obter dados atualizados, você pode:
+1. Aguardar a expiração natural (2 horas)
+2. Realizar uma operação de escrita que invalide o cache
