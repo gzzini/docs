@@ -1,0 +1,155 @@
+---
+title: "Tendências de Issues"
+api: "GET https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/issues"
+description: "Retorna tendências de issues ao longo do tempo"
+---
+
+## Descrição
+
+Retorna análise de tendências para cada tipo de issue, incluindo variação percentual em relação ao período anterior, indicador de tendência (subindo/descendo/estável) e série temporal. Este endpoint utiliza cache KV com TTL de 2 horas.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="data_inicio" type="string">
+  Data de início do período (formato: YYYY-MM-DD). Padrão: 30 dias atrás
+</ParamField>
+
+<ParamField query="data_fim" type="string">
+  Data de fim do período (formato: YYYY-MM-DD). Padrão: hoje
+</ParamField>
+
+<ParamField query="main" type="string">
+  Filtrar por categoria principal
+</ParamField>
+
+<ParamField query="agrupar_por" type="string" default="dia">
+  Agrupamento temporal para a série
+
+  Valores aceitos: `hora`, `dia`, `semana`, `mes`, `ano`
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados de tendências">
+    <ResponseField name="issues" type="array">
+      <Expandable title="Estrutura de cada issue">
+        <ResponseField name="issue" type="string">
+          Nome do issue
+        </ResponseField>
+
+        <ResponseField name="main" type="string">
+          Categoria principal
+        </ResponseField>
+
+        <ResponseField name="total" type="number">
+          Total de tickets no período
+        </ResponseField>
+
+        <ResponseField name="tendencia" type="string">
+          Indicador de tendência: `subindo`, `descendo` ou `estavel`
+        </ResponseField>
+
+        <ResponseField name="variacaoPercentual" type="number">
+          Variação percentual em relação ao período anterior
+        </ResponseField>
+
+        <ResponseField name="porPeriodo" type="array">
+          Série temporal com total por período
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="periodo" type="object">
+      Período analisado
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="cache" type="object">
+  Informações de cache (hit, age, expiresIn)
+</ResponseField>
+
+<RequestExample>
+
+```bash Básico
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/issues" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+```bash Por Semana
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/issues?data_inicio=2024-01-01&data_fim=2024-01-31&agrupar_por=semana" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "data": {
+    "issues": [
+      {
+        "issue": "Não recebi meus pontos de indicação",
+        "main": "Programa de indicação e prêmios",
+        "total": 78,
+        "tendencia": "subindo",
+        "variacaoPercentual": 15.3,
+        "porPeriodo": [
+          {"periodo": "2024-W01", "total": 18},
+          {"periodo": "2024-W02", "total": 22},
+          {"periodo": "2024-W03", "total": 19},
+          {"periodo": "2024-W04", "total": 19}
+        ]
+      },
+      {
+        "issue": "Streak não está contando",
+        "main": "Streak (pontuação diária)",
+        "total": 45,
+        "tendencia": "descendo",
+        "variacaoPercentual": -8.2,
+        "porPeriodo": [
+          {"periodo": "2024-W01", "total": 15},
+          {"periodo": "2024-W02", "total": 12},
+          {"periodo": "2024-W03", "total": 10},
+          {"periodo": "2024-W04", "total": 8}
+        ]
+      },
+      {
+        "issue": "Não estou recebendo a newsletter",
+        "main": "Problemas de recebimento das edições e cadastro",
+        "total": 34,
+        "tendencia": "estavel",
+        "variacaoPercentual": 2.1,
+        "porPeriodo": [
+          {"periodo": "2024-W01", "total": 8},
+          {"periodo": "2024-W02", "total": 9},
+          {"periodo": "2024-W03", "total": 8},
+          {"periodo": "2024-W04", "total": 9}
+        ]
+      }
+    ],
+    "periodo": {
+      "inicio": "2024-01-01",
+      "fim": "2024-01-31"
+    }
+  },
+  "cache": {
+    "hit": false
+  }
+}
+```
+
+</ResponseExample>

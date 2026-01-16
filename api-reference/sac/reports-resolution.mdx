@@ -1,0 +1,128 @@
+---
+title: "Métricas de Resolução"
+api: "GET https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/resolucao"
+description: "Retorna métricas detalhadas de resolução de tickets"
+---
+
+## Descrição
+
+Retorna métricas detalhadas focadas em resolução de tickets, incluindo tempos médio, mediano, mínimo e máximo de resolução, além de taxas de resolução no primeiro contato e geral.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="data_inicio" type="string">
+  Data de início do período (formato: YYYY-MM-DD). Padrão: 30 dias atrás
+</ParamField>
+
+<ParamField query="data_fim" type="string">
+  Data de fim do período (formato: YYYY-MM-DD). Padrão: hoje
+</ParamField>
+
+<ParamField query="main" type="string">
+  Filtrar por categoria principal
+</ParamField>
+
+<ParamField query="status" type="string">
+  Filtrar por status
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Métricas de resolução">
+    <ResponseField name="metricas" type="object">
+      <Expandable title="Estrutura das métricas">
+        <ResponseField name="tempoMedioResolucao" type="string">
+          Tempo médio de resolução formatado (ex: "4h 32min")
+        </ResponseField>
+
+        <ResponseField name="tempoMedianoResolucao" type="string">
+          Tempo mediano de resolução formatado
+        </ResponseField>
+
+        <ResponseField name="tempoMinimoResolucao" type="string">
+          Menor tempo de resolução registrado
+        </ResponseField>
+
+        <ResponseField name="tempoMaximoResolucao" type="string">
+          Maior tempo de resolução registrado
+        </ResponseField>
+
+        <ResponseField name="taxaResolucaoPrimeiroContato" type="number">
+          Percentual de tickets resolvidos no primeiro contato
+        </ResponseField>
+
+        <ResponseField name="taxaResolucaoGeral" type="number">
+          Percentual geral de resolução
+        </ResponseField>
+
+        <ResponseField name="ticketsResolvidos" type="number">
+          Total de tickets resolvidos
+        </ResponseField>
+
+        <ResponseField name="ticketsPendentes" type="number">
+          Total de tickets pendentes (status open)
+        </ResponseField>
+
+        <ResponseField name="ticketsEmProgresso" type="number">
+          Total de tickets em progresso
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="periodo" type="object">
+      Período analisado
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash Básico
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/resolucao" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+```bash Com Período
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/resolucao?data_inicio=2024-01-01&data_fim=2024-01-31" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "data": {
+    "metricas": {
+      "tempoMedioResolucao": "4h 32min",
+      "tempoMedianoResolucao": "2h 15min",
+      "tempoMinimoResolucao": "5min",
+      "tempoMaximoResolucao": "5d 12h",
+      "taxaResolucaoPrimeiroContato": 45.2,
+      "taxaResolucaoGeral": 80.4,
+      "ticketsResolvidos": 275,
+      "ticketsPendentes": 44,
+      "ticketsEmProgresso": 23
+    },
+    "periodo": {
+      "inicio": "2024-01-01",
+      "fim": "2024-01-31"
+    }
+  }
+}
+```
+
+</ResponseExample>

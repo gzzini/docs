@@ -1,0 +1,140 @@
+---
+title: "Filtros Disponíveis"
+api: "GET https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/filtros"
+description: "Retorna todos os filtros disponíveis para relatórios"
+---
+
+## Descrição
+
+Retorna todos os filtros disponíveis para os endpoints de relatórios, incluindo categorias com seus issues, lista de agentes, newsletters cadastradas, status possíveis e opções de agrupamento. Útil para popular dropdowns e filtros em interfaces. Este endpoint utiliza cache KV com TTL de 2 horas.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+## Query Parameters
+
+Nenhum parâmetro necessário.
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Filtros disponíveis">
+    <ResponseField name="categorias" type="array">
+      Lista de categorias principais com seus issues
+
+      Cada item contém: `main` (categoria) e `issues` (array de issues)
+    </ResponseField>
+
+    <ResponseField name="agentes" type="array">
+      Lista de emails de agentes que já responderam tickets
+    </ResponseField>
+
+    <ResponseField name="newsletters" type="array">
+      Lista de newsletters cadastradas
+    </ResponseField>
+
+    <ResponseField name="status" type="array">
+      Lista de status possíveis: `open`, `in_progress`, `resolved`, `closed`
+    </ResponseField>
+
+    <ResponseField name="agrupamentos" type="array">
+      Opções de agrupamento temporal: `hora`, `dia`, `semana`, `mes`, `ano`
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="cache" type="object">
+  Informações de cache (hit, age, expiresIn)
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/filtros" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "data": {
+    "categorias": [
+      {
+        "main": "Programa de indicação e prêmios",
+        "issues": [
+          "Não recebi meus pontos de indicação",
+          "Não consigo resgatar meu prêmio",
+          "Meu link de indicação não funciona",
+          "Quero saber quantos pontos tenho",
+          "Indicação não foi computada"
+        ]
+      },
+      {
+        "main": "Streak (pontuação diária)",
+        "issues": [
+          "Streak não está contando",
+          "Perdi meu streak injustamente",
+          "Pontos não estão aparecendo",
+          "Erro ao visualizar histórico"
+        ]
+      },
+      {
+        "main": "Problemas de recebimento das edições e cadastro",
+        "issues": [
+          "Não estou recebendo a newsletter",
+          "Email está indo para spam",
+          "Quero trocar meu email",
+          "Quero cancelar minha inscrição",
+          "Não recebi email de confirmação"
+        ]
+      }
+    ],
+    "agentes": [
+      "joao@suporte.com",
+      "maria@suporte.com",
+      "pedro@suporte.com",
+      "ana@suporte.com"
+    ],
+    "newsletters": [
+      "the news",
+      "the bizness",
+      "the champs",
+      "health times",
+      "rising",
+      "goget",
+      "pod isso, vic?"
+    ],
+    "status": [
+      "open",
+      "in_progress",
+      "resolved",
+      "closed"
+    ],
+    "agrupamentos": [
+      "hora",
+      "dia",
+      "semana",
+      "mes",
+      "ano"
+    ]
+  },
+  "cache": {
+    "hit": true,
+    "age": 1200,
+    "expiresIn": 6000
+  }
+}
+```
+
+</ResponseExample>

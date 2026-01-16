@@ -1,0 +1,141 @@
+---
+title: "Análise de Cohorts"
+api: "GET https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/cohorts"
+description: "Retorna análise de cohorts (grupos de tickets por período)"
+---
+
+## Descrição
+
+Retorna análise de cohorts, agrupando tickets por período de criação e analisando métricas como taxa de resolução e tempo médio de resolução para cada grupo. Este endpoint utiliza cache KV com TTL de 2 horas.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="data_inicio" type="string">
+  Data de início do período (formato: YYYY-MM-DD). Padrão: 30 dias atrás
+</ParamField>
+
+<ParamField query="data_fim" type="string">
+  Data de fim do período (formato: YYYY-MM-DD). Padrão: hoje
+</ParamField>
+
+<ParamField query="agrupar_por" type="string" default="mes">
+  Agrupamento temporal para cohorts
+
+  Valores aceitos: `semana`, `mes`, `ano`
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados de cohorts">
+    <ResponseField name="cohorts" type="array">
+      <Expandable title="Estrutura de cada cohort">
+        <ResponseField name="periodo" type="string">
+          Período do cohort (ex: "2024-01", "2024-W01")
+        </ResponseField>
+
+        <ResponseField name="ticketsCriados" type="number">
+          Total de tickets criados no período
+        </ResponseField>
+
+        <ResponseField name="ticketsResolvidos" type="number">
+          Total de tickets resolvidos do cohort
+        </ResponseField>
+
+        <ResponseField name="tempoMedioResolucao" type="string">
+          Tempo médio de resolução formatado
+        </ResponseField>
+
+        <ResponseField name="taxaResolucao" type="number">
+          Taxa de resolução em percentual
+        </ResponseField>
+
+        <ResponseField name="retencao" type="number">
+          Taxa de retenção/reincidência
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="periodo" type="object">
+      Período analisado
+    </ResponseField>
+
+    <ResponseField name="agrupamento" type="string">
+      Tipo de agrupamento utilizado
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="cache" type="object">
+  Informações de cache (hit, age, expiresIn)
+</ResponseField>
+
+<RequestExample>
+
+```bash Por Mês
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/cohorts?data_inicio=2024-01-01&data_fim=2024-06-30&agrupar_por=mes" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+```bash Por Semana
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/cohorts?data_inicio=2024-01-01&data_fim=2024-01-31&agrupar_por=semana" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "data": {
+    "cohorts": [
+      {
+        "periodo": "2024-01",
+        "ticketsCriados": 342,
+        "ticketsResolvidos": 298,
+        "tempoMedioResolucao": "4h 32min",
+        "taxaResolucao": 87.1,
+        "retencao": 0
+      },
+      {
+        "periodo": "2024-02",
+        "ticketsCriados": 289,
+        "ticketsResolvidos": 245,
+        "tempoMedioResolucao": "3h 45min",
+        "taxaResolucao": 84.8,
+        "retencao": 0
+      },
+      {
+        "periodo": "2024-03",
+        "ticketsCriados": 312,
+        "ticketsResolvidos": 278,
+        "tempoMedioResolucao": "4h 10min",
+        "taxaResolucao": 89.1,
+        "retencao": 0
+      }
+    ],
+    "periodo": {
+      "inicio": "2024-01-01",
+      "fim": "2024-03-31"
+    },
+    "agrupamento": "mes"
+  },
+  "cache": {
+    "hit": false
+  }
+}
+```
+
+</ResponseExample>

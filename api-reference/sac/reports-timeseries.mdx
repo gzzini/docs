@@ -1,0 +1,157 @@
+---
+title: "Série Temporal"
+api: "GET https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/serie-temporal"
+description: "Retorna série temporal de tickets com status detalhado"
+---
+
+## Descrição
+
+Retorna uma série temporal de tickets com breakdown por status (abertos, em progresso, resolvidos, fechados) para cada período. Ideal para gráficos de linha ou área. Este endpoint utiliza cache KV com TTL de 2 horas.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="data_inicio" type="string">
+  Data de início do período (formato: YYYY-MM-DD). Padrão: 30 dias atrás
+</ParamField>
+
+<ParamField query="data_fim" type="string">
+  Data de fim do período (formato: YYYY-MM-DD). Padrão: hoje
+</ParamField>
+
+<ParamField query="main" type="string">
+  Filtrar por categoria principal
+</ParamField>
+
+<ParamField query="status" type="string">
+  Filtrar por status específico
+</ParamField>
+
+<ParamField query="agrupar_por" type="string" default="dia">
+  Agrupamento temporal
+
+  Valores aceitos: `hora`, `dia`, `semana`, `mes`, `ano`
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados da série temporal">
+    <ResponseField name="serie" type="array">
+      <Expandable title="Estrutura de cada ponto">
+        <ResponseField name="periodo" type="string">
+          Período (formato depende do agrupamento)
+        </ResponseField>
+
+        <ResponseField name="total" type="number">
+          Total de tickets no período
+        </ResponseField>
+
+        <ResponseField name="abertos" type="number">
+          Tickets com status open
+        </ResponseField>
+
+        <ResponseField name="emProgresso" type="number">
+          Tickets com status in_progress
+        </ResponseField>
+
+        <ResponseField name="resolvidos" type="number">
+          Tickets com status resolved
+        </ResponseField>
+
+        <ResponseField name="fechados" type="number">
+          Tickets com status closed
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="periodo" type="object">
+      Período analisado
+    </ResponseField>
+
+    <ResponseField name="agrupamento" type="string">
+      Tipo de agrupamento utilizado
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="cache" type="object">
+  Informações de cache (hit, age, expiresIn)
+</ResponseField>
+
+<RequestExample>
+
+```bash Por Dia
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/serie-temporal?data_inicio=2024-01-01&data_fim=2024-01-31&agrupar_por=dia" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+```bash Por Hora
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/serie-temporal?data_inicio=2024-01-15&data_fim=2024-01-15&agrupar_por=hora" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "data": {
+    "serie": [
+      {
+        "periodo": "2024-01-01",
+        "total": 12,
+        "abertos": 3,
+        "emProgresso": 2,
+        "resolvidos": 5,
+        "fechados": 2
+      },
+      {
+        "periodo": "2024-01-02",
+        "total": 15,
+        "abertos": 4,
+        "emProgresso": 3,
+        "resolvidos": 6,
+        "fechados": 2
+      },
+      {
+        "periodo": "2024-01-03",
+        "total": 8,
+        "abertos": 2,
+        "emProgresso": 1,
+        "resolvidos": 4,
+        "fechados": 1
+      },
+      {
+        "periodo": "2024-01-04",
+        "total": 18,
+        "abertos": 5,
+        "emProgresso": 4,
+        "resolvidos": 7,
+        "fechados": 2
+      }
+    ],
+    "periodo": {
+      "inicio": "2024-01-01",
+      "fim": "2024-01-31"
+    },
+    "agrupamento": "dia"
+  },
+  "cache": {
+    "hit": false
+  }
+}
+```
+
+</ResponseExample>

@@ -1,0 +1,151 @@
+---
+title: "Distribuição de Tickets"
+api: "GET https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/distribuicao"
+description: "Retorna distribuição de tickets por hora, dia da semana e newsletter"
+---
+
+## Descrição
+
+Retorna a distribuição de tickets em três dimensões: por hora do dia (0-23), por dia da semana (Domingo a Sábado) e por newsletter (com percentuais). Útil para identificar padrões de volume de tickets. Este endpoint utiliza cache KV com TTL de 2 horas.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="data_inicio" type="string">
+  Data de início do período (formato: YYYY-MM-DD). Padrão: 30 dias atrás
+</ParamField>
+
+<ParamField query="data_fim" type="string">
+  Data de fim do período (formato: YYYY-MM-DD). Padrão: hoje
+</ParamField>
+
+<ParamField query="main" type="string">
+  Filtrar por categoria principal
+</ParamField>
+
+<ParamField query="newsletter" type="string">
+  Filtrar por newsletter relacionada
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados de distribuição">
+    <ResponseField name="distribuicao" type="object">
+      <Expandable title="Estrutura de distribuição">
+        <ResponseField name="porHora" type="array">
+          Distribuição por hora do dia (0-23)
+
+          Cada item contém: `hora` (0-23) e `total`
+        </ResponseField>
+
+        <ResponseField name="porDiaSemana" type="array">
+          Distribuição por dia da semana
+
+          Cada item contém: `dia` (0-6), `nome` (Domingo-Sábado) e `total`
+        </ResponseField>
+
+        <ResponseField name="porNewsletter" type="array">
+          Distribuição por newsletter
+
+          Cada item contém: `newsletter`, `total` e `percentual`
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="periodo" type="object">
+      Período analisado
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="cache" type="object">
+  Informações de cache (hit, age, expiresIn)
+</ResponseField>
+
+<RequestExample>
+
+```bash Básico
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/distribuicao" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+```bash Com Período
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/distribuicao?data_inicio=2024-01-01&data_fim=2024-01-31" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "data": {
+    "distribuicao": {
+      "porHora": [
+        {"hora": 0, "total": 5},
+        {"hora": 1, "total": 3},
+        {"hora": 2, "total": 2},
+        {"hora": 3, "total": 1},
+        {"hora": 4, "total": 1},
+        {"hora": 5, "total": 2},
+        {"hora": 6, "total": 8},
+        {"hora": 7, "total": 23},
+        {"hora": 8, "total": 45},
+        {"hora": 9, "total": 62},
+        {"hora": 10, "total": 58},
+        {"hora": 11, "total": 52},
+        {"hora": 12, "total": 35},
+        {"hora": 13, "total": 42},
+        {"hora": 14, "total": 48},
+        {"hora": 15, "total": 45},
+        {"hora": 16, "total": 38},
+        {"hora": 17, "total": 32},
+        {"hora": 18, "total": 25},
+        {"hora": 19, "total": 18},
+        {"hora": 20, "total": 15},
+        {"hora": 21, "total": 12},
+        {"hora": 22, "total": 8},
+        {"hora": 23, "total": 6}
+      ],
+      "porDiaSemana": [
+        {"dia": 0, "nome": "Domingo", "total": 23},
+        {"dia": 1, "nome": "Segunda", "total": 67},
+        {"dia": 2, "nome": "Terca", "total": 72},
+        {"dia": 3, "nome": "Quarta", "total": 68},
+        {"dia": 4, "nome": "Quinta", "total": 65},
+        {"dia": 5, "nome": "Sexta", "total": 35},
+        {"dia": 6, "nome": "Sabado", "total": 12}
+      ],
+      "porNewsletter": [
+        {"newsletter": "the news", "total": 145, "percentual": 42.4},
+        {"newsletter": "the bizness", "total": 78, "percentual": 22.8},
+        {"newsletter": "the champs", "total": 45, "percentual": 13.2},
+        {"newsletter": "health times", "total": 38, "percentual": 11.1},
+        {"newsletter": "rising", "total": 22, "percentual": 6.4},
+        {"newsletter": "goget", "total": 14, "percentual": 4.1}
+      ]
+    },
+    "periodo": {
+      "inicio": "2024-01-01",
+      "fim": "2024-01-31"
+    }
+  },
+  "cache": {
+    "hit": false
+  }
+}
+```
+
+</ResponseExample>

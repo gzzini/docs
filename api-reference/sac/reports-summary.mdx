@@ -1,0 +1,117 @@
+---
+title: "Resumo Rápido"
+api: "GET https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/resumo"
+description: "Retorna resumo dos últimos 30 dias"
+---
+
+## Descrição
+
+Retorna um resumo rápido das métricas dos últimos 30 dias sem necessidade de parâmetros. Ideal para dashboards que precisam de uma visão geral rápida. Este endpoint utiliza cache KV com TTL de 2 horas.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+## Query Parameters
+
+Nenhum parâmetro necessário. O endpoint automaticamente usa os últimos 30 dias.
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados do resumo">
+    <ResponseField name="totalTickets" type="number">
+      Total de tickets nos últimos 30 dias
+    </ResponseField>
+
+    <ResponseField name="ticketsByStatus" type="object">
+      Tickets agrupados por status
+    </ResponseField>
+
+    <ResponseField name="ticketsByCategory" type="object">
+      Tickets agrupados por categoria principal
+    </ResponseField>
+
+    <ResponseField name="resolutionMetrics" type="object">
+      Métricas de resolução
+    </ResponseField>
+
+    <ResponseField name="ticketTrend" type="array">
+      Série temporal diária
+    </ResponseField>
+
+    <ResponseField name="periodo" type="object">
+      Período analisado (últimos 30 dias)
+    </ResponseField>
+
+    <ResponseField name="geradoEm" type="string">
+      Data/hora de geração
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="cache" type="object">
+  Informações de cache (hit, age, expiresIn)
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/resumo" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "data": {
+    "totalTickets": 342,
+    "ticketsByStatus": {
+      "open": 44,
+      "in_progress": 23,
+      "resolved": 198,
+      "closed": 77
+    },
+    "ticketsByCategory": {
+      "Programa de indicação e prêmios": 156,
+      "Streak (pontuação diária)": 89,
+      "Problemas de recebimento das edições e cadastro": 97
+    },
+    "resolutionMetrics": {
+      "tempoMedioResolucao": "4h 32min",
+      "tempoMedianoResolucao": "2h 15min",
+      "taxaResolucaoGeral": 80.4,
+      "ticketsResolvidos": 275,
+      "ticketsPendentes": 44,
+      "ticketsEmProgresso": 23
+    },
+    "ticketTrend": [
+      {"periodo": "2024-01-01", "total": 12},
+      {"periodo": "2024-01-02", "total": 15},
+      {"periodo": "2024-01-03", "total": 8}
+    ],
+    "periodo": {
+      "inicio": "2023-12-16",
+      "fim": "2024-01-15"
+    },
+    "geradoEm": "2024-01-15T10:30:00.000Z"
+  },
+  "cache": {
+    "hit": true,
+    "age": 600,
+    "expiresIn": 6600
+  }
+}
+```
+
+</ResponseExample>

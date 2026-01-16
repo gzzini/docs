@@ -1,0 +1,250 @@
+---
+title: "Dashboard de Relatórios"
+api: "GET https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/dashboard"
+description: "Retorna métricas principais do dashboard com cache de 2h"
+---
+
+## Descrição
+
+Retorna métricas gerais do dashboard incluindo total de tickets, distribuição por status e categoria, métricas de resolução e tendência temporal. Este endpoint utiliza cache KV com TTL de 2 horas.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="data_inicio" type="string">
+  Data de início do período (formato: YYYY-MM-DD). Padrão: 30 dias atrás
+</ParamField>
+
+<ParamField query="data_fim" type="string">
+  Data de fim do período (formato: YYYY-MM-DD). Padrão: hoje
+</ParamField>
+
+<ParamField query="main" type="string">
+  Filtrar por categoria principal
+
+  Valores aceitos:
+  - `Programa de indicação e prêmios`
+  - `Streak (pontuação diária)`
+  - `Problemas de recebimento das edições e cadastro`
+</ParamField>
+
+<ParamField query="issue" type="string">
+  Filtrar por issue específico
+</ParamField>
+
+<ParamField query="status" type="string">
+  Filtrar por status do ticket
+
+  Valores aceitos:
+  - `open` - Tickets abertos
+  - `in_progress` - Em atendimento
+  - `resolved` - Resolvidos
+  - `closed` - Fechados
+</ParamField>
+
+<ParamField query="newsletter" type="string">
+  Filtrar por newsletter relacionada
+</ParamField>
+
+<ParamField query="agente" type="string">
+  Filtrar por email do agente responsável
+</ParamField>
+
+<ParamField query="agrupar_por" type="string" default="dia">
+  Agrupamento temporal para a tendência
+
+  Valores aceitos:
+  - `hora` - Por hora
+  - `dia` - Por dia
+  - `semana` - Por semana
+  - `mes` - Por mês
+  - `ano` - Por ano
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados do dashboard">
+    <ResponseField name="totalTickets" type="number">
+      Total de tickets no período
+    </ResponseField>
+
+    <ResponseField name="ticketsByStatus" type="object">
+      Tickets agrupados por status
+    </ResponseField>
+
+    <ResponseField name="ticketsByCategory" type="object">
+      Tickets agrupados por categoria principal
+    </ResponseField>
+
+    <ResponseField name="resolutionMetrics" type="object">
+      <Expandable title="Métricas de resolução">
+        <ResponseField name="tempoMedioResolucao" type="string">
+          Tempo médio de resolução formatado
+        </ResponseField>
+
+        <ResponseField name="tempoMedianoResolucao" type="string">
+          Tempo mediano de resolução formatado
+        </ResponseField>
+
+        <ResponseField name="tempoMinimoResolucao" type="string">
+          Tempo mínimo de resolução
+        </ResponseField>
+
+        <ResponseField name="tempoMaximoResolucao" type="string">
+          Tempo máximo de resolução
+        </ResponseField>
+
+        <ResponseField name="taxaResolucaoPrimeiroContato" type="number">
+          Taxa de resolução no primeiro contato (%)
+        </ResponseField>
+
+        <ResponseField name="taxaResolucaoGeral" type="number">
+          Taxa de resolução geral (%)
+        </ResponseField>
+
+        <ResponseField name="ticketsResolvidos" type="number">
+          Total de tickets resolvidos
+        </ResponseField>
+
+        <ResponseField name="ticketsPendentes" type="number">
+          Total de tickets pendentes
+        </ResponseField>
+
+        <ResponseField name="ticketsEmProgresso" type="number">
+          Total de tickets em progresso
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="ticketTrend" type="array">
+      Série temporal de tickets
+    </ResponseField>
+
+    <ResponseField name="periodo" type="object">
+      Período analisado (inicio e fim)
+    </ResponseField>
+
+    <ResponseField name="geradoEm" type="string">
+      Data/hora de geração do relatório
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="cache" type="object">
+  <Expandable title="Informações de cache">
+    <ResponseField name="hit" type="boolean">
+      Se a resposta veio do cache
+    </ResponseField>
+
+    <ResponseField name="age" type="number">
+      Idade do cache em segundos (se hit)
+    </ResponseField>
+
+    <ResponseField name="expiresIn" type="number">
+      Tempo até expiração em segundos (se hit)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash Básico
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/dashboard" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+```bash Com Filtros
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/dashboard?data_inicio=2024-01-01&data_fim=2024-01-31&agrupar_por=dia" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+```bash Por Categoria
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/dashboard?main=Programa%20de%20indicação%20e%20prêmios&agrupar_por=semana" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "data": {
+    "totalTickets": 342,
+    "ticketsByStatus": {
+      "open": 44,
+      "in_progress": 23,
+      "resolved": 198,
+      "closed": 77
+    },
+    "ticketsByCategory": {
+      "Programa de indicação e prêmios": 156,
+      "Streak (pontuação diária)": 89,
+      "Problemas de recebimento das edições e cadastro": 97
+    },
+    "resolutionMetrics": {
+      "tempoMedioResolucao": "4h 32min",
+      "tempoMedianoResolucao": "2h 15min",
+      "tempoMinimoResolucao": "5min",
+      "tempoMaximoResolucao": "5d 12h",
+      "taxaResolucaoPrimeiroContato": 45.2,
+      "taxaResolucaoGeral": 80.4,
+      "ticketsResolvidos": 275,
+      "ticketsPendentes": 44,
+      "ticketsEmProgresso": 23
+    },
+    "ticketTrend": [
+      {"periodo": "2024-01-01", "total": 12, "abertos": 3, "emProgresso": 2, "resolvidos": 5, "fechados": 2},
+      {"periodo": "2024-01-02", "total": 15, "abertos": 4, "emProgresso": 3, "resolvidos": 6, "fechados": 2}
+    ],
+    "periodo": {
+      "inicio": "2024-01-01",
+      "fim": "2024-01-31"
+    },
+    "geradoEm": "2024-01-15T10:30:00.000Z"
+  },
+  "cache": {
+    "hit": false
+  }
+}
+```
+
+```json Cache Hit
+{
+  "success": true,
+  "data": {
+    "totalTickets": 342,
+    "ticketsByStatus": {...},
+    "ticketsByCategory": {...},
+    "resolutionMetrics": {...},
+    "ticketTrend": [...],
+    "periodo": {...},
+    "geradoEm": "2024-01-15T10:30:00.000Z"
+  },
+  "cache": {
+    "hit": true,
+    "age": 1800,
+    "expiresIn": 5400
+  }
+}
+```
+
+```json Error
+{
+  "success": false,
+  "message": "Data de inicio deve ser anterior a data de fim"
+}
+```
+
+</ResponseExample>

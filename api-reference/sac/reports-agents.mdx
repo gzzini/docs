@@ -1,0 +1,154 @@
+---
+title: "Performance de Agentes"
+api: "GET https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/agentes"
+description: "Retorna métricas de performance por agente"
+---
+
+## Descrição
+
+Retorna métricas detalhadas de performance para cada agente que respondeu tickets no período, incluindo quantidade de tickets, tempos de resposta e resolução, e taxa de resolução. Este endpoint utiliza cache KV com TTL de 2 horas.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="data_inicio" type="string">
+  Data de início do período (formato: YYYY-MM-DD). Padrão: 30 dias atrás
+</ParamField>
+
+<ParamField query="data_fim" type="string">
+  Data de fim do período (formato: YYYY-MM-DD). Padrão: hoje
+</ParamField>
+
+<ParamField query="main" type="string">
+  Filtrar por categoria principal
+</ParamField>
+
+<ParamField query="newsletter" type="string">
+  Filtrar por newsletter relacionada
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados de performance">
+    <ResponseField name="agentes" type="array">
+      <Expandable title="Estrutura de cada agente">
+        <ResponseField name="agente" type="string">
+          Email do agente
+        </ResponseField>
+
+        <ResponseField name="ticketsRespondidos" type="number">
+          Total de tickets em que o agente respondeu
+        </ResponseField>
+
+        <ResponseField name="ticketsResolvidos" type="number">
+          Total de tickets resolvidos pelo agente
+        </ResponseField>
+
+        <ResponseField name="tempoMedioResposta" type="string">
+          Tempo médio de resposta formatado
+        </ResponseField>
+
+        <ResponseField name="tempoMedioResolucao" type="string">
+          Tempo médio de resolução formatado
+        </ResponseField>
+
+        <ResponseField name="taxaResolucao" type="number">
+          Taxa de resolução em percentual
+        </ResponseField>
+
+        <ResponseField name="satisfacao" type="number">
+          Nota de satisfação (se disponível)
+        </ResponseField>
+
+        <ResponseField name="mensagensEnviadas" type="number">
+          Total de mensagens enviadas pelo agente
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="periodo" type="object">
+      Período analisado
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="cache" type="object">
+  Informações de cache (hit, age, expiresIn)
+</ResponseField>
+
+<RequestExample>
+
+```bash Básico
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/agentes" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+```bash Com Período
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/agentes?data_inicio=2024-01-01&data_fim=2024-01-31" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "data": {
+    "agentes": [
+      {
+        "agente": "joao@suporte.com",
+        "ticketsRespondidos": 89,
+        "ticketsResolvidos": 72,
+        "tempoMedioResposta": "45min",
+        "tempoMedioResolucao": "3h 20min",
+        "taxaResolucao": 80.9,
+        "satisfacao": null,
+        "mensagensEnviadas": 234
+      },
+      {
+        "agente": "maria@suporte.com",
+        "ticketsRespondidos": 67,
+        "ticketsResolvidos": 58,
+        "tempoMedioResposta": "1h 10min",
+        "tempoMedioResolucao": "4h 15min",
+        "taxaResolucao": 86.6,
+        "satisfacao": null,
+        "mensagensEnviadas": 189
+      },
+      {
+        "agente": "pedro@suporte.com",
+        "ticketsRespondidos": 45,
+        "ticketsResolvidos": 38,
+        "tempoMedioResposta": "30min",
+        "tempoMedioResolucao": "2h 45min",
+        "taxaResolucao": 84.4,
+        "satisfacao": null,
+        "mensagensEnviadas": 156
+      }
+    ],
+    "periodo": {
+      "inicio": "2024-01-01",
+      "fim": "2024-01-31"
+    }
+  },
+  "cache": {
+    "hit": true,
+    "age": 300,
+    "expiresIn": 6900
+  }
+}
+```
+
+</ResponseExample>

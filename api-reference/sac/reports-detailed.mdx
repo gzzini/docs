@@ -1,0 +1,194 @@
+---
+title: "Relatório Detalhado"
+api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/detalhado"
+description: "Gera relatório completo com todos os filtros e métricas"
+---
+
+## Descrição
+
+Gera um relatório detalhado com todos os filtros disponíveis, incluindo opcionalmente métricas por agente, tendências de issues e análise de cohorts. Este endpoint utiliza cache KV com TTL de 2 horas.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="data_inicio" type="string" required>
+  Data de início do período (formato: YYYY-MM-DD)
+</ParamField>
+
+<ParamField body="data_fim" type="string" required>
+  Data de fim do período (formato: YYYY-MM-DD)
+</ParamField>
+
+<ParamField body="main" type="string">
+  Filtrar por categoria principal
+</ParamField>
+
+<ParamField body="issue" type="string">
+  Filtrar por issue específico
+</ParamField>
+
+<ParamField body="status" type="string">
+  Filtrar por status do ticket
+</ParamField>
+
+<ParamField body="newsletter" type="string">
+  Filtrar por newsletter relacionada
+</ParamField>
+
+<ParamField body="agente" type="string">
+  Filtrar por email do agente responsável
+</ParamField>
+
+<ParamField body="tag_id" type="number">
+  Filtrar por ID da tag
+</ParamField>
+
+<ParamField body="agrupar_por" type="string" default="dia">
+  Agrupamento temporal
+
+  Valores aceitos: `hora`, `dia`, `semana`, `mes`, `ano`
+</ParamField>
+
+<ParamField body="incluir_agentes" type="boolean" default="false">
+  Incluir métricas de performance por agente
+</ParamField>
+
+<ParamField body="incluir_tendencias" type="boolean" default="false">
+  Incluir tendências de issues ao longo do tempo
+</ParamField>
+
+<ParamField body="incluir_cohorts" type="boolean" default="false">
+  Incluir análise de cohorts
+</ParamField>
+
+<ParamField body="comparar_periodo_anterior" type="boolean" default="false">
+  Comparar com período anterior equivalente
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados do relatório">
+    <ResponseField name="dashboard" type="object">
+      Métricas principais do dashboard
+    </ResponseField>
+
+    <ResponseField name="agentPerformance" type="array">
+      Performance dos agentes (se incluir_agentes=true)
+    </ResponseField>
+
+    <ResponseField name="issueTrends" type="array">
+      Tendências de issues (se incluir_tendencias=true)
+    </ResponseField>
+
+    <ResponseField name="distribution" type="object">
+      Distribuição de tickets por hora, dia e newsletter
+    </ResponseField>
+
+    <ResponseField name="filters" type="object">
+      Filtros aplicados no relatório
+    </ResponseField>
+
+    <ResponseField name="metadata" type="object">
+      Metadados do relatório (geradoEm, versao)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="cache" type="object">
+  Informações de cache (hit, age, expiresIn)
+</ResponseField>
+
+<RequestExample>
+
+```bash Básico
+curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/detalhado" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data_inicio": "2024-01-01",
+    "data_fim": "2024-01-31"
+  }'
+```
+
+```bash Completo
+curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/detalhado" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data_inicio": "2024-01-01",
+    "data_fim": "2024-01-31",
+    "main": "Programa de indicação e prêmios",
+    "agrupar_por": "dia",
+    "incluir_agentes": true,
+    "incluir_tendencias": true,
+    "incluir_cohorts": true
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "data": {
+    "dashboard": {
+      "totalTickets": 342,
+      "ticketsByStatus": {"open": 44, "in_progress": 23, "resolved": 198, "closed": 77},
+      "ticketsByCategory": {...},
+      "resolutionMetrics": {...},
+      "ticketTrend": [...]
+    },
+    "agentPerformance": [
+      {
+        "agente": "joao@suporte.com",
+        "ticketsRespondidos": 89,
+        "ticketsResolvidos": 72,
+        "tempoMedioResposta": "45min",
+        "tempoMedioResolucao": "3h 20min",
+        "taxaResolucao": 80.9,
+        "mensagensEnviadas": 234
+      }
+    ],
+    "issueTrends": [
+      {
+        "issue": "Não recebi meus pontos",
+        "main": "Programa de indicação e prêmios",
+        "total": 78,
+        "tendencia": "subindo",
+        "variacaoPercentual": 15.3
+      }
+    ],
+    "distribution": {
+      "porHora": [...],
+      "porDiaSemana": [...],
+      "porNewsletter": [...]
+    },
+    "filters": {
+      "dataInicio": "2024-01-01",
+      "dataFim": "2024-01-31",
+      "main": "Programa de indicação e prêmios"
+    },
+    "metadata": {
+      "geradoEm": "2024-01-15T10:30:00.000Z",
+      "versao": "2.0"
+    }
+  },
+  "cache": {
+    "hit": false
+  }
+}
+```
+
+</ResponseExample>

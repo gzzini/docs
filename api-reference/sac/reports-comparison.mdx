@@ -1,0 +1,132 @@
+---
+title: "Comparativo entre Períodos"
+api: "GET https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/comparativo"
+description: "Compara métricas entre dois períodos"
+---
+
+## Descrição
+
+Compara métricas do período atual com um período anterior, calculando variações percentuais. Permite comparar com o período imediatamente anterior ou com o mesmo período do ano passado. Este endpoint utiliza cache KV com TTL de 2 horas.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="data_inicio" type="string">
+  Data de início do período atual (formato: YYYY-MM-DD). Padrão: 30 dias atrás
+</ParamField>
+
+<ParamField query="data_fim" type="string">
+  Data de fim do período atual (formato: YYYY-MM-DD). Padrão: hoje
+</ParamField>
+
+<ParamField query="comparar_com" type="string" default="periodo_anterior">
+  Tipo de comparação
+
+  Valores aceitos:
+  - `periodo_anterior` - Compara com o período de mesmo tamanho imediatamente anterior
+  - `mesmo_periodo_ano_anterior` - Compara com o mesmo período do ano passado
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados comparativos">
+    <ResponseField name="atual" type="object">
+      Métricas do período atual (estrutura de dashboard)
+    </ResponseField>
+
+    <ResponseField name="anterior" type="object">
+      Métricas do período anterior (estrutura de dashboard)
+    </ResponseField>
+
+    <ResponseField name="variacao" type="object">
+      <Expandable title="Variações percentuais">
+        <ResponseField name="totalTickets" type="number">
+          Variação percentual no total de tickets
+        </ResponseField>
+
+        <ResponseField name="taxaResolucao" type="number">
+          Variação percentual na taxa de resolução
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="cache" type="object">
+  Informações de cache (hit, age, expiresIn)
+</ResponseField>
+
+<RequestExample>
+
+```bash Período Anterior
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/comparativo?data_inicio=2024-01-01&data_fim=2024-01-31&comparar_com=periodo_anterior" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+```bash Mesmo Período Ano Anterior
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/comparativo?data_inicio=2024-01-01&data_fim=2024-01-31&comparar_com=mesmo_periodo_ano_anterior" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "data": {
+    "atual": {
+      "totalTickets": 342,
+      "ticketsByStatus": {
+        "open": 44,
+        "in_progress": 23,
+        "resolved": 198,
+        "closed": 77
+      },
+      "resolutionMetrics": {
+        "taxaResolucaoGeral": 80.4
+      },
+      "periodo": {
+        "inicio": "2024-01-01",
+        "fim": "2024-01-31"
+      }
+    },
+    "anterior": {
+      "totalTickets": 298,
+      "ticketsByStatus": {
+        "open": 38,
+        "in_progress": 19,
+        "resolved": 176,
+        "closed": 65
+      },
+      "resolutionMetrics": {
+        "taxaResolucaoGeral": 80.9
+      },
+      "periodo": {
+        "inicio": "2023-12-01",
+        "fim": "2023-12-31"
+      }
+    },
+    "variacao": {
+      "totalTickets": 14.8,
+      "taxaResolucao": -0.6
+    }
+  },
+  "cache": {
+    "hit": false
+  }
+}
+```
+
+</ResponseExample>
