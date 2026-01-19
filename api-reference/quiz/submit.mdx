@@ -1,6 +1,6 @@
 ---
 title: "Submeter Respostas"
-api: "POST https://dashboard-backend.theo-110.workers.dev/quiz/submit"
+api: "POST https://sac-waffle-v2.theo-110.workers.dev/quiz/submit"
 description: "Submete as respostas do usuário para um quiz e verifica se passou"
 ---
 
@@ -104,7 +104,7 @@ Cada usuário pode submeter respostas para um quiz apenas **uma vez**. Tentativa
 <RequestExample>
 
 ```bash cURL
-curl -X POST https://dashboard-backend.theo-110.workers.dev/quiz/submit \
+curl -X POST https://sac-waffle-v2.theo-110.workers.dev/quiz/submit \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -125,7 +125,7 @@ curl -X POST https://dashboard-backend.theo-110.workers.dev/quiz/submit \
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://dashboard-backend.theo-110.workers.dev/quiz/submit', {
+const response = await fetch('https://sac-waffle-v2.theo-110.workers.dev/quiz/submit', {
   method: 'POST',
   headers: {
     'Authorization': 'Bearer seu_token_jwt',

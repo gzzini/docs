@@ -1,6 +1,6 @@
 ---
 title: "Listar Quizzes Disponíveis"
-api: "GET https://dashboard-backend.theo-110.workers.dev/quiz/available"
+api: "GET https://sac-waffle-v2.theo-110.workers.dev/quiz/available"
 description: "Retorna a lista de quizzes disponíveis para o usuário nos últimos 3 dias"
 ---
 
@@ -90,12 +90,12 @@ Este endpoint é usado para mostrar ao usuário quais dias ele pode tentar recup
 <RequestExample>
 
 ```bash cURL
-curl -X GET https://dashboard-backend.theo-110.workers.dev/quiz/available \
+curl -X GET https://sac-waffle-v2.theo-110.workers.dev/quiz/available \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://dashboard-backend.theo-110.workers.dev/quiz/available', {
+const response = await fetch('https://sac-waffle-v2.theo-110.workers.dev/quiz/available', {
   method: 'GET',
   headers: {
     'Authorization': 'Bearer seu_token_jwt'
