@@ -1,0 +1,107 @@
+---
+title: "Gerar Quiz Diário"
+api: "POST https://dashboard-backend.theo-110.workers.dev/quiz/admin/generate"
+description: "Força a geração do quiz diário baseado na última edição da newsletter"
+---
+
+## Descrição
+
+Força a geração de um novo quiz baseado na última edição disponível da newsletter The News. Este endpoint é útil para gerar manualmente o quiz quando necessário, fora do horário programado do cron job.
+
+O sistema busca automaticamente a última edição disponível no Beehiiv e usa a OpenAI para gerar 10 perguntas sobre o conteúdo.
+
+<Warning>
+  Este é um endpoint administrativo. Se já existir um quiz para a data atual, o sistema pode retornar erro ou sobrescrever.
+</Warning>
+
+## Headers
+
+<ParamField header="Content-Type" type="string">
+  Tipo de conteúdo da requisição
+
+  Valor: `application/json`
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+  Mensagem descritiva do resultado
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados da resposta">
+    <ResponseField name="quizId" type="string">
+      ID do quiz gerado
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://dashboard-backend.theo-110.workers.dev/quiz/admin/generate \
+  -H "Content-Type: application/json"
+```
+
+```javascript JavaScript
+const response = await fetch('https://dashboard-backend.theo-110.workers.dev/quiz/admin/generate', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+const data = await response.json();
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "message": "Quiz gerado com sucesso",
+  "data": {
+    "quizId": "quiz_abc123"
+  }
+}
+```
+
+```json Already Exists
+{
+  "success": false,
+  "message": "Quiz já existe para hoje"
+}
+```
+
+```json No Post Available
+{
+  "success": false,
+  "message": "Nenhuma edição disponível para gerar quiz"
+}
+```
+
+```json Generation Error
+{
+  "success": false,
+  "message": "Erro ao gerar quiz com OpenAI"
+}
+```
+
+</ResponseExample>
+
+<Tip>
+  O quiz é gerado automaticamente todos os dias às 12h (horário de Brasília) via Cloudflare Cron. Este endpoint é apenas para forçar a geração manualmente.
+</Tip>
+
+## Processo de Geração
+
+1. **Busca do Post**: O sistema busca a última edição da newsletter no Beehiiv (geralmente do dia anterior)
+2. **Sanitização**: O conteúdo HTML é limpo (remoção de scripts, estilos, imagens)
+3. **Geração com IA**: A OpenAI GPT-4o gera 10 perguntas sobre o conteúdo
+4. **Persistência**: Quiz e perguntas são salvos no banco de dados com respostas corretas

@@ -1,0 +1,147 @@
+---
+title: "Histórico de Tentativas"
+api: "GET https://dashboard-backend.theo-110.workers.dev/quiz/history"
+description: "Retorna o histórico de todas as tentativas de quiz do usuário"
+---
+
+## Descrição
+
+Lista todas as tentativas de quiz realizadas pelo usuário autenticado, incluindo informações sobre o quiz, data, resultado e pontuação. Os resultados são ordenados por data de tentativa (mais recente primeiro).
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Token JWT do usuário autenticado
+
+  Formato: `Bearer {token}`
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object" required>
+  <Expandable title="Dados da resposta">
+    <ResponseField name="attempts" type="array" required>
+      Lista de tentativas do usuário
+      <Expandable title="Estrutura de cada tentativa">
+        <ResponseField name="id" type="string">
+          ID único da tentativa
+        </ResponseField>
+        <ResponseField name="quizId" type="string">
+          ID do quiz
+        </ResponseField>
+        <ResponseField name="quizTitle" type="string">
+          Título do quiz
+        </ResponseField>
+        <ResponseField name="quizDate" type="string">
+          Data do quiz (formato YYYY-MM-DD)
+        </ResponseField>
+        <ResponseField name="totalQuestions" type="number">
+          Total de perguntas no quiz
+        </ResponseField>
+        <ResponseField name="correctAnswers" type="number">
+          Quantidade de respostas corretas
+        </ResponseField>
+        <ResponseField name="passed" type="boolean">
+          Se o usuário passou no quiz
+        </ResponseField>
+        <ResponseField name="streakRecovered" type="boolean">
+          Se o streak foi recuperado
+        </ResponseField>
+        <ResponseField name="attemptedAt" type="string">
+          Data/hora da tentativa (formato ISO 8601)
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X GET https://dashboard-backend.theo-110.workers.dev/quiz/history \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+```javascript JavaScript
+const response = await fetch('https://dashboard-backend.theo-110.workers.dev/quiz/history', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer seu_token_jwt'
+  }
+});
+
+const data = await response.json();
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "data": {
+    "attempts": [
+      {
+        "id": "attempt_xyz789",
+        "quizId": "quiz_abc123",
+        "quizTitle": "quiz do dia - manchete",
+        "quizDate": "2026-01-18",
+        "totalQuestions": 10,
+        "correctAnswers": 8,
+        "passed": true,
+        "streakRecovered": true,
+        "attemptedAt": "2026-01-18T15:30:00.000Z"
+      },
+      {
+        "id": "attempt_uvw456",
+        "quizId": "quiz_def456",
+        "quizTitle": "quiz do dia - manchete",
+        "quizDate": "2026-01-17",
+        "totalQuestions": 10,
+        "correctAnswers": 4,
+        "passed": false,
+        "streakRecovered": false,
+        "attemptedAt": "2026-01-17T10:15:00.000Z"
+      },
+      {
+        "id": "attempt_rst123",
+        "quizId": "quiz_ghi789",
+        "quizTitle": "quiz do dia - manchete",
+        "quizDate": "2026-01-16",
+        "totalQuestions": 10,
+        "correctAnswers": 7,
+        "passed": true,
+        "streakRecovered": true,
+        "attemptedAt": "2026-01-16T18:45:00.000Z"
+      }
+    ]
+  }
+}
+```
+
+```json Empty History
+{
+  "success": true,
+  "data": {
+    "attempts": []
+  }
+}
+```
+
+```json Unauthorized
+{
+  "success": false,
+  "message": "token de autenticação inválido ou ausente"
+}
+```
+
+</ResponseExample>
+
+<Tip>
+  Use este endpoint para mostrar ao usuário um resumo de sua performance nos quizzes, incluindo taxa de aprovação e streaks recuperados.
+</Tip>

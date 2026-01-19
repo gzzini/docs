@@ -1,0 +1,123 @@
+---
+title: "Criar Quiz para Data"
+api: "POST https://dashboard-backend.theo-110.workers.dev/quiz/admin/create"
+description: "Cria um quiz para uma data específica"
+---
+
+## Descrição
+
+Cria um novo quiz para uma data específica. Se nenhuma data for fornecida, o sistema usa a data atual. Este endpoint é útil para criar quizzes retroativos ou para datas futuras.
+
+Se já existir um quiz para a data especificada, retorna erro 409 (conflito).
+
+<Warning>
+  Este é um endpoint administrativo. Use com cuidado para evitar duplicação de quizzes.
+</Warning>
+
+## Headers
+
+<ParamField header="Content-Type" type="string" required>
+  Tipo de conteúdo da requisição
+
+  Valor: `application/json`
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="date" type="string">
+  Data para o quiz (formato YYYY-MM-DD)
+
+  Se não fornecido, usa a data atual.
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+  Mensagem descritiva do resultado
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados da resposta">
+    <ResponseField name="quizId" type="string">
+      ID do quiz criado
+    </ResponseField>
+    <ResponseField name="date" type="string">
+      Data do quiz criado (formato YYYY-MM-DD)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash Com Data Específica
+curl -X POST https://dashboard-backend.theo-110.workers.dev/quiz/admin/create \
+  -H "Content-Type: application/json" \
+  -d '{
+    "date": "2026-01-15"
+  }'
+```
+
+```bash Sem Data (usa data atual)
+curl -X POST https://dashboard-backend.theo-110.workers.dev/quiz/admin/create \
+  -H "Content-Type: application/json"
+```
+
+```javascript JavaScript
+const response = await fetch('https://dashboard-backend.theo-110.workers.dev/quiz/admin/create', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    date: '2026-01-15'  // opcional
+  })
+});
+
+const data = await response.json();
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "message": "Quiz criado com sucesso",
+  "data": {
+    "quizId": "quiz_xyz789",
+    "date": "2026-01-15"
+  }
+}
+```
+
+```json Conflict (Already Exists)
+{
+  "success": false,
+  "message": "Já existe um quiz para esta data"
+}
+```
+
+```json Bad Request
+{
+  "success": false,
+  "message": "Formato de data inválido. Use YYYY-MM-DD"
+}
+```
+
+```json Error
+{
+  "success": false,
+  "message": "Erro ao criar quiz"
+}
+```
+
+</ResponseExample>
+
+<Tip>
+  Use este endpoint para criar quizzes retroativos, permitindo que usuários recuperem streaks de dias anteriores que não tinham quiz disponível.
+</Tip>

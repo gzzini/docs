@@ -305,6 +305,30 @@
             ]
           },
           {
+            "group": "Quiz API",
+            "pages": [
+              "api-reference/quiz/introduction",
+              {
+                "group": "Usuário",
+                "pages": [
+                  "api-reference/quiz/available",
+                  "api-reference/quiz/get-quiz",
+                  "api-reference/quiz/submit",
+                  "api-reference/quiz/history"
+                ]
+              },
+              {
+                "group": "Admin",
+                "pages": [
+                  "api-reference/quiz/admin-generate",
+                  "api-reference/quiz/admin-create",
+                  "api-reference/quiz/admin-list",
+                  "api-reference/quiz/admin-delete"
+                ]
+              }
+            ]
+          },
+          {
             "group": "OpenAI API",
             "pages": [
               "api-reference/openai/introduction",

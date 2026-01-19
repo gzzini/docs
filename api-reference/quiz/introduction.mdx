@@ -1,0 +1,128 @@
+---
+title: "Quiz API"
+sidebarTitle: "Introdução"
+description: "API para sistema de quiz de recuperação de streaks baseado nas edições diárias do The News"
+---
+
+## Visão Geral
+
+A API de Quiz fornece endpoints para o sistema de recuperação de streaks do The News. Os quizzes são gerados automaticamente a partir das edições diárias da newsletter, permitindo que usuários recuperem seus streaks perdidos respondendo perguntas sobre o conteúdo.
+
+## Base URL
+
+```
+https://dashboard-backend.theo-110.workers.dev
+```
+
+## Autenticação
+
+A maioria dos endpoints requer autenticação via JWT token. Endpoints administrativos estão separados e claramente indicados.
+
+### Headers Obrigatórios
+
+```http
+Authorization: Bearer {token}
+Content-Type: application/json
+```
+
+## Recursos Principais
+
+### 1. Quizzes para Usuários
+
+- Listar quizzes disponíveis (últimos 3 dias)
+- Visualizar perguntas do quiz
+- Submeter respostas
+- Histórico de tentativas
+- Recuperação automática de streak
+
+### 2. Administração
+
+- Gerar quiz diário manualmente
+- Criar quiz para data específica
+- Listar todos os quizzes
+- Deletar quizzes
+
+## Regras do Sistema
+
+| Regra | Valor |
+|-------|-------|
+| Perguntas por quiz | 10 |
+| Opções por pergunta | 4 |
+| Mínimo de acertos para passar | 6 (60%) |
+| Tentativas por quiz | 1 |
+| Dias recuperáveis | Até 3 dias anteriores |
+
+## Endpoints Disponíveis
+
+### Rotas Autenticadas (Usuário)
+
+| Endpoint | Descrição |
+|----------|-----------|
+| [GET /quiz/available](/api-reference/quiz/available) | Lista quizzes disponíveis |
+| [GET /quiz/:id](/api-reference/quiz/get-quiz) | Obtém quiz com perguntas |
+| [POST /quiz/submit](/api-reference/quiz/submit) | Submete respostas do quiz |
+| [GET /quiz/history](/api-reference/quiz/history) | Histórico de tentativas |
+
+### Rotas Administrativas
+
+| Endpoint | Descrição |
+|----------|-----------|
+| [POST /quiz/admin/generate](/api-reference/quiz/admin-generate) | Força geração do quiz diário |
+| [POST /quiz/admin/create](/api-reference/quiz/admin-create) | Cria quiz para data específica |
+| [GET /quiz/admin/list](/api-reference/quiz/admin-list) | Lista todos os quizzes |
+| [DELETE /quiz/admin/:id](/api-reference/quiz/admin-delete) | Deleta quiz específico |
+
+## Fluxo de Recuperação de Streak
+
+Quando o usuário **passa** no quiz (acertos >= 6):
+
+1. Sistema verifica as respostas do usuário
+2. Calcula pontuação total
+3. Se passou, registra leitura histórica automaticamente
+4. Streak é recuperado para a data do quiz
+5. Tentativa é salva com `streakRecovered: true`
+
+<Tip>
+  O quiz é gerado automaticamente todos os dias às 12h (horário de Brasília) com base na edição do dia anterior da newsletter.
+</Tip>
+
+## Tratamento de Erros
+
+A API retorna erros padronizados no seguinte formato:
+
+```json
+{
+  "success": false,
+  "message": "Descrição do erro"
+}
+```
+
+### Códigos de Status HTTP
+
+| Código | Descrição |
+|--------|-----------|
+| `200` | Sucesso |
+| `201` | Criado com sucesso |
+| `400` | Requisição inválida |
+| `401` | Não autorizado |
+| `403` | Acesso negado (já tentou o quiz) |
+| `404` | Quiz não encontrado |
+| `409` | Conflito (quiz já existe para data) |
+| `500` | Erro interno do servidor |
+
+## Geração Automática de Quizzes
+
+O sistema gera quizzes automaticamente usando:
+
+1. **Beehiiv API**: Busca a última edição da newsletter
+2. **OpenAI GPT-4o**: Gera 10 perguntas sobre o conteúdo
+3. **Cloudflare D1**: Armazena quizzes e tentativas
+
+<Warning>
+  Aos domingos não há edição da newsletter, portanto o quiz de segunda-feira é baseado na edição de sábado.
+</Warning>
+
+## Suporte
+
+Para dúvidas ou problemas com a API, entre em contato:
+- Email: tech@waffle.com.br

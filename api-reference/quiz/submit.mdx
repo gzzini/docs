@@ -1,0 +1,236 @@
+---
+title: "Submeter Respostas"
+api: "POST https://dashboard-backend.theo-110.workers.dev/quiz/submit"
+description: "Submete as respostas do usuário para um quiz e verifica se passou"
+---
+
+## Descrição
+
+Submete as respostas do usuário para um quiz específico. O sistema verifica cada resposta, calcula a pontuação e determina se o usuário passou. Se passou, o streak é automaticamente recuperado para a data do quiz.
+
+Cada usuário pode submeter respostas para um quiz apenas **uma vez**. Tentativas subsequentes retornam erro 403.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Token JWT do usuário autenticado
+
+  Formato: `Bearer {token}`
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  Tipo de conteúdo da requisição
+
+  Valor: `application/json`
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="quizId" type="string" required>
+  ID do quiz que está sendo respondido
+</ParamField>
+
+<ParamField body="answers" type="array" required>
+  Array com as respostas do usuário
+
+  <Expandable title="Estrutura de cada resposta">
+    <ParamField body="fieldId" type="string" required>
+      ID da pergunta
+    </ParamField>
+    <ParamField body="answer" type="string" required>
+      Resposta selecionada pelo usuário (deve ser exatamente igual a uma das opções)
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+  Mensagem descritiva do resultado
+</ResponseField>
+
+<ResponseField name="data" type="object" required>
+  <Expandable title="Dados do resultado">
+    <ResponseField name="totalQuestions" type="number" required>
+      Total de perguntas no quiz (10)
+    </ResponseField>
+
+    <ResponseField name="correctAnswers" type="number" required>
+      Quantidade de respostas corretas
+    </ResponseField>
+
+    <ResponseField name="passed" type="boolean" required>
+      Se o usuário passou (acertos >= minCorrectAnswers)
+    </ResponseField>
+
+    <ResponseField name="minRequired" type="number" required>
+      Mínimo de acertos necessários (6)
+    </ResponseField>
+
+    <ResponseField name="streakRecovered" type="boolean" required>
+      Se o streak foi recuperado automaticamente
+    </ResponseField>
+
+    <ResponseField name="details" type="array" required>
+      Detalhes de cada pergunta com correção
+      <Expandable title="Estrutura de cada detalhe">
+        <ResponseField name="fieldId" type="string">
+          ID da pergunta
+        </ResponseField>
+        <ResponseField name="question" type="string">
+          Texto da pergunta
+        </ResponseField>
+        <ResponseField name="userAnswer" type="string">
+          Resposta do usuário
+        </ResponseField>
+        <ResponseField name="correctAnswer" type="string">
+          Resposta correta
+        </ResponseField>
+        <ResponseField name="isCorrect" type="boolean">
+          Se a resposta estava correta
+        </ResponseField>
+        <ResponseField name="explanation" type="string">
+          Explicação da resposta correta
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://dashboard-backend.theo-110.workers.dev/quiz/submit \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "quizId": "quiz_abc123",
+    "answers": [
+      {"fieldId": "q1_abc123", "answer": "openai"},
+      {"fieldId": "q2_abc123", "answer": "r$ 100 milhões"},
+      {"fieldId": "q3_abc123", "answer": "brasil"},
+      {"fieldId": "q4_abc123", "answer": "inteligência artificial"},
+      {"fieldId": "q5_abc123", "answer": "elon musk"},
+      {"fieldId": "q6_abc123", "answer": "2025"},
+      {"fieldId": "q7_abc123", "answer": "são paulo"},
+      {"fieldId": "q8_abc123", "answer": "fintech"},
+      {"fieldId": "q9_abc123", "answer": "5 bilhões"},
+      {"fieldId": "q10_abc123", "answer": "google"}
+    ]
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://dashboard-backend.theo-110.workers.dev/quiz/submit', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer seu_token_jwt',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    quizId: 'quiz_abc123',
+    answers: [
+      { fieldId: 'q1_abc123', answer: 'openai' },
+      { fieldId: 'q2_abc123', answer: 'r$ 100 milhões' },
+      // ... outras respostas
+    ]
+  })
+});
+
+const data = await response.json();
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Passou (Streak Recuperado)
+{
+  "success": true,
+  "message": "parabéns! você acertou o suficiente e seu streak foi recuperado! 🎉",
+  "data": {
+    "totalQuestions": 10,
+    "correctAnswers": 8,
+    "passed": true,
+    "minRequired": 6,
+    "streakRecovered": true,
+    "details": [
+      {
+        "fieldId": "q1_abc123",
+        "question": "qual empresa anunciou uma nova parceria estratégica com a microsoft?",
+        "userAnswer": "openai",
+        "correctAnswer": "openai",
+        "isCorrect": true,
+        "explanation": "a openai anunciou uma extensão da parceria com a microsoft no valor de mais us$ 10 bilhões."
+      },
+      {
+        "fieldId": "q2_abc123",
+        "question": "qual foi o valor do investimento anunciado pela startup brasileira?",
+        "userAnswer": "r$ 100 milhões",
+        "correctAnswer": "r$ 200 milhões",
+        "isCorrect": false,
+        "explanation": "a startup recebeu r$ 200 milhões em sua série c, liderada pelo softbank."
+      }
+    ]
+  }
+}
+```
+
+```json Não Passou
+{
+  "success": true,
+  "message": "você acertou 4 de 10 perguntas. eram necessários 6 acertos para recuperar o streak.",
+  "data": {
+    "totalQuestions": 10,
+    "correctAnswers": 4,
+    "passed": false,
+    "minRequired": 6,
+    "streakRecovered": false,
+    "details": [
+      {
+        "fieldId": "q1_abc123",
+        "question": "qual empresa anunciou uma nova parceria estratégica com a microsoft?",
+        "userAnswer": "google",
+        "correctAnswer": "openai",
+        "isCorrect": false,
+        "explanation": "a openai anunciou uma extensão da parceria com a microsoft."
+      }
+    ]
+  }
+}
+```
+
+```json Already Attempted
+{
+  "success": false,
+  "message": "você já tentou este quiz. cada quiz pode ser tentado apenas uma vez."
+}
+```
+
+```json Bad Request
+{
+  "success": false,
+  "message": "quizId e answers são obrigatórios"
+}
+```
+
+```json Not Found
+{
+  "success": false,
+  "message": "quiz não encontrado"
+}
+```
+
+</ResponseExample>
+
+<Warning>
+  As respostas devem ser **exatamente iguais** às opções retornadas no endpoint GET /quiz/:id. A comparação é case-sensitive.
+</Warning>
+
+<Tip>
+  O streak é recuperado automaticamente quando o usuário passa no quiz. Não é necessário chamar nenhum endpoint adicional.
+</Tip>

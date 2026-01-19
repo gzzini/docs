@@ -1,0 +1,106 @@
+---
+title: "Deletar Quiz"
+api: "DELETE https://dashboard-backend.theo-110.workers.dev/quiz/admin/{id}"
+description: "Deleta um quiz específico e todos os dados relacionados"
+---
+
+## Descrição
+
+Deleta permanentemente um quiz específico do sistema. A operação é em cascata, deletando também:
+
+- Todas as perguntas do quiz
+- Todas as respostas corretas
+- Todas as tentativas de usuários
+
+<Warning>
+  Esta operação é **irreversível**. Todos os dados relacionados ao quiz serão permanentemente removidos.
+</Warning>
+
+## Path Parameters
+
+<ParamField path="id" type="string" required>
+  ID único do quiz a ser deletado
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+  Mensagem descritiva do resultado
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados da resposta">
+    <ResponseField name="deletedQuizId" type="string">
+      ID do quiz deletado
+    </ResponseField>
+    <ResponseField name="quizDate" type="string">
+      Data do quiz deletado (formato YYYY-MM-DD)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X DELETE https://dashboard-backend.theo-110.workers.dev/quiz/admin/quiz_abc123
+```
+
+```javascript JavaScript
+const quizId = 'quiz_abc123';
+
+const response = await fetch(`https://dashboard-backend.theo-110.workers.dev/quiz/admin/${quizId}`, {
+  method: 'DELETE'
+});
+
+const data = await response.json();
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "message": "Quiz deletado com sucesso",
+  "data": {
+    "deletedQuizId": "quiz_abc123",
+    "quizDate": "2026-01-19"
+  }
+}
+```
+
+```json Not Found
+{
+  "success": false,
+  "message": "Quiz não encontrado"
+}
+```
+
+```json Error
+{
+  "success": false,
+  "message": "Erro ao deletar quiz"
+}
+```
+
+</ResponseExample>
+
+## Dados Deletados em Cascata
+
+Quando um quiz é deletado, os seguintes dados são removidos:
+
+| Tabela | Descrição |
+|--------|-----------|
+| `dynamicForms` | O quiz em si |
+| `formFields` | Todas as perguntas do quiz |
+| `quizCorrectAnswers` | Todas as respostas corretas |
+| `quizAttempts` | Todas as tentativas de usuários |
+
+<Tip>
+  Antes de deletar um quiz, considere usar o endpoint `GET /quiz/admin/list` para verificar os detalhes do quiz e garantir que está deletando o correto.
+</Tip>
