@@ -1,0 +1,105 @@
+---
+title: "Remover Tag do Ticket"
+api: "DELETE https://sac-waffle-v2.theo-110.workers.dev/support/{id}/tags/{tagId}"
+description: "Remove a associação de uma tag com um ticket"
+---
+
+## Descrição
+
+Remove uma tag de um ticket de suporte. A tag não é excluída do sistema, apenas a associação com o ticket é removida. Requer autenticação.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="id" type="number" required>
+  ID do ticket do qual a tag será removida
+</ParamField>
+
+<ParamField path="tagId" type="number" required>
+  ID da tag a ser removida do ticket
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem descritiva do resultado
+</ResponseField>
+
+## Regras de Negócio
+
+<Note>
+  **Apenas Remove Associação**: Esta operação remove apenas a ligação entre o ticket e a tag. A tag continua existindo no sistema e pode ser usada em outros tickets.
+</Note>
+
+<Note>
+  **Operação Idempotente**: Se a tag não estiver associada ao ticket, a operação não gera erro.
+</Note>
+
+<RequestExample>
+
+```bash Remover Tag do Ticket
+curl -X DELETE "https://sac-waffle-v2.theo-110.workers.dev/support/123/tags/1" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success (200 OK)
+{
+  "success": true,
+  "message": "Tag removida do ticket com sucesso"
+}
+```
+
+```json Error - Token Inválido (401)
+{
+  "success": false,
+  "message": "Token inválido ou expirado"
+}
+```
+
+```json Error - Erro Interno (500)
+{
+  "success": false,
+  "message": "Erro ao remover tag do ticket"
+}
+```
+
+</ResponseExample>
+
+## Exemplo de Uso
+
+### Reorganizando tags de um ticket
+
+1. **Visualizar tags atuais do ticket**
+```bash
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/123" \
+  -H "Authorization: Bearer seu_token_jwt"
+
+# Resposta mostra tags: [{"id": 1, "name": "Urgente"}, {"id": 2, "name": "Novo"}]
+```
+
+2. **Remover tag "Novo" (id: 2) pois o ticket já está em análise**
+```bash
+curl -X DELETE "https://sac-waffle-v2.theo-110.workers.dev/support/123/tags/2" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+3. **Adicionar tag "Em Análise" (id: 3)**
+```bash
+curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/123/tags" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{"tagId": 3}'
+```

@@ -1,0 +1,135 @@
+---
+title: "Adicionar Tag ao Ticket"
+api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/{id}/tags"
+description: "Associa uma tag a um ticket de suporte"
+---
+
+## Descrição
+
+Adiciona uma tag existente a um ticket de suporte. Um ticket pode ter múltiplas tags associadas. Requer autenticação.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  `application/json`
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="id" type="number" required>
+  ID do ticket ao qual a tag será adicionada
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="tagId" type="number" required>
+  ID da tag a ser associada ao ticket
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem descritiva do resultado
+</ResponseField>
+
+## Regras de Negócio
+
+<Note>
+  **Múltiplas Tags**: Um ticket pode ter várias tags associadas simultaneamente, permitindo categorização flexível.
+</Note>
+
+<Note>
+  **Validação de Existência**: O sistema verifica se tanto o ticket quanto a tag existem antes de criar a associação.
+</Note>
+
+<RequestExample>
+
+```bash Adicionar Tag
+curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/123/tags" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tagId": 1
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success (200 OK)
+{
+  "success": true,
+  "message": "Tag adicionada ao ticket com sucesso"
+}
+```
+
+```json Error - TagId Obrigatório (400)
+{
+  "success": false,
+  "message": "tagId é obrigatório"
+}
+```
+
+```json Error - Ticket Não Encontrado (404)
+{
+  "success": false,
+  "message": "Ticket não encontrado"
+}
+```
+
+```json Error - Tag Não Encontrada (404)
+{
+  "success": false,
+  "message": "Tag não encontrada"
+}
+```
+
+```json Error - Token Inválido (401)
+{
+  "success": false,
+  "message": "Token inválido ou expirado"
+}
+```
+
+</ResponseExample>
+
+## Exemplo de Uso
+
+### Fluxo típico de categorização de ticket
+
+1. **Listar tags disponíveis**
+```bash
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/tags" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+2. **Adicionar tag "Urgente" ao ticket**
+```bash
+curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/123/tags" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{"tagId": 1}'
+```
+
+3. **Adicionar tag "Financeiro" ao mesmo ticket**
+```bash
+curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/123/tags" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{"tagId": 5}'
+```
+
+4. **Visualizar ticket com tags**
+```bash
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/123" \
+  -H "Authorization: Bearer seu_token_jwt"
+```

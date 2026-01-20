@@ -1,0 +1,168 @@
+---
+title: "Atualizar Tag"
+api: "PATCH https://sac-waffle-v2.theo-110.workers.dev/support/tags/{id}"
+description: "Atualiza uma tag de suporte existente"
+---
+
+## Descrição
+
+Atualiza os dados de uma tag de suporte existente. Pelo menos um campo deve ser fornecido para atualização. Requer autenticação.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  `application/json`
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="id" type="number" required>
+  ID da tag a ser atualizada
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="name" type="string">
+  Novo nome da tag (deve ser único no sistema)
+</ParamField>
+
+<ParamField body="color" type="string">
+  Nova cor em formato hexadecimal (ex: #FF0000)
+</ParamField>
+
+<ParamField body="isDefault" type="boolean">
+  Define se esta é a tag padrão. Ao definir como `true`, todas as outras tags perdem o status de padrão.
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados da tag atualizada">
+    <ResponseField name="id" type="number">
+      ID único da tag
+    </ResponseField>
+
+    <ResponseField name="name" type="string">
+      Nome da tag
+    </ResponseField>
+
+    <ResponseField name="color" type="string">
+      Cor em formato hexadecimal
+    </ResponseField>
+
+    <ResponseField name="isDefault" type="boolean">
+      Indica se é a tag padrão
+    </ResponseField>
+
+    <ResponseField name="createdAt" type="string">
+      Data de criação (ISO 8601)
+    </ResponseField>
+
+    <ResponseField name="updatedAt" type="string">
+      Data da última atualização (ISO 8601)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Regras de Negócio
+
+<Note>
+  **Campo Obrigatório**: Pelo menos um campo (`name`, `color` ou `isDefault`) deve ser fornecido para atualização.
+</Note>
+
+<Note>
+  **Tag Padrão Única**: Ao definir `isDefault: true`, todas as outras tags perdem automaticamente o status de padrão.
+</Note>
+
+<Note>
+  **Atualização Automática**: O campo `updatedAt` é atualizado automaticamente com a data/hora da modificação.
+</Note>
+
+<RequestExample>
+
+```bash Atualizar Nome
+curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/tags/1" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Muito Urgente"
+  }'
+```
+
+```bash Atualizar Cor
+curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/tags/1" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "color": "#FF5500"
+  }'
+```
+
+```bash Definir como Padrão
+curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/tags/1" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "isDefault": true
+  }'
+```
+
+```bash Atualizar Múltiplos Campos
+curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/tags/1" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Prioridade Alta",
+    "color": "#FF0000",
+    "isDefault": true
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success (200 OK)
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "Muito Urgente",
+    "color": "#FF0000",
+    "isDefault": true,
+    "createdAt": "2024-03-20T10:00:00Z",
+    "updatedAt": "2024-03-20T15:30:00Z"
+  }
+}
+```
+
+```json Error - Nenhum Campo (400)
+{
+  "success": false,
+  "message": "Nenhum campo para atualizar fornecido"
+}
+```
+
+```json Error - Tag Não Encontrada (404)
+{
+  "success": false,
+  "message": "Tag não encontrada"
+}
+```
+
+```json Error - Token Inválido (401)
+{
+  "success": false,
+  "message": "Token inválido ou expirado"
+}
+```
+
+</ResponseExample>

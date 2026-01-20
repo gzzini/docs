@@ -1,0 +1,82 @@
+---
+title: "Deletar Tag"
+api: "DELETE https://sac-waffle-v2.theo-110.workers.dev/support/tags/{id}"
+description: "Remove uma tag de suporte do sistema"
+---
+
+## Descrição
+
+Remove uma tag de suporte do sistema. A tag não pode estar em uso em nenhum ticket. Requer autenticação.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="id" type="number" required>
+  ID da tag a ser removida
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem descritiva do resultado
+</ResponseField>
+
+## Regras de Negócio
+
+<Warning>
+  **Proteção de Integridade**: Uma tag não pode ser deletada se estiver associada a algum ticket. Remova a tag de todos os tickets antes de excluí-la.
+</Warning>
+
+<Note>
+  **Verificação Automática**: O sistema verifica automaticamente se existem tickets usando a tag antes de permitir a exclusão.
+</Note>
+
+<RequestExample>
+
+```bash Deletar Tag
+curl -X DELETE "https://sac-waffle-v2.theo-110.workers.dev/support/tags/1" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success (200 OK)
+{
+  "success": true,
+  "message": "Tag excluída com sucesso"
+}
+```
+
+```json Error - Tag em Uso (400)
+{
+  "success": false,
+  "message": "Tag está em uso em tickets e não pode ser excluída"
+}
+```
+
+```json Error - Tag Não Encontrada (404)
+{
+  "success": false,
+  "message": "Tag não encontrada"
+}
+```
+
+```json Error - Token Inválido (401)
+{
+  "success": false,
+  "message": "Token inválido ou expirado"
+}
+```
+
+</ResponseExample>

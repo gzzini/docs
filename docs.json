@@ -286,6 +286,17 @@
                 ]
               },
               {
+                "group": "Tags",
+                "pages": [
+                  "api-reference/sac/tags-list",
+                  "api-reference/sac/tags-create",
+                  "api-reference/sac/tags-update",
+                  "api-reference/sac/tags-delete",
+                  "api-reference/sac/tags-add-ticket",
+                  "api-reference/sac/tags-remove-ticket"
+                ]
+              },
+              {
                 "group": "Relatórios",
                 "pages": [
                   "api-reference/sac/reports",

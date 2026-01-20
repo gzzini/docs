@@ -1,0 +1,103 @@
+---
+title: "Listar Tags"
+api: "GET https://sac-waffle-v2.theo-110.workers.dev/support/tags"
+description: "Retorna todas as tags de suporte disponíveis"
+---
+
+## Descrição
+
+Retorna uma lista de todas as tags de suporte cadastradas, ordenadas alfabeticamente pelo nome. Requer autenticação.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  Lista de tags cadastradas
+
+  <Expandable title="Estrutura da tag">
+    <ResponseField name="id" type="number">
+      ID único da tag
+    </ResponseField>
+
+    <ResponseField name="name" type="string">
+      Nome da tag (único no sistema)
+    </ResponseField>
+
+    <ResponseField name="color" type="string">
+      Cor em formato hexadecimal (ex: #FF0000)
+    </ResponseField>
+
+    <ResponseField name="isDefault" type="boolean">
+      Indica se é a tag padrão (apenas uma por vez)
+    </ResponseField>
+
+    <ResponseField name="createdAt" type="string">
+      Data de criação (ISO 8601)
+    </ResponseField>
+
+    <ResponseField name="updatedAt" type="string">
+      Data da última atualização (ISO 8601)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash Listar Tags
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/tags" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "name": "Aguardando Cliente",
+      "color": "#FFA500",
+      "isDefault": false,
+      "createdAt": "2024-03-20T10:00:00Z",
+      "updatedAt": "2024-03-20T10:00:00Z"
+    },
+    {
+      "id": 2,
+      "name": "Novo",
+      "color": "#00FF00",
+      "isDefault": true,
+      "createdAt": "2024-03-20T10:01:00Z",
+      "updatedAt": "2024-03-20T10:01:00Z"
+    },
+    {
+      "id": 3,
+      "name": "Urgente",
+      "color": "#FF0000",
+      "isDefault": false,
+      "createdAt": "2024-03-20T10:02:00Z",
+      "updatedAt": "2024-03-20T10:02:00Z"
+    }
+  ]
+}
+```
+
+```json Error
+{
+  "success": false,
+  "message": "Token inválido ou expirado"
+}
+```
+
+</ResponseExample>

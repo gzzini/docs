@@ -1,0 +1,141 @@
+---
+title: "Criar Tag"
+api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/tags"
+description: "Cria uma nova tag de suporte"
+---
+
+## Descrição
+
+Cria uma nova tag de suporte para categorização de tickets. Requer autenticação.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  `application/json`
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="name" type="string" required>
+  Nome da tag (deve ser único no sistema)
+</ParamField>
+
+<ParamField body="color" type="string" required>
+  Cor em formato hexadecimal (ex: #FF0000, #00FF00)
+</ParamField>
+
+<ParamField body="isDefault" type="boolean" default="false">
+  Define se esta é a tag padrão. Apenas uma tag pode ser padrão por vez - ao definir uma nova tag como padrão, a anterior é automaticamente desativada.
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados da tag criada">
+    <ResponseField name="id" type="number">
+      ID único da tag
+    </ResponseField>
+
+    <ResponseField name="name" type="string">
+      Nome da tag
+    </ResponseField>
+
+    <ResponseField name="color" type="string">
+      Cor em formato hexadecimal
+    </ResponseField>
+
+    <ResponseField name="isDefault" type="boolean">
+      Indica se é a tag padrão
+    </ResponseField>
+
+    <ResponseField name="createdAt" type="string">
+      Data de criação (ISO 8601)
+    </ResponseField>
+
+    <ResponseField name="updatedAt" type="string">
+      Data da última atualização (ISO 8601)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Regras de Negócio
+
+<Note>
+  **Tag Padrão Única**: Apenas uma tag pode ter `isDefault = true`. Quando uma nova tag é marcada como padrão, todas as outras são automaticamente desativadas.
+</Note>
+
+<Note>
+  **Nomes Únicos**: O campo `name` possui constraint de unicidade no banco de dados. Tentar criar uma tag com nome existente resultará em erro.
+</Note>
+
+<RequestExample>
+
+```bash Tag Simples
+curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/tags" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Urgente",
+    "color": "#FF0000"
+  }'
+```
+
+```bash Tag Padrão
+curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/tags" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Novo",
+    "color": "#00FF00",
+    "isDefault": true
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success (201 Created)
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "Urgente",
+    "color": "#FF0000",
+    "isDefault": false,
+    "createdAt": "2024-03-20T10:00:00Z",
+    "updatedAt": "2024-03-20T10:00:00Z"
+  }
+}
+```
+
+```json Error - Campos Obrigatórios (400)
+{
+  "success": false,
+  "message": "Nome e cor são obrigatórios"
+}
+```
+
+```json Error - Nome Duplicado (400)
+{
+  "success": false,
+  "message": "Já existe uma tag com este nome"
+}
+```
+
+```json Error - Token Inválido (401)
+{
+  "success": false,
+  "message": "Token inválido ou expirado"
+}
+```
+
+</ResponseExample>
