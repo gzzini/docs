@@ -26,27 +26,41 @@ Adiciona uma nova mensagem ao histórico de conversação de um ticket. Suporta 
 
 ## Body Parameters
 
-<ParamField body="conteudo" type="string" required>
-  Conteúdo da mensagem
+<ParamField body="mensagem" type="string" required>
+  Conteúdo da mensagem (suporta HTML)
 </ParamField>
 
-<ParamField body="remetente" type="string" default="suporte">
-  Identificador do remetente
-  
-  Valores comuns:
-  - `suporte` - Mensagem da equipe de suporte
+<ParamField body="autor" type="string" required>
+  Email do autor da mensagem
+</ParamField>
+
+<ParamField body="origem" type="string" default="admin">
+  Origem da mensagem
+
+  Valores aceitos:
+  - `admin` - Mensagem da equipe de suporte
   - `usuario` - Mensagem do usuário
-  - Email do agente de suporte
+  - `email` - Mensagem recebida por email
 </ParamField>
 
-<ParamField body="enviarEmail" type="boolean" default="false">
+<ParamField body="status" type="string" default="Respondido">
+  Status da mensagem
+
+  Valores aceitos:
+  - `Pendente`
+  - `Respondido`
+  - `Resolvido`
+</ParamField>
+
+<ParamField body="enviar_email" type="boolean" default="true">
   Se deve enviar a mensagem por email para o usuário
-  
-  Funciona apenas se o ticket tem email e `wantReply = true`
+
+  Funciona apenas se o ticket tem email e `origem = admin`
 </ParamField>
 
 <ParamField body="support_ids" type="array">
-  Array de IDs de tickets para adicionar a mesma mensagem em lote
+  Array de IDs de tickets para adicionar a mesma mensagem em lote.
+  Quando fornecido, o `id` do path é ignorado.
 </ParamField>
 
 ## Response
@@ -55,34 +69,40 @@ Adiciona uma nova mensagem ao histórico de conversação de um ticket. Suporta 
   Indica se a operação foi bem-sucedida
 </ResponseField>
 
-<ResponseField name="message" type="string" required>
-  Mensagem descritiva do resultado
-</ResponseField>
-
 <ResponseField name="data" type="object">
-  <Expandable title="Dados da mensagem">
+  <Expandable title="Resposta para mensagem única">
+    <ResponseField name="modo" type="string">
+      Sempre `unico` para operação em um único ticket
+    </ResponseField>
+
     <ResponseField name="id" type="number">
       ID da mensagem criada
     </ResponseField>
-    
-    <ResponseField name="supportId" type="number">
-      ID do ticket
+
+    <ResponseField name="email_enviado" type="boolean">
+      Se o email foi enviado ao usuário
     </ResponseField>
-    
-    <ResponseField name="conteudo" type="string">
-      Conteúdo da mensagem
+  </Expandable>
+
+  <Expandable title="Resposta para mensagem em lote">
+    <ResponseField name="modo" type="string">
+      Sempre `lote` para operação em múltiplos tickets
     </ResponseField>
-    
-    <ResponseField name="remetente" type="string">
-      Identificador do remetente
+
+    <ResponseField name="enviados" type="number">
+      Quantidade de mensagens enviadas com sucesso
     </ResponseField>
-    
-    <ResponseField name="createdAt" type="string">
-      Data de criação
+
+    <ResponseField name="falhas" type="number">
+      Quantidade de falhas
     </ResponseField>
-    
-    <ResponseField name="emailSent" type="boolean">
-      Se o email foi enviado
+
+    <ResponseField name="emails_enviados" type="number">
+      Quantidade de emails enviados
+    </ResponseField>
+
+    <ResponseField name="resultados" type="array">
+      Detalhes de cada operação
     </ResponseField>
   </Expandable>
 </ResponseField>
@@ -94,8 +114,8 @@ curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/12345/mensagens
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
-    "conteudo": "Obrigado pelo contato. Estamos analisando seu caso.",
-    "remetente": "suporte"
+    "mensagem": "Obrigado pelo contato. Estamos analisando seu caso.",
+    "autor": "suporte@waffle.com.br"
   }'
 ```
 
@@ -104,21 +124,21 @@ curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/12345/mensagens
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
-    "conteudo": "Seu problema foi resolvido. Por favor, verifique e confirme.",
-    "remetente": "joao@suporte.com",
-    "enviarEmail": true
+    "mensagem": "<p>Seu problema foi resolvido.</p><p>Por favor, verifique e confirme.</p>",
+    "autor": "joao@waffle.com.br",
+    "enviar_email": true
   }'
 ```
 
 ```bash Mensagem em Lote
-curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/0/mensagens" \
+curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/lote/mensagens" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
-    "conteudo": "Informamos que houve uma atualização no sistema.",
-    "remetente": "suporte",
+    "mensagem": "Informamos que houve uma atualização no sistema.",
+    "autor": "suporte@waffle.com.br",
     "support_ids": [12345, 12346, 12347],
-    "enviarEmail": true
+    "enviar_email": true
   }'
 ```
 
@@ -126,17 +146,13 @@ curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/0/mensagens" \
 
 <ResponseExample>
 
-```json Success
+```json Success - Mensagem Única
 {
   "success": true,
-  "message": "Mensagem adicionada com sucesso",
   "data": {
+    "modo": "unico",
     "id": 567,
-    "supportId": 12345,
-    "conteudo": "Obrigado pelo contato. Estamos analisando seu caso.",
-    "remetente": "suporte",
-    "createdAt": "2024-01-14T15:30:00Z",
-    "emailSent": false
+    "email_enviado": false
   }
 }
 ```
@@ -144,22 +160,42 @@ curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/0/mensagens" \
 ```json Success - Email Enviado
 {
   "success": true,
-  "message": "Mensagem adicionada e email enviado com sucesso",
   "data": {
+    "modo": "unico",
     "id": 568,
-    "supportId": 12345,
-    "conteudo": "Seu problema foi resolvido. Por favor, verifique e confirme.",
-    "remetente": "joao@suporte.com",
-    "createdAt": "2024-01-14T16:00:00Z",
-    "emailSent": true
+    "email_enviado": true
   }
 }
 ```
 
-```json Error
+```json Success - Lote
+{
+  "success": true,
+  "data": {
+    "modo": "lote",
+    "enviados": 3,
+    "falhas": 0,
+    "emails_enviados": 2,
+    "resultados": [
+      { "id": 12345, "sucesso": true, "email_enviado": true },
+      { "id": 12346, "sucesso": true, "email_enviado": true },
+      { "id": 12347, "sucesso": true, "email_enviado": false }
+    ]
+  }
+}
+```
+
+```json Error - Campos Obrigatórios
 {
   "success": false,
-  "message": "Ticket não encontrado"
+  "message": "Mensagem e autor sao obrigatorios"
+}
+```
+
+```json Error - Ticket Não Encontrado
+{
+  "success": false,
+  "message": "Ticket nao encontrado"
 }
 ```
 

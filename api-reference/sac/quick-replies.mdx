@@ -20,7 +20,7 @@ Sistema de templates de respostas pré-definidas para agilizar o atendimento. Pe
   Filtrar por categoria
 </ParamField>
 
-<ParamField query="busca" type="string">
+<ParamField query="search" type="string">
   Buscar no título ou conteúdo
 </ParamField>
 
@@ -28,9 +28,21 @@ Sistema de templates de respostas pré-definidas para agilizar o atendimento. Pe
   Número da página
 </ParamField>
 
-<ParamField query="limit" type="number" default="10">
+<ParamField query="limit" type="number" default="20">
   Itens por página
 </ParamField>
+
+### Obter Resposta Rápida
+
+`GET /support/quick-replies/{quickReplyId}`
+
+Retorna uma resposta rápida específica pelo ID.
+
+### Obter Categorias
+
+`GET /support/quick-replies/categorias`
+
+Retorna a lista de categorias disponíveis.
 
 ### Criar Resposta Rápida
 
@@ -46,9 +58,9 @@ Sistema de templates de respostas pré-definidas para agilizar o atendimento. Pe
   Conteúdo do template
 </ParamField>
 
-<ParamField body="categoria" type="string" required>
+<ParamField body="categoria" type="string">
   Categoria da resposta
-  
+
   Valores comuns:
   - `saudacao` - Mensagens de boas-vindas
   - `despedida` - Mensagens de encerramento
@@ -57,9 +69,39 @@ Sistema de templates de respostas pré-definidas para agilizar o atendimento. Pe
   - `geral` - Respostas gerais
 </ParamField>
 
-<ParamField body="tags" type="array">
-  Tags para facilitar busca
+<ParamField body="atalho" type="string">
+  Atalho único para a resposta (ex: `/login`, `/boas-vindas`)
 </ParamField>
+
+### Atualizar Resposta Rápida
+
+`PATCH /support/quick-replies/{quickReplyId}`
+
+Atualiza uma resposta rápida existente. Todos os campos são opcionais.
+
+#### Body Parameters
+
+<ParamField body="titulo" type="string">
+  Novo título
+</ParamField>
+
+<ParamField body="conteudo" type="string">
+  Novo conteúdo
+</ParamField>
+
+<ParamField body="categoria" type="string">
+  Nova categoria
+</ParamField>
+
+<ParamField body="atalho" type="string">
+  Novo atalho
+</ParamField>
+
+### Excluir Resposta Rápida
+
+`DELETE /support/quick-replies/{quickReplyId}`
+
+Remove uma resposta rápida.
 
 ### Usar Resposta Rápida
 
@@ -130,6 +172,21 @@ curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies" 
     "categoria": "tecnico",
     "tags": ["login", "senha", "acesso"]
   }'
+```
+
+```bash Atualizar
+curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies/123" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "titulo": "Problema de Login - Atualizado",
+    "conteudo": "Novo conteúdo atualizado..."
+  }'
+```
+
+```bash Excluir
+curl -X DELETE "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies/123" \
+  -H "Authorization: Bearer seu_token_jwt"
 ```
 
 ```bash Usar
