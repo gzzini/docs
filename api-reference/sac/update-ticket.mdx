@@ -1,0 +1,119 @@
+---
+title: "Atualizar Ticket"
+api: "PATCH https://sac-waffle-v2.theo-110.workers.dev/support/{id}"
+description: "Atualiza os campos replied e status de um ticket"
+---
+
+## Descrição
+
+Atualiza a resposta sugerida (`replied`) e/ou o status de um ticket. Requer autenticação.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  `application/json`
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="id" type="number" required>
+  ID do ticket
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="replied" type="string">
+  Resposta sugerida/padrão para o ticket. Texto que será usado como template de resposta.
+</ParamField>
+
+<ParamField body="status" type="string">
+  Novo status do ticket
+
+  Valores aceitos:
+  - `open` - Aberto
+  - `in_progress` - Em atendimento
+  - `resolved` - Resolvido
+  - `closed` - Fechado
+</ParamField>
+
+<Note>
+  É necessário fornecer pelo menos um dos campos (`replied` ou `status`).
+</Note>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string" required>
+  Mensagem descritiva do resultado
+</ResponseField>
+
+<RequestExample>
+
+```bash Atualizar Replied
+curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/5082" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "replied": "Olá! Confirmamos que nossos e-mails estão sendo enviados corretamente para seu endereço. Caso não esteja recebendo, verifique a pasta de spam."
+  }'
+```
+
+```bash Atualizar Status
+curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/5082" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "resolved"
+  }'
+```
+
+```bash Atualizar Ambos
+curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/5082" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "replied": "Problema resolvido! Por favor, verifique sua caixa de entrada.",
+    "status": "resolved"
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "message": "Ticket atualizado com sucesso"
+}
+```
+
+```json Error - Campos Obrigatórios
+{
+  "success": false,
+  "message": "É necessário fornecer uma resposta ou um novo status"
+}
+```
+
+```json Error - Status Inválido
+{
+  "success": false,
+  "message": "Status inválido"
+}
+```
+
+```json Error - Não Encontrado
+{
+  "success": false,
+  "message": "Ticket não encontrado"
+}
+```
+
+</ResponseExample>
