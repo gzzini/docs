@@ -1,0 +1,188 @@
+---
+title: "Obter Opções"
+api: "GET https://sac-waffle-v2.theo-110.workers.dev/support/options"
+description: "Retorna as opções disponíveis para formulários de tickets"
+---
+
+## Descrição
+
+Retorna todas as opções disponíveis para preenchimento de formulários de tickets, incluindo categorias principais (main), assuntos (issues), status e newsletters. Útil para popular selects/dropdowns no frontend. Requer autenticação.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Opções disponíveis">
+    <ResponseField name="mainCategories" type="array">
+      Categorias principais com seus respectivos issues
+
+      <Expandable title="Estrutura">
+        <ResponseField name="value" type="string">
+          Valor para enviar na API
+        </ResponseField>
+
+        <ResponseField name="label" type="string">
+          Label para exibição
+        </ResponseField>
+
+        <ResponseField name="issues" type="array">
+          Issues válidos para esta categoria
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="statuses" type="array">
+      Status disponíveis para tickets
+
+      <Expandable title="Estrutura">
+        <ResponseField name="value" type="string">
+          Valor para enviar na API
+        </ResponseField>
+
+        <ResponseField name="label" type="string">
+          Label para exibição
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="newsletters" type="array">
+      Newsletters disponíveis
+
+      <Expandable title="Estrutura">
+        <ResponseField name="value" type="string">
+          Valor para enviar na API
+        </ResponseField>
+
+        <ResponseField name="label" type="string">
+          Label para exibição
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="allIssues" type="array">
+      Lista completa de todos os issues (para edição)
+
+      <Expandable title="Estrutura">
+        <ResponseField name="value" type="string">
+          Valor para enviar na API
+        </ResponseField>
+
+        <ResponseField name="label" type="string">
+          Label para exibição
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/options" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "data": {
+    "mainCategories": [
+      {
+        "value": "Programa de indicação e prêmios",
+        "label": "Programa de indicação e prêmios",
+        "issues": [
+          { "value": "Não estou conseguindo indicar o the news", "label": "Não estou conseguindo indicar o the news" },
+          { "value": "Meu prêmio chegou com defeito", "label": "Meu prêmio chegou com defeito" },
+          { "value": "Não recebi meus prêmios", "label": "Não recebi meus prêmios" },
+          { "value": "Giveaway", "label": "Giveaway" }
+        ]
+      },
+      {
+        "value": "Streak (pontuação diária)",
+        "label": "Streak (pontuação diária)",
+        "issues": [
+          { "value": "Meus pontos no streak não estão sendo contabilizados", "label": "Meus pontos no streak não estão sendo contabilizados" }
+        ]
+      },
+      {
+        "value": "Problemas de recebimento das edições e cadastro",
+        "label": "Problemas de recebimento das edições e cadastro",
+        "issues": [
+          { "value": "Me desinscrevi e continuo recebendo", "label": "Me desinscrevi e continuo recebendo" },
+          { "value": "Não estou recebendo a edição", "label": "Não estou recebendo a edição" },
+          { "value": "Alteração de cadastro", "label": "Alteração de cadastro" }
+        ]
+      }
+    ],
+    "statuses": [
+      { "value": "open", "label": "Aberto" },
+      { "value": "in_progress", "label": "Em atendimento" },
+      { "value": "resolved", "label": "Resolvido" },
+      { "value": "closed", "label": "Fechado" }
+    ],
+    "newsletters": [
+      { "value": "thenews", "label": "The News" },
+      { "value": "thebizness", "label": "The Bizness" },
+      { "value": "thechamps", "label": "The Champs" },
+      { "value": "healthtimes", "label": "Health Times" },
+      { "value": "rising", "label": "Rising" },
+      { "value": "goget", "label": "GoGet" },
+      { "value": "podissovic", "label": "Pod Isso, Vic?" }
+    ],
+    "allIssues": [
+      { "value": "Não recebi meus prêmios", "label": "Não recebi meus prêmios" },
+      { "value": "Não estou recebendo a edição", "label": "Não estou recebendo a edição" },
+      { "value": "Me desinscrevi e continuo recebendo", "label": "Me desinscrevi e continuo recebendo" },
+      { "value": "Alterações de cadastro", "label": "Alterações de cadastro" },
+      { "value": "Não estou conseguindo indicar", "label": "Não estou conseguindo indicar" },
+      { "value": "Prêmio com defeito", "label": "Prêmio com defeito" },
+      { "value": "Meus pontos no streak não estão contabilizando", "label": "Meus pontos no streak não estão contabilizando" },
+      { "value": "Giveaway", "label": "Giveaway" },
+      { "value": "Outros", "label": "Outros" },
+      { "value": "Outro", "label": "Outro" }
+    ]
+  }
+}
+```
+
+</ResponseExample>
+
+## Uso no Frontend
+
+```typescript
+// Exemplo de uso com React
+const [options, setOptions] = useState(null);
+
+useEffect(() => {
+  fetch('/support/options', {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+    .then(res => res.json())
+    .then(data => setOptions(data.data));
+}, []);
+
+// Popular select de categoria
+<select onChange={(e) => {
+  setMain(e.target.value);
+  // Filtrar issues baseado no main selecionado
+  const category = options.mainCategories.find(c => c.value === e.target.value);
+  setAvailableIssues(category?.issues || []);
+}}>
+  {options?.mainCategories.map(cat => (
+    <option key={cat.value} value={cat.value}>{cat.label}</option>
+  ))}
+</select>
+```

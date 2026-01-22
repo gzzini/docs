@@ -262,6 +262,7 @@
               {
                 "group": "Tickets",
                 "pages": [
+                  "api-reference/sac/options",
                   "api-reference/sac/create-ticket",
                   "api-reference/sac/list-tickets",
                   "api-reference/sac/get-ticket",
