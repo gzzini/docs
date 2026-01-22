@@ -286,6 +286,14 @@
                 ]
               },
               {
+                "group": "Operações em Lote",
+                "pages": [
+                  "api-reference/sac/batch-status",
+                  "api-reference/sac/batch-messages",
+                  "api-reference/sac/batch-delete"
+                ]
+              },
+              {
                 "group": "Tags",
                 "pages": [
                   "api-reference/sac/tags-list",
