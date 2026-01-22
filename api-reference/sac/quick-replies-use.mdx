@@ -1,0 +1,93 @@
+---
+title: "Usar Resposta Rápida"
+api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies/{quickReplyId}/usar"
+description: "Incrementa o contador de uso e retorna o conteúdo formatado"
+---
+
+## Descrição
+
+Registra o uso de uma resposta rápida, incrementando o contador de utilizações, e retorna o conteúdo formatado para ser inserido na mensagem. Requer autenticação.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="quickReplyId" type="number" required>
+  ID da resposta rápida
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem descritiva
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Dados da resposta">
+    <ResponseField name="conteudo" type="string">
+      Conteúdo da resposta rápida para ser usado
+    </ResponseField>
+
+    <ResponseField name="usageCount" type="number">
+      Contador de uso atualizado
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies/15/usar" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "message": "Resposta rapida utilizada com sucesso",
+  "data": {
+    "conteudo": "Olá! Lamentamos o problema com seu login. Por favor, tente limpar o cache do navegador e os cookies. Se o problema persistir, clique em 'Esqueci minha senha' para redefini-la.",
+    "usageCount": 90
+  }
+}
+```
+
+```json Error - Não Encontrada
+{
+  "success": false,
+  "message": "Resposta rapida nao encontrada"
+}
+```
+
+</ResponseExample>
+
+## Uso no Frontend
+
+```typescript
+// Exemplo de uso com React
+const handleUseQuickReply = async (quickReplyId: number) => {
+  const response = await fetch(`/support/quick-replies/${quickReplyId}/usar`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  const data = await response.json();
+
+  if (data.success) {
+    // Inserir o conteúdo no campo de mensagem
+    setMessageContent(data.data.conteudo);
+  }
+};
+```

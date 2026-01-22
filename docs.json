@@ -282,8 +282,17 @@
                 "pages": [
                   "api-reference/sac/fast-response-preview",
                   "api-reference/sac/fast-response-ticket",
-                  "api-reference/sac/fast-response-batch",
-                  "api-reference/sac/quick-replies"
+                  "api-reference/sac/fast-response-batch"
+                ]
+              },
+              {
+                "group": "Respostas Rápidas",
+                "pages": [
+                  "api-reference/sac/quick-replies-list",
+                  "api-reference/sac/quick-replies-create",
+                  "api-reference/sac/quick-replies-update",
+                  "api-reference/sac/quick-replies-delete",
+                  "api-reference/sac/quick-replies-use"
                 ]
               },
               {

@@ -1,0 +1,167 @@
+---
+title: "Listar Respostas Rápidas"
+api: "GET https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies"
+description: "Lista templates de respostas rápidas com filtros e paginação"
+---
+
+## Descrição
+
+Retorna uma lista paginada de respostas rápidas. Permite filtrar por categoria e buscar por título ou conteúdo. Requer autenticação.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="categoria" type="string">
+  Filtrar por categoria
+</ParamField>
+
+<ParamField query="search" type="string">
+  Buscar no título ou conteúdo
+</ParamField>
+
+<ParamField query="page" type="number" default="1">
+  Número da página
+</ParamField>
+
+<ParamField query="limit" type="number" default="20">
+  Itens por página
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="array">
+  Lista de respostas rápidas
+
+  <Expandable title="Estrutura">
+    <ResponseField name="id" type="number">
+      ID único
+    </ResponseField>
+
+    <ResponseField name="titulo" type="string">
+      Título da resposta
+    </ResponseField>
+
+    <ResponseField name="conteudo" type="string">
+      Conteúdo do template
+    </ResponseField>
+
+    <ResponseField name="categoria" type="string">
+      Categoria
+    </ResponseField>
+
+    <ResponseField name="atalho" type="string">
+      Atalho para uso rápido
+    </ResponseField>
+
+    <ResponseField name="usageCount" type="number">
+      Número de vezes utilizada
+    </ResponseField>
+
+    <ResponseField name="lastUsedAt" type="string">
+      Última vez utilizada
+    </ResponseField>
+
+    <ResponseField name="createdBy" type="string">
+      Criado por
+    </ResponseField>
+
+    <ResponseField name="createdAt" type="string">
+      Data de criação
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="pagination" type="object">
+  <Expandable title="Paginação">
+    <ResponseField name="total" type="number">
+      Total de itens
+    </ResponseField>
+
+    <ResponseField name="page" type="number">
+      Página atual
+    </ResponseField>
+
+    <ResponseField name="limit" type="number">
+      Itens por página
+    </ResponseField>
+
+    <ResponseField name="totalPages" type="number">
+      Total de páginas
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash Listar Todas
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+```bash Filtrar por Categoria
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies?categoria=tecnico" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+```bash Buscar
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies?search=login" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "titulo": "Boas-vindas",
+      "conteudo": "Olá! Bem-vindo ao suporte. Como posso ajudar?",
+      "categoria": "saudacao",
+      "atalho": "/ola",
+      "usageCount": 150,
+      "lastUsedAt": "2024-01-14T10:00:00Z",
+      "createdBy": "admin@waffle.com.br",
+      "createdAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": 2,
+      "titulo": "Problema de Login",
+      "conteudo": "Lamentamos o problema com seu login. Por favor, tente limpar o cache do navegador...",
+      "categoria": "tecnico",
+      "atalho": "/login",
+      "usageCount": 89,
+      "lastUsedAt": "2024-01-14T09:30:00Z",
+      "createdBy": "joao@waffle.com.br",
+      "createdAt": "2024-01-05T10:00:00Z"
+    }
+  ],
+  "pagination": {
+    "total": 25,
+    "page": 1,
+    "limit": 20,
+    "totalPages": 2
+  }
+}
+```
+
+</ResponseExample>
+
+## Endpoints Relacionados
+
+- [Obter Categorias](/api-reference/sac/quick-replies-categories) - Lista categorias disponíveis
+- [Criar Resposta Rápida](/api-reference/sac/quick-replies-create) - Cria nova resposta
+- [Atualizar Resposta Rápida](/api-reference/sac/quick-replies-update) - Edita resposta existente
+- [Excluir Resposta Rápida](/api-reference/sac/quick-replies-delete) - Remove resposta

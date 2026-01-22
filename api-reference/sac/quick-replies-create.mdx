@@ -1,0 +1,142 @@
+---
+title: "Criar Resposta Rápida"
+api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies"
+description: "Cria um novo template de resposta rápida"
+---
+
+## Descrição
+
+Cria uma nova resposta rápida para uso no atendimento. Requer autenticação.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  `application/json`
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="titulo" type="string" required>
+  Título da resposta rápida
+</ParamField>
+
+<ParamField body="conteudo" type="string" required>
+  Conteúdo do template (suporta HTML)
+</ParamField>
+
+<ParamField body="categoria" type="string">
+  Categoria da resposta
+
+  Valores comuns:
+  - `saudacao` - Mensagens de boas-vindas
+  - `despedida` - Mensagens de encerramento
+  - `tecnico` - Respostas técnicas
+  - `financeiro` - Respostas financeiras
+  - `geral` - Respostas gerais
+</ParamField>
+
+<ParamField body="atalho" type="string">
+  Atalho único para a resposta (ex: `/login`, `/boas-vindas`)
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem descritiva
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Resposta criada">
+    <ResponseField name="id" type="number">
+      ID da resposta criada
+    </ResponseField>
+
+    <ResponseField name="titulo" type="string">
+      Título
+    </ResponseField>
+
+    <ResponseField name="conteudo" type="string">
+      Conteúdo
+    </ResponseField>
+
+    <ResponseField name="categoria" type="string">
+      Categoria
+    </ResponseField>
+
+    <ResponseField name="atalho" type="string">
+      Atalho
+    </ResponseField>
+
+    <ResponseField name="createdAt" type="string">
+      Data de criação
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash Básico
+curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "titulo": "Problema de Login",
+    "conteudo": "Olá! Lamentamos o problema com seu login. Por favor, tente limpar o cache do navegador e os cookies. Se o problema persistir, clique em \"Esqueci minha senha\" para redefini-la.",
+    "categoria": "tecnico"
+  }'
+```
+
+```bash Com Atalho
+curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "titulo": "Boas-vindas",
+    "conteudo": "<p>Olá! Bem-vindo ao suporte do The News.</p><p>Como posso ajudar?</p>",
+    "categoria": "saudacao",
+    "atalho": "/ola"
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "message": "Resposta rapida criada com sucesso",
+  "data": {
+    "id": 15,
+    "titulo": "Problema de Login",
+    "conteudo": "Olá! Lamentamos o problema com seu login...",
+    "categoria": "tecnico",
+    "atalho": null,
+    "createdAt": "2024-01-20T15:30:00Z"
+  }
+}
+```
+
+```json Error - Campos Obrigatórios
+{
+  "success": false,
+  "message": "Titulo e conteudo sao obrigatorios"
+}
+```
+
+```json Error - Atalho Duplicado
+{
+  "success": false,
+  "message": "Atalho ja existe"
+}
+```
+
+</ResponseExample>

@@ -1,0 +1,155 @@
+---
+title: "Atualizar Resposta Rápida"
+api: "PATCH https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies/{quickReplyId}"
+description: "Atualiza um template de resposta rápida existente"
+---
+
+## Descrição
+
+Atualiza uma resposta rápida existente. Todos os campos são opcionais - apenas os campos enviados serão atualizados. Requer autenticação.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  `application/json`
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="quickReplyId" type="number" required>
+  ID da resposta rápida
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="titulo" type="string">
+  Novo título
+</ParamField>
+
+<ParamField body="conteudo" type="string">
+  Novo conteúdo (suporta HTML)
+</ParamField>
+
+<ParamField body="categoria" type="string">
+  Nova categoria
+
+  Valores comuns:
+  - `saudacao` - Mensagens de boas-vindas
+  - `despedida` - Mensagens de encerramento
+  - `tecnico` - Respostas técnicas
+  - `financeiro` - Respostas financeiras
+  - `geral` - Respostas gerais
+</ParamField>
+
+<ParamField body="atalho" type="string">
+  Novo atalho (ex: `/login`, `/boas-vindas`)
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem descritiva
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Resposta atualizada">
+    <ResponseField name="id" type="number">
+      ID da resposta
+    </ResponseField>
+
+    <ResponseField name="titulo" type="string">
+      Título atualizado
+    </ResponseField>
+
+    <ResponseField name="conteudo" type="string">
+      Conteúdo atualizado
+    </ResponseField>
+
+    <ResponseField name="categoria" type="string">
+      Categoria atualizada
+    </ResponseField>
+
+    <ResponseField name="atalho" type="string">
+      Atalho atualizado
+    </ResponseField>
+
+    <ResponseField name="updatedAt" type="string">
+      Data de atualização
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash Atualizar Título
+curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies/15" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "titulo": "Problema de Login - Atualizado"
+  }'
+```
+
+```bash Atualizar Conteúdo
+curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies/15" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "conteudo": "<p>Novo conteúdo com instruções atualizadas...</p>"
+  }'
+```
+
+```bash Atualizar Múltiplos Campos
+curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies/15" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "titulo": "Problema de Login v2",
+    "conteudo": "Novo conteúdo...",
+    "categoria": "tecnico",
+    "atalho": "/login2"
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "message": "Resposta rapida atualizada com sucesso",
+  "data": {
+    "id": 15,
+    "titulo": "Problema de Login - Atualizado",
+    "conteudo": "Novo conteúdo...",
+    "categoria": "tecnico",
+    "atalho": "/login2",
+    "updatedAt": "2024-01-20T16:00:00Z"
+  }
+}
+```
+
+```json Error - Não Encontrada
+{
+  "success": false,
+  "message": "Resposta rapida nao encontrada"
+}
+```
+
+```json Error - Atalho Duplicado
+{
+  "success": false,
+  "message": "Atalho ja existe em outra resposta rapida"
+}
+```
+
+</ResponseExample>

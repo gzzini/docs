@@ -1,0 +1,58 @@
+---
+title: "Excluir Resposta Rápida"
+api: "DELETE https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies/{quickReplyId}"
+description: "Remove um template de resposta rápida"
+---
+
+## Descrição
+
+Remove permanentemente uma resposta rápida. Esta ação não pode ser desfeita. Requer autenticação.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="quickReplyId" type="number" required>
+  ID da resposta rápida a ser excluída
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="message" type="string">
+  Mensagem descritiva
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl -X DELETE "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies/15" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "message": "Resposta rapida excluida com sucesso"
+}
+```
+
+```json Error - Não Encontrada
+{
+  "success": false,
+  "message": "Resposta rapida nao encontrada"
+}
+```
+
+</ResponseExample>
