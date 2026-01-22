@@ -9,6 +9,16 @@ Registra uma nova leitura de conteúdo para um usuário, atualizando seu streak.
 
 O post pode ser identificado pelo `postId` ou pela `postUrl`. Se nenhum dos dois for fornecido, o endpoint apenas recalcula o streak do usuário sem registrar uma nova leitura.
 
+## Autenticação
+
+<Note>
+  **Requer autenticação.** O email do leitor é obtido automaticamente do token JWT. Não é necessário enviar o email no body da requisição.
+</Note>
+
+<ParamField header="Authorization" type="string" required>
+  Token JWT no formato `Bearer <token>`
+</ParamField>
+
 ## Request Body
 
 <ParamField body="postId" type="string">
