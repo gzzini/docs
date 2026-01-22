@@ -1,12 +1,12 @@
 ---
 title: "Atualizar Ticket"
 api: "PATCH https://sac-waffle-v2.theo-110.workers.dev/support/{id}"
-description: "Atualiza os campos replied e status de um ticket"
+description: "Atualiza os campos de um ticket"
 ---
 
 ## Descrição
 
-Atualiza a resposta sugerida (`replied`) e/ou o status de um ticket. Requer autenticação.
+Atualiza um ou mais campos de um ticket. Todos os campos são opcionais, mas pelo menos um deve ser fornecido. Requer autenticação.
 
 ## Headers
 
@@ -26,10 +26,6 @@ Atualiza a resposta sugerida (`replied`) e/ou o status de um ticket. Requer aute
 
 ## Body Parameters
 
-<ParamField body="replied" type="string">
-  Resposta sugerida/padrão para o ticket. Texto que será usado como template de resposta.
-</ParamField>
-
 <ParamField body="status" type="string">
   Novo status do ticket
 
@@ -40,8 +36,36 @@ Atualiza a resposta sugerida (`replied`) e/ou o status de um ticket. Requer aute
   - `closed` - Fechado
 </ParamField>
 
+<ParamField body="issue" type="string">
+  Assunto/motivo do ticket
+
+  Valores aceitos:
+  - `Não recebi meus prêmios`
+  - `Não estou recebendo a edição`
+  - `Me desinscrevi e continuo recebendo`
+  - `Alterações de cadastro`
+  - `Não estou conseguindo indicar`
+  - `Não estou conseguindo indicar o the news`
+  - `Prêmio com defeito`
+  - `Meus pontos no streak não estão contabilizando`
+  - `Outros`
+  - `Outro`
+</ParamField>
+
+<ParamField body="main" type="string">
+  Categoria principal do ticket
+</ParamField>
+
+<ParamField body="newsletter" type="string">
+  Newsletter relacionada ao ticket
+</ParamField>
+
+<ParamField body="replied" type="string">
+  Resposta sugerida/padrão para o ticket
+</ParamField>
+
 <Note>
-  É necessário fornecer pelo menos um dos campos (`replied` ou `status`).
+  Pelo menos um campo deve ser fornecido. Apenas os campos enviados serão atualizados.
 </Note>
 
 ## Response
@@ -54,16 +78,35 @@ Atualiza a resposta sugerida (`replied`) e/ou o status de um ticket. Requer aute
   Mensagem descritiva do resultado
 </ResponseField>
 
-<RequestExample>
+<ResponseField name="data" type="object">
+  <Expandable title="Campos atualizados">
+    <ResponseField name="id" type="number">
+      ID do ticket
+    </ResponseField>
 
-```bash Atualizar Replied
-curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/5082" \
-  -H "Authorization: Bearer seu_token_jwt" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "replied": "Olá! Confirmamos que nossos e-mails estão sendo enviados corretamente para seu endereço. Caso não esteja recebendo, verifique a pasta de spam."
-  }'
-```
+    <ResponseField name="status" type="string">
+      Status atualizado (se fornecido)
+    </ResponseField>
+
+    <ResponseField name="issue" type="string">
+      Issue atualizado (se fornecido)
+    </ResponseField>
+
+    <ResponseField name="main" type="string">
+      Main atualizado (se fornecido)
+    </ResponseField>
+
+    <ResponseField name="newsletter" type="string">
+      Newsletter atualizada (se fornecida)
+    </ResponseField>
+
+    <ResponseField name="replied" type="string">
+      Replied atualizado (se fornecido)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
 
 ```bash Atualizar Status
 curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/5082" \
@@ -74,13 +117,23 @@ curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/5082" \
   }'
 ```
 
-```bash Atualizar Ambos
+```bash Atualizar Issue (Assunto)
 curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/5082" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
-    "replied": "Problema resolvido! Por favor, verifique sua caixa de entrada.",
-    "status": "resolved"
+    "issue": "Não estou recebendo a edição"
+  }'
+```
+
+```bash Atualizar Múltiplos Campos
+curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/5082" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "resolved",
+    "issue": "Não estou recebendo a edição",
+    "replied": "Problema resolvido! Verifique sua caixa de entrada."
   }'
 ```
 
@@ -91,28 +144,42 @@ curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/5082" \
 ```json Success
 {
   "success": true,
-  "message": "Ticket atualizado com sucesso"
+  "message": "Ticket atualizado com sucesso",
+  "data": {
+    "id": 5082,
+    "status": "resolved",
+    "issue": "Não estou recebendo a edição",
+    "replied": "Problema resolvido! Verifique sua caixa de entrada.",
+    "updatedAt": "2024-01-20T18:39:59.000Z"
+  }
 }
 ```
 
-```json Error - Campos Obrigatórios
+```json Error - Nenhum Campo
 {
   "success": false,
-  "message": "É necessário fornecer uma resposta ou um novo status"
+  "message": "E necessario fornecer pelo menos um campo para atualizar (replied, status, issue, main, newsletter)"
 }
 ```
 
 ```json Error - Status Inválido
 {
   "success": false,
-  "message": "Status inválido"
+  "message": "Status invalido. Valores aceitos: open, in_progress, resolved, closed"
+}
+```
+
+```json Error - Issue Inválido
+{
+  "success": false,
+  "message": "Issue invalido. Valores aceitos: Não recebi meus prêmios, Não estou recebendo a edição, ..."
 }
 ```
 
 ```json Error - Não Encontrado
 {
   "success": false,
-  "message": "Ticket não encontrado"
+  "message": "Ticket nao encontrado"
 }
 ```
 

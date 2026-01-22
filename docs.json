@@ -265,9 +265,7 @@
                   "api-reference/sac/create-ticket",
                   "api-reference/sac/list-tickets",
                   "api-reference/sac/get-ticket",
-                  "api-reference/sac/update-ticket",
-                  "api-reference/sac/update-ticket-status",
-                  "api-reference/sac/update-ticket-issue"
+                  "api-reference/sac/update-ticket"
                 ]
               },
               {
