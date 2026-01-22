@@ -6,7 +6,7 @@ description: "Obtém os detalhes completos de um ticket específico"
 
 ## Descrição
 
-Retorna todos os detalhes de um ticket específico, incluindo mensagens, anexos e tags associadas. Requer autenticação.
+Retorna todos os detalhes de um ticket específico, incluindo tags, anexos e histórico de mensagens. Requer autenticação.
 
 ## Headers
 
@@ -31,109 +31,121 @@ Retorna todos os detalhes de um ticket específico, incluindo mensagens, anexos 
     <ResponseField name="id" type="number">
       ID do ticket
     </ResponseField>
-    
+
     <ResponseField name="main" type="string">
       Categoria principal
     </ResponseField>
-    
+
     <ResponseField name="issue" type="string">
       Assunto do ticket
     </ResponseField>
-    
+
     <ResponseField name="description" type="string">
       Descrição detalhada
     </ResponseField>
-    
+
     <ResponseField name="status" type="string">
-      Status atual
+      Status atual (`open`, `in_progress`, `resolved`, `closed`)
     </ResponseField>
-    
-    <ResponseField name="priority" type="string">
-      Prioridade do ticket
-    </ResponseField>
-    
+
     <ResponseField name="email" type="string">
       Email do solicitante
     </ResponseField>
-    
+
     <ResponseField name="newsletter" type="string">
       Newsletter relacionada
     </ResponseField>
-    
+
     <ResponseField name="wantReply" type="boolean">
       Se o usuário deseja receber respostas por email
     </ResponseField>
-    
+
+    <ResponseField name="replied" type="string">
+      Resposta sugerida/padrão para o ticket (se houver)
+    </ResponseField>
+
     <ResponseField name="createdAt" type="string">
-      Data de criação
+      Data de criação (ISO 8601)
     </ResponseField>
-    
+
     <ResponseField name="updatedAt" type="string">
-      Última atualização
+      Última atualização (ISO 8601)
     </ResponseField>
-    
+
+    <ResponseField name="deletedAt" type="string">
+      Data de exclusão, se deletado (ISO 8601)
+    </ResponseField>
+
     <ResponseField name="tags" type="array">
       Tags associadas ao ticket
-      
+
       <Expandable title="Estrutura da tag">
         <ResponseField name="id" type="number">
           ID da tag
         </ResponseField>
-        
+
         <ResponseField name="name" type="string">
           Nome da tag
         </ResponseField>
-        
+
         <ResponseField name="color" type="string">
           Cor da tag (hexadecimal)
         </ResponseField>
+
+        <ResponseField name="isDefault" type="boolean">
+          Se é a tag padrão
+        </ResponseField>
       </Expandable>
     </ResponseField>
-    
+
     <ResponseField name="anexos" type="array">
       Anexos do ticket
-      
+
       <Expandable title="Estrutura do anexo">
         <ResponseField name="id" type="number">
           ID do anexo
         </ResponseField>
-        
+
         <ResponseField name="nomeArquivo" type="string">
           Nome do arquivo
         </ResponseField>
-        
+
         <ResponseField name="tipoArquivo" type="string">
           Tipo MIME do arquivo
         </ResponseField>
-        
+
         <ResponseField name="tamanhoArquivo" type="number">
           Tamanho em bytes
         </ResponseField>
-        
+
         <ResponseField name="createdAt" type="string">
-          Data de upload
+          Data de upload (ISO 8601)
         </ResponseField>
       </Expandable>
     </ResponseField>
-    
+
     <ResponseField name="mensagens" type="array">
-      Histórico de mensagens
-      
+      Histórico de mensagens do ticket. A primeira mensagem é sempre a `description` do ticket (mensagem inicial do cliente).
+
       <Expandable title="Estrutura da mensagem">
         <ResponseField name="id" type="number">
-          ID da mensagem
+          ID da mensagem (`null` para a mensagem inicial do cliente)
         </ResponseField>
-        
+
         <ResponseField name="conteudo" type="string">
           Conteúdo da mensagem
         </ResponseField>
-        
+
         <ResponseField name="remetente" type="string">
-          Quem enviou (usuário ou suporte)
+          Email do autor da mensagem
         </ResponseField>
-        
+
+        <ResponseField name="origem" type="string">
+          Origem da mensagem (`admin`, `usuario`, `email`)
+        </ResponseField>
+
         <ResponseField name="createdAt" type="string">
-          Data de envio
+          Data de envio (ISO 8601)
         </ResponseField>
       </Expandable>
     </ResponseField>
@@ -143,7 +155,7 @@ Retorna todos os detalhes de um ticket específico, incluindo mensagens, anexos 
 <RequestExample>
 
 ```bash
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/12345" \
+curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/5082" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
@@ -155,27 +167,24 @@ curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/12345" \
 {
   "success": true,
   "data": {
-    "id": 12345,
-    "main": "Técnico",
-    "issue": "Erro no login",
-    "description": "Não consigo fazer login na plataforma. Aparece erro 500.",
-    "status": "in_progress",
-    "priority": "high",
+    "id": 5082,
+    "main": "Problemas de recebimento das edições e cadastro",
+    "issue": "Não estou recebendo a edição",
+    "description": "Do nada, parei de receber as edições diárias do The News. Já me recadastrei, porém não recebo mesmo assim.",
+    "status": "resolved",
     "email": "usuario@exemplo.com",
-    "newsletter": "the news",
+    "newsletter": "thenews",
     "wantReply": true,
-    "createdAt": "2024-01-14T10:00:00Z",
-    "updatedAt": "2024-01-14T14:30:00Z",
+    "replied": "Olá! Confirmamos que nossos e-mails estão sendo enviados corretamente...",
+    "createdAt": "2024-01-20T13:22:59.000Z",
+    "updatedAt": "2024-01-20T18:39:59.000Z",
+    "deletedAt": null,
     "tags": [
       {
         "id": 1,
         "name": "urgente",
-        "color": "#FF0000"
-      },
-      {
-        "id": 3,
-        "name": "bug",
-        "color": "#FFA500"
+        "color": "#FF0000",
+        "isDefault": false
       }
     ],
     "anexos": [
@@ -184,21 +193,30 @@ curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/12345" \
         "nomeArquivo": "erro_screenshot.png",
         "tipoArquivo": "image/png",
         "tamanhoArquivo": 245760,
-        "createdAt": "2024-01-14T10:00:00Z"
+        "createdAt": "2024-01-20T13:22:59.000Z"
       }
     ],
     "mensagens": [
       {
+        "id": null,
+        "conteudo": "Do nada, parei de receber as edições diárias do The News. Já me recadastrei, porém não recebo mesmo assim.",
+        "remetente": "usuario@exemplo.com",
+        "origem": "usuario",
+        "createdAt": "2024-01-20T13:22:59.000Z"
+      },
+      {
         "id": 1,
         "conteudo": "Estamos analisando o problema reportado.",
-        "remetente": "suporte",
-        "createdAt": "2024-01-14T11:00:00Z"
+        "remetente": "suporte@waffle.com.br",
+        "origem": "admin",
+        "createdAt": "2024-01-20T14:00:00.000Z"
       },
       {
         "id": 2,
-        "conteudo": "Identificamos o erro. Uma correção está sendo implementada.",
-        "remetente": "suporte",
-        "createdAt": "2024-01-14T14:30:00Z"
+        "conteudo": "Problema resolvido! Por favor, verifique sua caixa de entrada.",
+        "remetente": "suporte@waffle.com.br",
+        "origem": "admin",
+        "createdAt": "2024-01-20T18:39:59.000Z"
       }
     ]
   }
@@ -208,7 +226,7 @@ curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/12345" \
 ```json Not Found
 {
   "success": false,
-  "message": "Ticket não encontrado"
+  "message": "Ticket nao encontrado"
 }
 ```
 

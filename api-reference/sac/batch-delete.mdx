@@ -1,0 +1,96 @@
+---
+title: "Deletar Tickets em Lote"
+api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/lote/deletar"
+description: "Realiza soft delete de múltiplos tickets de uma vez"
+---
+
+## Descrição
+
+Realiza soft delete (exclusão lógica) de vários tickets simultaneamente. Os tickets não são removidos permanentemente, apenas marcados como deletados. Podem ser restaurados posteriormente. Requer autenticação.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  `application/json`
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="support_ids" type="array" required>
+  Array de IDs dos tickets a serem deletados
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Resultado da operação">
+    <ResponseField name="modo" type="string">
+      Sempre `lote`
+    </ResponseField>
+
+    <ResponseField name="deletados" type="number">
+      Quantidade de tickets deletados com sucesso
+    </ResponseField>
+
+    <ResponseField name="falhas" type="number">
+      Quantidade de falhas (tickets não encontrados ou já deletados)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/lote/deletar" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "support_ids": [5082, 5083, 5084, 5085]
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "data": {
+    "modo": "lote",
+    "deletados": 4,
+    "falhas": 0
+  }
+}
+```
+
+```json Partial Success
+{
+  "success": true,
+  "data": {
+    "modo": "lote",
+    "deletados": 3,
+    "falhas": 1
+  }
+}
+```
+
+</ResponseExample>
+
+## Restaurar Tickets Deletados
+
+Para restaurar um ticket deletado, use o endpoint:
+
+```
+POST /support/{id}/restaurar
+```
+
+Consulte a documentação de [Restaurar Ticket](/api-reference/sac/restore-ticket) para mais detalhes.

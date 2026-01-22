@@ -1,0 +1,104 @@
+---
+title: "Atualizar Status em Lote"
+api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/lote/status"
+description: "Atualiza o status de múltiplos tickets de uma vez"
+---
+
+## Descrição
+
+Atualiza o status de vários tickets simultaneamente. Útil para processar múltiplos tickets de uma vez. Requer autenticação.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  `application/json`
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="support_ids" type="array" required>
+  Array de IDs dos tickets a serem atualizados
+</ParamField>
+
+<ParamField body="status" type="string" required>
+  Novo status para os tickets
+
+  Valores aceitos:
+  - `open` - Aberto
+  - `in_progress` - Em atendimento
+  - `resolved` - Resolvido
+  - `closed` - Fechado
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Resultado da operação">
+    <ResponseField name="modo" type="string">
+      Sempre `lote`
+    </ResponseField>
+
+    <ResponseField name="atualizados" type="number">
+      Quantidade de tickets atualizados com sucesso
+    </ResponseField>
+
+    <ResponseField name="falhas" type="number">
+      Quantidade de falhas (tickets não encontrados ou já deletados)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash
+curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/lote/status" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "support_ids": [5082, 5083, 5084, 5085],
+    "status": "resolved"
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "data": {
+    "modo": "lote",
+    "atualizados": 4,
+    "falhas": 0
+  }
+}
+```
+
+```json Partial Success
+{
+  "success": true,
+  "data": {
+    "modo": "lote",
+    "atualizados": 3,
+    "falhas": 1
+  }
+}
+```
+
+```json Error - Status Inválido
+{
+  "success": false,
+  "message": "Status invalido. Status validos: open, in_progress, resolved, closed"
+}
+```
+
+</ResponseExample>

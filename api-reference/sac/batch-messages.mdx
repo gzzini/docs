@@ -1,0 +1,173 @@
+---
+title: "Enviar Mensagem em Lote"
+api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/lote/mensagens"
+description: "Envia a mesma mensagem para múltiplos tickets de uma vez"
+---
+
+## Descrição
+
+Envia a mesma mensagem para vários tickets simultaneamente. Útil para comunicados em massa ou respostas padronizadas. Opcionalmente envia emails para os solicitantes. Requer autenticação.
+
+## Headers
+
+<ParamField header="Authorization" type="string" required>
+  Bearer token JWT para autenticação
+</ParamField>
+
+<ParamField header="Content-Type" type="string" required>
+  `application/json`
+</ParamField>
+
+## Body Parameters
+
+<ParamField body="support_ids" type="array" required>
+  Array de IDs dos tickets que receberão a mensagem
+</ParamField>
+
+<ParamField body="mensagem" type="string" required>
+  Conteúdo da mensagem (suporta HTML)
+</ParamField>
+
+<ParamField body="autor" type="string" required>
+  Email do autor da mensagem
+</ParamField>
+
+<ParamField body="origem" type="string" default="admin">
+  Origem da mensagem
+
+  Valores aceitos:
+  - `admin` - Mensagem da equipe de suporte
+  - `usuario` - Mensagem do usuário
+  - `email` - Mensagem recebida por email
+</ParamField>
+
+<ParamField body="status" type="string" default="Respondido">
+  Status da mensagem
+
+  Valores aceitos:
+  - `Pendente`
+  - `Respondido`
+  - `Resolvido`
+</ParamField>
+
+<ParamField body="enviar_email" type="boolean" default="true">
+  Se deve enviar a mensagem por email para os solicitantes
+
+  Funciona apenas para tickets que têm email e quando `origem = admin`
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean" required>
+  Indica se a operação foi bem-sucedida
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  <Expandable title="Resultado da operação">
+    <ResponseField name="modo" type="string">
+      Sempre `lote`
+    </ResponseField>
+
+    <ResponseField name="enviados" type="number">
+      Quantidade de mensagens enviadas com sucesso
+    </ResponseField>
+
+    <ResponseField name="falhas" type="number">
+      Quantidade de falhas (tickets não encontrados)
+    </ResponseField>
+
+    <ResponseField name="emails_enviados" type="number">
+      Quantidade de emails enviados com sucesso
+    </ResponseField>
+
+    <ResponseField name="resultados" type="array">
+      Detalhes de cada operação
+
+      <Expandable title="Estrutura do resultado">
+        <ResponseField name="id" type="number">
+          ID do ticket
+        </ResponseField>
+
+        <ResponseField name="sucesso" type="boolean">
+          Se a mensagem foi adicionada com sucesso
+        </ResponseField>
+
+        <ResponseField name="email_enviado" type="boolean">
+          Se o email foi enviado (quando aplicável)
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash Mensagem Simples
+curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/lote/mensagens" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "support_ids": [5082, 5083, 5084],
+    "mensagem": "Informamos que o problema foi identificado e estamos trabalhando na solução.",
+    "autor": "suporte@waffle.com.br"
+  }'
+```
+
+```bash Com Envio de Email
+curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/lote/mensagens" \
+  -H "Authorization: Bearer seu_token_jwt" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "support_ids": [5082, 5083, 5084],
+    "mensagem": "<p>Seu problema foi resolvido!</p><p>Por favor, verifique e nos avise se precisar de mais alguma coisa.</p>",
+    "autor": "suporte@waffle.com.br",
+    "enviar_email": true
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "data": {
+    "modo": "lote",
+    "enviados": 3,
+    "falhas": 0,
+    "emails_enviados": 2,
+    "resultados": [
+      { "id": 5082, "sucesso": true, "email_enviado": true },
+      { "id": 5083, "sucesso": true, "email_enviado": true },
+      { "id": 5084, "sucesso": true, "email_enviado": false }
+    ]
+  }
+}
+```
+
+```json Partial Success
+{
+  "success": true,
+  "data": {
+    "modo": "lote",
+    "enviados": 2,
+    "falhas": 1,
+    "emails_enviados": 1,
+    "resultados": [
+      { "id": 5082, "sucesso": true, "email_enviado": true },
+      { "id": 5083, "sucesso": true, "email_enviado": false },
+      { "id": 9999, "sucesso": false }
+    ]
+  }
+}
+```
+
+```json Error - Campos Obrigatórios
+{
+  "success": false,
+  "message": "Mensagem e autor sao obrigatorios"
+}
+```
+
+</ResponseExample>
