@@ -7,14 +7,16 @@ openapi: 'POST /streaks/read'
 
 Registra uma nova leitura de conteúdo para um usuário, atualizando seu streak.
 
+O post pode ser identificado pelo `postId` ou pela `postUrl`. Se nenhum dos dois for fornecido, o endpoint apenas recalcula o streak do usuário sem registrar uma nova leitura.
+
 ## Request Body
 
-<ParamField body="email" type="string" required>
-  Email do leitor
+<ParamField body="postId" type="string">
+  ID do post lido. Opcional se `postUrl` for fornecido.
 </ParamField>
 
-<ParamField body="postId" type="string" required>
-  ID do post lido
+<ParamField body="postUrl" type="string">
+  URL do post lido. Alternativa ao `postId` - o sistema buscará o post correspondente pela URL no banco de dados. Opcional se `postId` for fornecido.
 </ParamField>
 
 <ParamField body="utm_source" type="string">
@@ -28,6 +30,10 @@ Registra uma nova leitura de conteúdo para um usuário, atualizando seu streak.
 <ParamField body="utm_campaign" type="string">
   Campanha UTM para tracking
 </ParamField>
+
+<Note>
+  **Identificação do Post:** Forneça `postId` OU `postUrl`. Se ambos forem fornecidos, o `postId` terá prioridade. Se nenhum for fornecido, o endpoint apenas recalculará o streak do usuário.
+</Note>
 
 ## Response
 
@@ -59,14 +65,18 @@ Registra uma nova leitura de conteúdo para um usuário, atualizando seu streak.
   </Expandable>
 </ResponseField>
 
+## Exemplos de Uso
+
+### Registrar leitura com postId
+
 <RequestExample>
 
-```bash
+```bash Usando postId
 curl --request POST \
   --url https://backend.testeswaffle.org/streaks/read \
+  --header 'Authorization: Bearer <token>' \
   --header 'Content-Type: application/json' \
   --data '{
-    "email": "leitor@exemplo.com",
     "postId": "post_123456",
     "utm_source": "newsletter",
     "utm_medium": "email",
@@ -74,11 +84,32 @@ curl --request POST \
   }'
 ```
 
+```bash Usando postUrl
+curl --request POST \
+  --url https://backend.testeswaffle.org/streaks/read \
+  --header 'Authorization: Bearer <token>' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "postUrl": "https://thenewscc.beehiiv.com/p/minha-newsletter",
+    "utm_source": "newsletter",
+    "utm_medium": "email",
+    "utm_campaign": "daily_news"
+  }'
+```
+
+```bash Recalcular streak (sem post)
+curl --request POST \
+  --url https://backend.testeswaffle.org/streaks/read \
+  --header 'Authorization: Bearer <token>' \
+  --header 'Content-Type: application/json' \
+  --data '{}'
+```
+
 </RequestExample>
 
 <ResponseExample>
 
-```json
+```json Leitura registrada
 {
   "success": true,
   "message": "Leitura registrada com sucesso",
@@ -88,6 +119,26 @@ curl --request POST \
     "maxStreak": 15,
     "readToday": true
   }
+}
+```
+
+```json Streak recalculado
+{
+  "success": true,
+  "message": "Streak recalculado com sucesso.",
+  "data": {
+    "readerId": "reader_789",
+    "currentStreak": 7,
+    "maxStreak": 15,
+    "readToday": true
+  }
+}
+```
+
+```json Post não encontrado (pela URL)
+{
+  "success": false,
+  "message": "Post não encontrado para a URL informada."
 }
 ```
 
