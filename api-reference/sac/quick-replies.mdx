@@ -1,6 +1,6 @@
 ---
 title: "Respostas Rápidas"
-api: "GET https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies"
+api: "GET https://worker.thenewscc.com/support/quick-replies"
 description: "Gerencia templates de respostas rápidas para suporte"
 ---
 
@@ -158,12 +158,12 @@ Incrementa o contador de uso e retorna o conteúdo formatado.
 <RequestExample>
 
 ```bash Listar
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies?categoria=tecnico" \
+curl -X GET "https://worker.thenewscc.com/support/quick-replies?categoria=tecnico" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
 ```bash Criar
-curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies" \
+curl -X POST "https://worker.thenewscc.com/support/quick-replies" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -175,7 +175,7 @@ curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies" 
 ```
 
 ```bash Atualizar
-curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies/123" \
+curl -X PATCH "https://worker.thenewscc.com/support/quick-replies/123" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -185,12 +185,12 @@ curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies/
 ```
 
 ```bash Excluir
-curl -X DELETE "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies/123" \
+curl -X DELETE "https://worker.thenewscc.com/support/quick-replies/123" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
 ```bash Usar
-curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies/123/usar" \
+curl -X POST "https://worker.thenewscc.com/support/quick-replies/123/usar" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 

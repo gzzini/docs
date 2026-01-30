@@ -1,6 +1,6 @@
 ---
 title: "Criar Tag"
-api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/tags"
+api: "POST https://worker.thenewscc.com/support/tags"
 description: "Cria uma nova tag de suporte"
 ---
 
@@ -79,7 +79,7 @@ Cria uma nova tag de suporte para categorização de tickets. Requer autenticaç
 <RequestExample>
 
 ```bash Tag Simples
-curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/tags" \
+curl -X POST "https://worker.thenewscc.com/support/tags" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -89,7 +89,7 @@ curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/tags" \
 ```
 
 ```bash Tag Padrão
-curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/tags" \
+curl -X POST "https://worker.thenewscc.com/support/tags" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{

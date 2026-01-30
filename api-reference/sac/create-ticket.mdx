@@ -1,6 +1,6 @@
 ---
 title: "Criar Ticket"
-api: "POST https://sac-waffle-v2.theo-110.workers.dev/support"
+api: "POST https://worker.thenewscc.com/support"
 description: "Cria um novo ticket de suporte"
 ---
 
@@ -110,7 +110,7 @@ Endpoint público para criar um novo ticket de suporte. Aceita tanto JSON quanto
 <RequestExample>
 
 ```bash JSON
-curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support \
+curl -X POST https://worker.thenewscc.com/support \
   -H "Content-Type: application/json" \
   -d '{
     "main": "Técnico",
@@ -122,7 +122,7 @@ curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support \
 ```
 
 ```bash Multipart
-curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support \
+curl -X POST https://worker.thenewscc.com/support \
   -F "main=Técnico" \
   -F "issue=Bug no sistema" \
   -F "description=Segue print do erro anexado" \

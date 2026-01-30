@@ -1,6 +1,6 @@
 ---
 title: "Adicionar Tag ao Ticket"
-api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/{id}/tags"
+api: "POST https://worker.thenewscc.com/support/{id}/tags"
 description: "Associa uma tag a um ticket de suporte"
 ---
 
@@ -53,7 +53,7 @@ Adiciona uma tag existente a um ticket de suporte. Um ticket pode ter múltiplas
 <RequestExample>
 
 ```bash Adicionar Tag
-curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/123/tags" \
+curl -X POST "https://worker.thenewscc.com/support/123/tags" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -108,13 +108,13 @@ curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/123/tags" \
 
 1. **Listar tags disponíveis**
 ```bash
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/tags" \
+curl -X GET "https://worker.thenewscc.com/support/tags" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
 2. **Adicionar tag "Urgente" ao ticket**
 ```bash
-curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/123/tags" \
+curl -X POST "https://worker.thenewscc.com/support/123/tags" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{"tagId": 1}'
@@ -122,7 +122,7 @@ curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/123/tags" \
 
 3. **Adicionar tag "Financeiro" ao mesmo ticket**
 ```bash
-curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/123/tags" \
+curl -X POST "https://worker.thenewscc.com/support/123/tags" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{"tagId": 5}'
@@ -130,6 +130,6 @@ curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/123/tags" \
 
 4. **Visualizar ticket com tags**
 ```bash
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/123" \
+curl -X GET "https://worker.thenewscc.com/support/123" \
   -H "Authorization: Bearer seu_token_jwt"
 ```

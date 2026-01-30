@@ -1,6 +1,6 @@
 ---
 title: "Chat with MCP"
-api: "POST https://sac-waffle-v2.theo-110.workers.dev/openai/chat-with-mcp"
+api: "POST https://worker.thenewscc.com/openai/chat-with-mcp"
 description: "Chat com Model Context Protocol para contexto dinâmico"
 ---
 
@@ -106,7 +106,7 @@ Model Context Protocol (MCP) permite adicionar contexto dinâmico às conversas 
 <RequestExample>
 
 ```bash Contexto de Usuário
-curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/chat-with-mcp \
+curl -X POST https://worker.thenewscc.com/openai/chat-with-mcp \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -122,7 +122,7 @@ curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/chat-with-mcp \
 ```
 
 ```bash Múltiplos Contextos
-curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/chat-with-mcp \
+curl -X POST https://worker.thenewscc.com/openai/chat-with-mcp \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{

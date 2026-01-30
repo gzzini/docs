@@ -1,6 +1,6 @@
 ---
 title: "Atualizar Tag"
-api: "PATCH https://sac-waffle-v2.theo-110.workers.dev/support/tags/{id}"
+api: "PATCH https://worker.thenewscc.com/support/tags/{id}"
 description: "Atualiza uma tag de suporte existente"
 ---
 
@@ -89,7 +89,7 @@ Atualiza os dados de uma tag de suporte existente. Pelo menos um campo deve ser 
 <RequestExample>
 
 ```bash Atualizar Nome
-curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/tags/1" \
+curl -X PATCH "https://worker.thenewscc.com/support/tags/1" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -98,7 +98,7 @@ curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/tags/1" \
 ```
 
 ```bash Atualizar Cor
-curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/tags/1" \
+curl -X PATCH "https://worker.thenewscc.com/support/tags/1" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -107,7 +107,7 @@ curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/tags/1" \
 ```
 
 ```bash Definir como Padrão
-curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/tags/1" \
+curl -X PATCH "https://worker.thenewscc.com/support/tags/1" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -116,7 +116,7 @@ curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/tags/1" \
 ```
 
 ```bash Atualizar Múltiplos Campos
-curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/tags/1" \
+curl -X PATCH "https://worker.thenewscc.com/support/tags/1" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{

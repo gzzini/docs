@@ -1,6 +1,6 @@
 ---
 title: "Criar Resposta Rápida"
-api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies"
+api: "POST https://worker.thenewscc.com/support/quick-replies"
 description: "Cria um novo template de resposta rápida"
 ---
 
@@ -84,7 +84,7 @@ Cria uma nova resposta rápida para uso no atendimento. Requer autenticação.
 <RequestExample>
 
 ```bash Básico
-curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies" \
+curl -X POST "https://worker.thenewscc.com/support/quick-replies" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -95,7 +95,7 @@ curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies" 
 ```
 
 ```bash Com Atalho
-curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies" \
+curl -X POST "https://worker.thenewscc.com/support/quick-replies" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{

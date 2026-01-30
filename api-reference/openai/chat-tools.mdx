@@ -1,6 +1,6 @@
 ---
 title: "Chat with Tools"
-api: "POST https://sac-waffle-v2.theo-110.workers.dev/openai/chat-with-tools"
+api: "POST https://worker.thenewscc.com/openai/chat-with-tools"
 description: "Chat com function calling para executar tools e ações"
 ---
 
@@ -128,7 +128,7 @@ Chat completion com suporte a function calling (tools). Permite que o modelo cha
 <RequestExample>
 
 ```bash Com Data Atual
-curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/chat-with-tools \
+curl -X POST https://worker.thenewscc.com/openai/chat-with-tools \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -139,7 +139,7 @@ curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/chat-with-tools \
 ```
 
 ```bash Formatar JSON
-curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/chat-with-tools \
+curl -X POST https://worker.thenewscc.com/openai/chat-with-tools \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{

@@ -1,6 +1,6 @@
 ---
 title: "Atualizar Status em Lote"
-api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/lote/status"
+api: "POST https://worker.thenewscc.com/support/lote/status"
 description: "Atualiza o status de múltiplos tickets de uma vez"
 ---
 
@@ -59,7 +59,7 @@ Atualiza o status de vários tickets simultaneamente. Útil para processar múlt
 <RequestExample>
 
 ```bash
-curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/lote/status" \
+curl -X POST "https://worker.thenewscc.com/support/lote/status" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{

@@ -10,7 +10,7 @@
   },
   "servers": [
     {
-      "url": "https://sac-waffle-v2.theo-110.workers.dev",
+      "url": "https://worker.thenewscc.com",
       "description": "Servidor de produção"
     }
   ],

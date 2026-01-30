@@ -1,6 +1,6 @@
 ---
 title: "Fast Response para Ticket"
-api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/{id}/fast-response"
+api: "POST https://worker.thenewscc.com/support/{id}/fast-response"
 description: "Gera resposta de IA para um ticket específico"
 ---
 
@@ -53,7 +53,7 @@ Gera resposta automática com IA para um ticket existente, com opção de salvar
     </ResponseField>
     
     <ResponseField name="resposta" type="string">
-      Resposta gerada pela IA
+      Resposta gerada pela IA em formato HTML (com tags `<p>`, `<strong>`, etc.)
     </ResponseField>
     
     <ResponseField name="confianca" type="number">
@@ -81,14 +81,14 @@ Gera resposta automática com IA para um ticket existente, com opção de salvar
 <RequestExample>
 
 ```bash Preview Apenas
-curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support/12345/fast-response \
+curl -X POST https://worker.thenewscc.com/support/12345/fast-response \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{}'
 ```
 
 ```bash Salvar Resposta
-curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support/12345/fast-response \
+curl -X POST https://worker.thenewscc.com/support/12345/fast-response \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -98,7 +98,7 @@ curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support/12345/fast-respo
 ```
 
 ```bash Salvar e Enviar Email
-curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support/12345/fast-response \
+curl -X POST https://worker.thenewscc.com/support/12345/fast-response \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -117,7 +117,7 @@ curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support/12345/fast-respo
   "success": true,
   "data": {
     "ticket_id": 12345,
-    "resposta": "Olá! Verificamos seu problema de login. O erro 500 indica um problema temporário em nossos servidores. Por favor, tente novamente em alguns minutos. Se persistir, use a opção 'Esqueci minha senha'.",
+    "resposta": "<p>verificamos seu problema de login. o erro 500 indica um problema temporário em nossos servidores.</p><p>por favor, tente novamente em alguns minutos. se persistir, use a opção <strong>esqueci minha senha</strong>.</p>",
     "confianca": 0.92,
     "baseado_em_similares": true,
     "tickets_similares_usados": 5,
@@ -131,7 +131,7 @@ curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support/12345/fast-respo
   "success": true,
   "data": {
     "ticket_id": 12345,
-    "resposta": "Agradecemos seu contato. Identificamos o problema com sua assinatura e já corrigimos. Você deve receber as próximas edições normalmente.",
+    "resposta": "<p>identificamos o problema com sua assinatura e já corrigimos! 🎉</p><p>você deve receber as próximas edições normalmente.</p>",
     "confianca": 0.88,
     "baseado_em_similares": true,
     "tickets_similares_usados": 4,
@@ -149,3 +149,13 @@ curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support/12345/fast-respo
 ```
 
 </ResponseExample>
+
+## Notas
+
+<Note>
+  As respostas geradas pela IA são retornadas em **formato HTML** com tags como `<p>`, `<strong>`, `<em>`, `<ol>`, `<ul>`. Isso garante formatação adequada no frontend e nos emails enviados.
+</Note>
+
+<Note>
+  Quando `salvar=true` e `enviar_email=true`, se o email for enviado com sucesso, o status do ticket é automaticamente alterado para **`resolved`**.
+</Note>

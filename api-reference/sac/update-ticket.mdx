@@ -1,6 +1,6 @@
 ---
 title: "Atualizar Ticket"
-api: "PATCH https://sac-waffle-v2.theo-110.workers.dev/support/{id}"
+api: "PATCH https://worker.thenewscc.com/support/{id}"
 description: "Atualiza os campos de um ticket"
 ---
 
@@ -109,7 +109,7 @@ Atualiza um ou mais campos de um ticket. Todos os campos são opcionais, mas pel
 <RequestExample>
 
 ```bash Atualizar Status
-curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/5082" \
+curl -X PATCH "https://worker.thenewscc.com/support/5082" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -118,7 +118,7 @@ curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/5082" \
 ```
 
 ```bash Atualizar Issue (Assunto)
-curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/5082" \
+curl -X PATCH "https://worker.thenewscc.com/support/5082" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -127,7 +127,7 @@ curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/5082" \
 ```
 
 ```bash Atualizar Múltiplos Campos
-curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/5082" \
+curl -X PATCH "https://worker.thenewscc.com/support/5082" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{

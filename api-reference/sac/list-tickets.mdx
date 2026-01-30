@@ -1,6 +1,6 @@
 ---
 title: "Listar Tickets"
-api: "GET https://sac-waffle-v2.theo-110.workers.dev/support"
+api: "GET https://worker.thenewscc.com/support"
 description: "Lista tickets de suporte com filtragem e paginação"
 ---
 
@@ -20,10 +20,11 @@ Retorna uma lista paginada de tickets de suporte com opções de filtragem. Requ
   Filtrar por status do ticket
   
   Valores aceitos:
+  - `all` - Todos os status
   - `open` - Tickets abertos
   - `in_progress` - Em atendimento
+  - `resolved` - Resolvidos
   - `closed` - Fechados
-  - `deleted` - Excluídos
 </ParamField>
 
 <ParamField query="main" type="string">
@@ -39,11 +40,25 @@ Retorna uma lista paginada de tickets de suporte com opções de filtragem. Requ
 </ParamField>
 
 <ParamField query="email" type="string">
-  Filtrar por email do solicitante
+  Filtrar por email do solicitante (busca parcial, case-insensitive)
+
+  Exemplo: `email=amanda` retorna todos os tickets cujo email contém "amanda"
+</ParamField>
+
+<ParamField query="ticketNumber" type="number">
+  Filtrar por número (ID) do ticket
 </ParamField>
 
 <ParamField query="tagId" type="number">
   Filtrar por ID da tag
+</ParamField>
+
+<ParamField query="startDate" type="string">
+  Data inicial para filtro por período de criação (formato `YYYY-MM-DD`)
+</ParamField>
+
+<ParamField query="endDate" type="string">
+  Data final para filtro por período de criação (formato `YYYY-MM-DD`)
 </ParamField>
 
 <ParamField query="page" type="number" default="1">
@@ -154,17 +169,27 @@ Retorna uma lista paginada de tickets de suporte com opções de filtragem. Requ
 <RequestExample>
 
 ```bash Básico
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support" \
+curl -X GET "https://worker.thenewscc.com/support" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
 ```bash Com Filtros
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support?status=open&main=Técnico&page=1&limit=20&sort=desc" \
+curl -X GET "https://worker.thenewscc.com/support?status=open&main=Técnico&page=1&limit=20&sort=desc" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
-```bash Filtrar por Email
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support?email=usuario@exemplo.com&sortField=email&sort=asc" \
+```bash Busca Parcial por Email
+curl -X GET "https://worker.thenewscc.com/support?email=amanda&sortField=email&sort=asc" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+```bash Filtrar por Período
+curl -X GET "https://worker.thenewscc.com/support?startDate=2026-01-01&endDate=2026-01-31" \
+  -H "Authorization: Bearer seu_token_jwt"
+```
+
+```bash Buscar por Número do Ticket
+curl -X GET "https://worker.thenewscc.com/support?ticketNumber=12345" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 

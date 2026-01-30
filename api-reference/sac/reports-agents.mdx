@@ -1,6 +1,6 @@
 ---
 title: "Performance de Agentes"
-api: "GET https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/agentes"
+api: "GET https://worker.thenewscc.com/support/relatorios/agentes"
 description: "Retorna métricas de performance por agente"
 ---
 
@@ -89,12 +89,12 @@ Retorna métricas detalhadas de performance para cada agente que respondeu ticke
 <RequestExample>
 
 ```bash Básico
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/agentes" \
+curl -X GET "https://worker.thenewscc.com/support/relatorios/agentes" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
 ```bash Com Período
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/agentes?data_inicio=2024-01-01&data_fim=2024-01-31" \
+curl -X GET "https://worker.thenewscc.com/support/relatorios/agentes?data_inicio=2024-01-01&data_fim=2024-01-31" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 

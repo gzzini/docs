@@ -1,6 +1,6 @@
 ---
 title: "Atualizar Status do Ticket"
-api: "PATCH https://sac-waffle-v2.theo-110.workers.dev/support/{id}/status"
+api: "PATCH https://worker.thenewscc.com/support/{id}/status"
 description: "Atualiza o status de um ou múltiplos tickets"
 ---
 
@@ -66,7 +66,7 @@ Atualiza o status de um ticket específico ou múltiplos tickets de uma vez. Sup
 <RequestExample>
 
 ```bash Único Ticket
-curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/12345/status" \
+curl -X PATCH "https://worker.thenewscc.com/support/12345/status" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -75,7 +75,7 @@ curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/12345/status" 
 ```
 
 ```bash Múltiplos Tickets
-curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/0/status" \
+curl -X PATCH "https://worker.thenewscc.com/support/0/status" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{

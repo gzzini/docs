@@ -1,6 +1,6 @@
 ---
 title: "Adicionar Mensagem"
-api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/{id}/mensagens"
+api: "POST https://worker.thenewscc.com/support/{id}/mensagens"
 description: "Adiciona uma nova mensagem a um ticket"
 ---
 
@@ -110,7 +110,7 @@ Adiciona uma nova mensagem ao histórico de conversação de um ticket. Suporta 
 <RequestExample>
 
 ```bash Mensagem Simples
-curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/12345/mensagens" \
+curl -X POST "https://worker.thenewscc.com/support/12345/mensagens" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -120,7 +120,7 @@ curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/12345/mensagens
 ```
 
 ```bash Com Envio de Email
-curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/12345/mensagens" \
+curl -X POST "https://worker.thenewscc.com/support/12345/mensagens" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -131,7 +131,7 @@ curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/12345/mensagens
 ```
 
 ```bash Mensagem em Lote
-curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/lote/mensagens" \
+curl -X POST "https://worker.thenewscc.com/support/lote/mensagens" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -200,3 +200,13 @@ curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/lote/mensagens"
 ```
 
 </ResponseExample>
+
+## Comportamento Automático de Status
+
+<Note>
+  Quando o email é enviado com sucesso (`email_enviado: true`), o status do ticket é automaticamente alterado para **`resolved`**. Se o envio do email falhar, o status permanece inalterado.
+</Note>
+
+<Note>
+  Se o leitor responder ao email, o status do ticket volta automaticamente para **`open`**.
+</Note>

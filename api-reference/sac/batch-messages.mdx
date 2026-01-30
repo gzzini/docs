@@ -1,6 +1,6 @@
 ---
 title: "Enviar Mensagem em Lote"
-api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/lote/mensagens"
+api: "POST https://worker.thenewscc.com/support/lote/mensagens"
 description: "Envia a mesma mensagem para múltiplos tickets de uma vez"
 ---
 
@@ -103,7 +103,7 @@ Envia a mesma mensagem para vários tickets simultaneamente. Útil para comunica
 <RequestExample>
 
 ```bash Mensagem Simples
-curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/lote/mensagens" \
+curl -X POST "https://worker.thenewscc.com/support/lote/mensagens" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -114,7 +114,7 @@ curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/lote/mensagens"
 ```
 
 ```bash Com Envio de Email
-curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/lote/mensagens" \
+curl -X POST "https://worker.thenewscc.com/support/lote/mensagens" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{

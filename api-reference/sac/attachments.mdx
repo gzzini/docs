@@ -1,6 +1,6 @@
 ---
 title: "Anexos"
-api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/{id}/anexos"
+api: "POST https://worker.thenewscc.com/support/{id}/anexos"
 description: "Gerencia anexos de tickets de suporte"
 ---
 
@@ -110,25 +110,25 @@ Remove um anexo do ticket e do armazenamento.
 <RequestExample>
 
 ```bash Upload
-curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/12345/anexos" \
+curl -X POST "https://worker.thenewscc.com/support/12345/anexos" \
   -H "Authorization: Bearer seu_token_jwt" \
   -F "arquivo=@/path/to/document.pdf" \
   -F "mensagemId=567"
 ```
 
 ```bash Listar
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/12345/anexos" \
+curl -X GET "https://worker.thenewscc.com/support/12345/anexos" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
 ```bash Download
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/anexos/789/download" \
+curl -X GET "https://worker.thenewscc.com/support/anexos/789/download" \
   -H "Authorization: Bearer seu_token_jwt" \
   -o arquivo_baixado.pdf
 ```
 
 ```bash Excluir
-curl -X DELETE "https://sac-waffle-v2.theo-110.workers.dev/support/anexos/789" \
+curl -X DELETE "https://worker.thenewscc.com/support/anexos/789" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
@@ -164,7 +164,7 @@ curl -X DELETE "https://sac-waffle-v2.theo-110.workers.dev/support/anexos/789" \
       "tipoArquivo": "application/pdf",
       "tamanhoArquivo": 245760,
       "createdAt": "2024-01-14T15:30:00Z",
-      "downloadUrl": "https://sac-waffle-v2.theo-110.workers.dev/support/anexos/789/download"
+      "downloadUrl": "https://worker.thenewscc.com/support/anexos/789/download"
     },
     {
       "id": 790,
@@ -173,7 +173,7 @@ curl -X DELETE "https://sac-waffle-v2.theo-110.workers.dev/support/anexos/789" \
       "tipoArquivo": "image/png",
       "tamanhoArquivo": 512000,
       "createdAt": "2024-01-14T15:35:00Z",
-      "downloadUrl": "https://sac-waffle-v2.theo-110.workers.dev/support/anexos/790/download"
+      "downloadUrl": "https://worker.thenewscc.com/support/anexos/790/download"
     }
   ]
 }

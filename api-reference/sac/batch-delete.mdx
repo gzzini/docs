@@ -1,6 +1,6 @@
 ---
 title: "Deletar Tickets em Lote"
-api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/lote/deletar"
+api: "POST https://worker.thenewscc.com/support/lote/deletar"
 description: "Realiza soft delete de múltiplos tickets de uma vez"
 ---
 
@@ -49,7 +49,7 @@ Realiza soft delete (exclusão lógica) de vários tickets simultaneamente. Os t
 <RequestExample>
 
 ```bash
-curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/lote/deletar" \
+curl -X POST "https://worker.thenewscc.com/support/lote/deletar" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{

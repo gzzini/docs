@@ -1,6 +1,6 @@
 ---
 title: "Fast Response em Lote"
-api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/fast-response/lote"
+api: "POST https://worker.thenewscc.com/support/fast-response/lote"
 description: "Processa múltiplos tickets com IA simultaneamente"
 ---
 
@@ -81,7 +81,7 @@ Gera respostas automáticas com IA para múltiplos tickets de uma vez, com opç�
         </ResponseField>
         
         <ResponseField name="resposta" type="string">
-          Resposta gerada
+          Resposta gerada em formato HTML
         </ResponseField>
         
         <ResponseField name="confianca" type="number">
@@ -133,7 +133,7 @@ Gera respostas automáticas com IA para múltiplos tickets de uma vez, com opç�
 <RequestExample>
 
 ```bash Preview em Lote
-curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support/fast-response/lote \
+curl -X POST https://worker.thenewscc.com/support/fast-response/lote \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -143,7 +143,7 @@ curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support/fast-response/lo
 ```
 
 ```bash Salvar em Lote
-curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support/fast-response/lote \
+curl -X POST https://worker.thenewscc.com/support/fast-response/lote \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{

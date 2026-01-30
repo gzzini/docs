@@ -1,6 +1,6 @@
 ---
 title: "Dashboard de Relatórios"
-api: "GET https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/dashboard"
+api: "GET https://worker.thenewscc.com/support/relatorios/dashboard"
 description: "Retorna métricas principais do dashboard com cache de 2h"
 ---
 
@@ -159,17 +159,17 @@ Retorna métricas gerais do dashboard incluindo total de tickets, distribuição
 <RequestExample>
 
 ```bash Básico
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/dashboard" \
+curl -X GET "https://worker.thenewscc.com/support/relatorios/dashboard" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
 ```bash Com Filtros
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/dashboard?data_inicio=2024-01-01&data_fim=2024-01-31&agrupar_por=dia" \
+curl -X GET "https://worker.thenewscc.com/support/relatorios/dashboard?data_inicio=2024-01-01&data_fim=2024-01-31&agrupar_por=dia" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
 ```bash Por Categoria
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/dashboard?main=Programa%20de%20indicação%20e%20prêmios&agrupar_por=semana" \
+curl -X GET "https://worker.thenewscc.com/support/relatorios/dashboard?main=Programa%20de%20indicação%20e%20prêmios&agrupar_por=semana" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 

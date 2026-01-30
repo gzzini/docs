@@ -1,6 +1,6 @@
 ---
 title: "Usar Agente"
-api: "POST https://sac-waffle-v2.theo-110.workers.dev/openai/agent/{agentName}"
+api: "POST https://worker.thenewscc.com/openai/agent/{agentName}"
 description: "Chat usando agente pré-configurado"
 ---
 
@@ -79,7 +79,7 @@ Executa chat usando um agente pré-configurado com system prompt e configuraçõ
 <RequestExample>
 
 ```bash Support Assistant
-curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/agent/support-assistant \
+curl -X POST https://worker.thenewscc.com/openai/agent/support-assistant \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -88,7 +88,7 @@ curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/agent/support-ass
 ```
 
 ```bash Analytics Assistant
-curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/agent/analytics-assistant \
+curl -X POST https://worker.thenewscc.com/openai/agent/analytics-assistant \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{

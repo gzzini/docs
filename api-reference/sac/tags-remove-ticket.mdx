@@ -1,6 +1,6 @@
 ---
 title: "Remover Tag do Ticket"
-api: "DELETE https://sac-waffle-v2.theo-110.workers.dev/support/{id}/tags/{tagId}"
+api: "DELETE https://worker.thenewscc.com/support/{id}/tags/{tagId}"
 description: "Remove a associação de uma tag com um ticket"
 ---
 
@@ -47,7 +47,7 @@ Remove uma tag de um ticket de suporte. A tag não é excluída do sistema, apen
 <RequestExample>
 
 ```bash Remover Tag do Ticket
-curl -X DELETE "https://sac-waffle-v2.theo-110.workers.dev/support/123/tags/1" \
+curl -X DELETE "https://worker.thenewscc.com/support/123/tags/1" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
@@ -84,7 +84,7 @@ curl -X DELETE "https://sac-waffle-v2.theo-110.workers.dev/support/123/tags/1" \
 
 1. **Visualizar tags atuais do ticket**
 ```bash
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/123" \
+curl -X GET "https://worker.thenewscc.com/support/123" \
   -H "Authorization: Bearer seu_token_jwt"
 
 # Resposta mostra tags: [{"id": 1, "name": "Urgente"}, {"id": 2, "name": "Novo"}]
@@ -92,13 +92,13 @@ curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/123" \
 
 2. **Remover tag "Novo" (id: 2) pois o ticket já está em análise**
 ```bash
-curl -X DELETE "https://sac-waffle-v2.theo-110.workers.dev/support/123/tags/2" \
+curl -X DELETE "https://worker.thenewscc.com/support/123/tags/2" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
 3. **Adicionar tag "Em Análise" (id: 3)**
 ```bash
-curl -X POST "https://sac-waffle-v2.theo-110.workers.dev/support/123/tags" \
+curl -X POST "https://worker.thenewscc.com/support/123/tags" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{"tagId": 3}'

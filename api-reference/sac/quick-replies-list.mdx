@@ -1,6 +1,6 @@
 ---
 title: "Listar Respostas Rápidas"
-api: "GET https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies"
+api: "GET https://worker.thenewscc.com/support/quick-replies"
 description: "Lista templates de respostas rápidas com filtros e paginação"
 ---
 
@@ -103,17 +103,17 @@ Retorna uma lista paginada de respostas rápidas. Permite filtrar por categoria 
 <RequestExample>
 
 ```bash Listar Todas
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies" \
+curl -X GET "https://worker.thenewscc.com/support/quick-replies" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
 ```bash Filtrar por Categoria
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies?categoria=tecnico" \
+curl -X GET "https://worker.thenewscc.com/support/quick-replies?categoria=tecnico" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
 ```bash Buscar
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies?search=login" \
+curl -X GET "https://worker.thenewscc.com/support/quick-replies?search=login" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 

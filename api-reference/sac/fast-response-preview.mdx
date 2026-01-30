@@ -1,6 +1,6 @@
 ---
 title: "Fast Response Preview"
-api: "POST https://sac-waffle-v2.theo-110.workers.dev/support/fast-response"
+api: "POST https://worker.thenewscc.com/support/fast-response"
 description: "Gera resposta de IA sem criar ticket (preview)"
 ---
 
@@ -90,7 +90,7 @@ Endpoint público para gerar uma resposta automática usando IA sem criar um tic
 <RequestExample>
 
 ```bash Com ID do Ticket
-curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support/fast-response \
+curl -X POST https://worker.thenewscc.com/support/fast-response \
   -H "Content-Type: application/json" \
   -d '{
     "id": 12345
@@ -98,7 +98,7 @@ curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support/fast-response \
 ```
 
 ```bash Sem ID (Manual)
-curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support/fast-response \
+curl -X POST https://worker.thenewscc.com/support/fast-response \
   -H "Content-Type: application/json" \
   -d '{
     "issue": "Erro ao fazer login",

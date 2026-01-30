@@ -1,6 +1,6 @@
 ---
 title: "Análise de Cohorts"
-api: "GET https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/cohorts"
+api: "GET https://worker.thenewscc.com/support/relatorios/cohorts"
 description: "Retorna análise de cohorts (grupos de tickets por período)"
 ---
 
@@ -83,12 +83,12 @@ Retorna análise de cohorts, agrupando tickets por período de criação e anali
 <RequestExample>
 
 ```bash Por Mês
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/cohorts?data_inicio=2024-01-01&data_fim=2024-06-30&agrupar_por=mes" \
+curl -X GET "https://worker.thenewscc.com/support/relatorios/cohorts?data_inicio=2024-01-01&data_fim=2024-06-30&agrupar_por=mes" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
 ```bash Por Semana
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/cohorts?data_inicio=2024-01-01&data_fim=2024-01-31&agrupar_por=semana" \
+curl -X GET "https://worker.thenewscc.com/support/relatorios/cohorts?data_inicio=2024-01-01&data_fim=2024-01-31&agrupar_por=semana" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 

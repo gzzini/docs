@@ -1,6 +1,6 @@
 ---
 title: "Histórico de Tentativas"
-api: "GET https://sac-waffle-v2.theo-110.workers.dev/quiz/history"
+api: "GET https://worker.thenewscc.com/quiz/history"
 description: "Retorna o histórico de todas as tentativas de quiz do usuário"
 ---
 
@@ -62,12 +62,12 @@ Lista todas as tentativas de quiz realizadas pelo usuário autenticado, incluind
 <RequestExample>
 
 ```bash cURL
-curl -X GET https://sac-waffle-v2.theo-110.workers.dev/quiz/history \
+curl -X GET https://worker.thenewscc.com/quiz/history \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://sac-waffle-v2.theo-110.workers.dev/quiz/history', {
+const response = await fetch('https://worker.thenewscc.com/quiz/history', {
   method: 'GET',
   headers: {
     'Authorization': 'Bearer seu_token_jwt'

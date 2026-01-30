@@ -1,6 +1,6 @@
 ---
 title: "Listar Quizzes Disponíveis"
-api: "GET https://sac-waffle-v2.theo-110.workers.dev/quiz/available"
+api: "GET https://worker.thenewscc.com/quiz/available"
 description: "Retorna a lista de quizzes disponíveis para o usuário nos últimos 3 dias"
 ---
 
@@ -39,7 +39,10 @@ Este endpoint é usado para mostrar ao usuário quais dias ele pode tentar recup
           Descrição do quiz
         </ResponseField>
         <ResponseField name="quizDate" type="string">
-          Data do quiz (formato YYYY-MM-DD)
+          Data do quiz (formato `YYYY-MM-DD` para matinal, `YYYY-MM-DD-night` para noturna)
+        </ResponseField>
+        <ResponseField name="edition" type="string">
+          Edição do quiz: `morning` (matinal) ou `night` (noturna)
         </ResponseField>
         <ResponseField name="postId" type="string">
           ID do post do Beehiiv relacionado
@@ -90,12 +93,12 @@ Este endpoint é usado para mostrar ao usuário quais dias ele pode tentar recup
 <RequestExample>
 
 ```bash cURL
-curl -X GET https://sac-waffle-v2.theo-110.workers.dev/quiz/available \
+curl -X GET https://worker.thenewscc.com/quiz/available \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://sac-waffle-v2.theo-110.workers.dev/quiz/available', {
+const response = await fetch('https://worker.thenewscc.com/quiz/available', {
   method: 'GET',
   headers: {
     'Authorization': 'Bearer seu_token_jwt'
@@ -116,19 +119,32 @@ const data = await response.json();
     "quizzes": [
       {
         "id": "quiz_abc123",
-        "title": "quiz do dia - manchete",
-        "description": "teste seus conhecimentos sobre a edição de hoje",
+        "title": "quiz do dia - 18/01/2026 as 5 notícias mais importantes",
+        "description": "teste seus conhecimentos sobre a edição de hoje do the news! acerte 6 de 10 para recuperar seu streak.",
         "quizDate": "2026-01-18",
+        "edition": "morning",
         "postId": "post_xyz789",
         "minCorrectAnswers": 6,
         "alreadyAttempted": false,
         "attemptResult": null
       },
       {
+        "id": "quiz_ghi789",
+        "title": "quiz da night - night #146",
+        "description": "teste seus conhecimentos sobre a edição noturna do the news! acerte 6 de 10 para recuperar seu streak.",
+        "quizDate": "2026-01-18-night",
+        "edition": "night",
+        "postId": "post_night123",
+        "minCorrectAnswers": 6,
+        "alreadyAttempted": false,
+        "attemptResult": null
+      },
+      {
         "id": "quiz_def456",
-        "title": "quiz do dia - manchete",
-        "description": "teste seus conhecimentos sobre a edição de ontem",
+        "title": "quiz do dia - 17/01/2026 as 5 notícias mais importantes",
+        "description": "teste seus conhecimentos sobre a edição de hoje do the news! acerte 6 de 10 para recuperar seu streak.",
         "quizDate": "2026-01-17",
+        "edition": "morning",
         "postId": "post_uvw456",
         "minCorrectAnswers": 6,
         "alreadyAttempted": true,

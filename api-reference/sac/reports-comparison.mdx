@@ -1,6 +1,6 @@
 ---
 title: "Comparativo entre Períodos"
-api: "GET https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/comparativo"
+api: "GET https://worker.thenewscc.com/support/relatorios/comparativo"
 description: "Compara métricas entre dois períodos"
 ---
 
@@ -69,12 +69,12 @@ Compara métricas do período atual com um período anterior, calculando variaç
 <RequestExample>
 
 ```bash Período Anterior
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/comparativo?data_inicio=2024-01-01&data_fim=2024-01-31&comparar_com=periodo_anterior" \
+curl -X GET "https://worker.thenewscc.com/support/relatorios/comparativo?data_inicio=2024-01-01&data_fim=2024-01-31&comparar_com=periodo_anterior" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
 ```bash Mesmo Período Ano Anterior
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/relatorios/comparativo?data_inicio=2024-01-01&data_fim=2024-01-31&comparar_com=mesmo_periodo_ano_anterior" \
+curl -X GET "https://worker.thenewscc.com/support/relatorios/comparativo?data_inicio=2024-01-01&data_fim=2024-01-31&comparar_com=mesmo_periodo_ano_anterior" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 

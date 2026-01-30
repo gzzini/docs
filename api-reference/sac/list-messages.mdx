@@ -1,6 +1,6 @@
 ---
 title: "Listar Mensagens"
-api: "GET https://sac-waffle-v2.theo-110.workers.dev/support/{id}/mensagens"
+api: "GET https://worker.thenewscc.com/support/{id}/mensagens"
 description: "Lista o histórico de mensagens de um ticket com paginação"
 ---
 
@@ -152,17 +152,17 @@ Retorna o histórico de mensagens de um ticket específico com suporte a pagina�
 <RequestExample>
 
 ```bash Básico
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/5016/mensagens" \
+curl -X GET "https://worker.thenewscc.com/support/5016/mensagens" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
 ```bash Com Paginação
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/5016/mensagens?page=2&limit=10" \
+curl -X GET "https://worker.thenewscc.com/support/5016/mensagens?page=2&limit=10" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
 ```bash Mais Recentes Primeiro
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/5016/mensagens?sort=desc&limit=5" \
+curl -X GET "https://worker.thenewscc.com/support/5016/mensagens?sort=desc&limit=5" \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
@@ -176,9 +176,9 @@ curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/5016/mensagens?s
   "data": {
     "mensagens": [
       {
-        "id": 101,
+        "id": 0,
         "supportId": 5016,
-        "mensagem": "Não recebi meus prêmios do programa de indicação.",
+        "mensagem": "Não recebi meus prêmios do programa de indicação. Já indiquei 5 amigos e nenhum foi contabilizado.",
         "autor": "usuario@exemplo.com",
         "origem": "usuario",
         "status": "Pendente",
@@ -215,7 +215,7 @@ curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/5016/mensagens?s
       }
     ],
     "pagination": {
-      "total": 3,
+      "total": 4,
       "page": 1,
       "limit": 20,
       "totalPages": 1
@@ -241,6 +241,10 @@ curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support/5016/mensagens?s
 </ResponseExample>
 
 ## Notas
+
+<Note>
+  A primeira mensagem retornada (com `id: 0`) é a **descrição original do ticket**, ou seja, a mensagem que o leitor enviou ao abrir o chamado. Essa mensagem é sempre incluída automaticamente na primeira página (quando `sort=asc`) ou na última página (quando `sort=desc`).
+</Note>
 
 <Note>
   O campo `email` só está presente para mensagens com `origem: "email"`. Para mensagens criadas pelo formulário (`origem: "usuario"`) ou pela equipe (`origem: "admin"`), este campo será `null`.

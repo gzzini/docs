@@ -1,6 +1,6 @@
 ---
 title: "Registrar Agente"
-api: "POST https://sac-waffle-v2.theo-110.workers.dev/openai/agents"
+api: "POST https://worker.thenewscc.com/openai/agents"
 description: "Cria um novo agente com configuração customizada"
 ---
 
@@ -105,7 +105,7 @@ Registra um novo agente com system prompt, modelo e tools customizados para caso
 <RequestExample>
 
 ```bash Agente de Conteúdo
-curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/agents \
+curl -X POST https://worker.thenewscc.com/openai/agents \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -119,7 +119,7 @@ curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/agents \
 ```
 
 ```bash Agente Técnico
-curl -X POST https://sac-waffle-v2.theo-110.workers.dev/openai/agents \
+curl -X POST https://worker.thenewscc.com/openai/agents \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{

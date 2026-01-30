@@ -11,7 +11,7 @@ A API do SAC (Sistema de Atendimento ao Cliente) fornece endpoints completos par
 ## Base URL
 
 ```
-https://sac-waffle-v2.theo-110.workers.dev
+https://worker.thenewscc.com
 ```
 
 ## Autenticação
@@ -133,7 +133,7 @@ A API implementa rate limiting para proteção contra abuso:
 ### Criar um Ticket
 
 ```bash
-curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support \
+curl -X POST https://worker.thenewscc.com/support \
   -H "Content-Type: application/json" \
   -d '{
     "main": "Técnico",
@@ -146,7 +146,7 @@ curl -X POST https://sac-waffle-v2.theo-110.workers.dev/support \
 ### Listar Tickets
 
 ```bash
-curl -X GET "https://sac-waffle-v2.theo-110.workers.dev/support?status=open&page=1&limit=10" \
+curl -X GET "https://worker.thenewscc.com/support?status=open&page=1&limit=10" \
   -H "Authorization: Bearer {token}"
 ```
 

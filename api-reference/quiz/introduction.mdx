@@ -1,17 +1,17 @@
 ---
 title: "Quiz API"
 sidebarTitle: "Introdução"
-description: "API para sistema de quiz de recuperação de streaks baseado nas edições diárias do The News"
+description: "API para sistema de quiz de recuperação de streaks baseado nas edições diárias (matinal e noturna) do The News"
 ---
 
 ## Visão Geral
 
-A API de Quiz fornece endpoints para o sistema de recuperação de streaks do The News. Os quizzes são gerados automaticamente a partir das edições diárias da newsletter, permitindo que usuários recuperem seus streaks perdidos respondendo perguntas sobre o conteúdo.
+A API de Quiz fornece endpoints para o sistema de recuperação de streaks do The News. Os quizzes são gerados automaticamente a partir das edições diárias (matinal e noturna/NIGHT) da newsletter, permitindo que usuários recuperem seus streaks perdidos respondendo perguntas sobre o conteúdo.
 
 ## Base URL
 
 ```
-https://sac-waffle-v2.theo-110.workers.dev
+https://worker.thenewscc.com
 ```
 
 ## Autenticação
@@ -112,14 +112,23 @@ A API retorna erros padronizados no seguinte formato:
 
 ## Geração Automática de Quizzes
 
-O sistema gera quizzes automaticamente usando:
+O sistema gera quizzes automaticamente todos os dias às 7h UTC usando:
 
-1. **Beehiiv API**: Busca a última edição da newsletter
-2. **OpenAI GPT-4o**: Gera 10 perguntas sobre o conteúdo
+1. **Beehiiv API**: Busca a edição do dia anterior (matinal e noturna)
+2. **OpenAI GPT-4o**: Gera 10 perguntas sobre o conteúdo de cada edição
 3. **Cloudflare D1**: Armazena quizzes e tentativas
 
+### Edições Suportadas
+
+| Edição | Identificação no título | `quizDate` | `edition` |
+|--------|------------------------|------------|-----------|
+| Matinal | `DD/MM/YYYY ...` | `YYYY-MM-DD` | `morning` |
+| Noturna | `NIGHT #NNN` | `YYYY-MM-DD-night` | `night` |
+
+Cada dia pode gerar **dois quizzes**: um para a edição matinal e outro para a edição noturna (NIGHT).
+
 <Warning>
-  Aos domingos não há edição da newsletter, portanto o quiz de segunda-feira é baseado na edição de sábado.
+  Aos domingos não há edição da newsletter, portanto o quiz de segunda-feira (matinal) é baseado na edição de sábado. Não há quiz noturno para domingos.
 </Warning>
 
 ## Suporte

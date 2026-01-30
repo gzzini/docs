@@ -1,6 +1,6 @@
 ---
 title: "Obter Quiz"
-api: "GET https://sac-waffle-v2.theo-110.workers.dev/quiz/{id}"
+api: "GET https://worker.thenewscc.com/quiz/{id}"
 description: "Retorna um quiz específico com todas as suas perguntas"
 ---
 
@@ -78,14 +78,14 @@ O sistema verifica se o usuário já tentou este quiz. Caso já tenha tentado, r
 <RequestExample>
 
 ```bash cURL
-curl -X GET https://sac-waffle-v2.theo-110.workers.dev/quiz/quiz_abc123 \
+curl -X GET https://worker.thenewscc.com/quiz/quiz_abc123 \
   -H "Authorization: Bearer seu_token_jwt"
 ```
 
 ```javascript JavaScript
 const quizId = 'quiz_abc123';
 
-const response = await fetch(`https://sac-waffle-v2.theo-110.workers.dev/quiz/${quizId}`, {
+const response = await fetch(`https://worker.thenewscc.com/quiz/${quizId}`, {
   method: 'GET',
   headers: {
     'Authorization': 'Bearer seu_token_jwt'

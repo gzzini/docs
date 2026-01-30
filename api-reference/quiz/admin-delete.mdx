@@ -1,6 +1,6 @@
 ---
 title: "Deletar Quiz"
-api: "DELETE https://sac-waffle-v2.theo-110.workers.dev/quiz/admin/{id}"
+api: "DELETE https://worker.thenewscc.com/quiz/admin/{id}"
 description: "Deleta um quiz específico e todos os dados relacionados"
 ---
 
@@ -46,13 +46,13 @@ Deleta permanentemente um quiz específico do sistema. A operação é em cascat
 <RequestExample>
 
 ```bash cURL
-curl -X DELETE https://sac-waffle-v2.theo-110.workers.dev/quiz/admin/quiz_abc123
+curl -X DELETE https://worker.thenewscc.com/quiz/admin/quiz_abc123
 ```
 
 ```javascript JavaScript
 const quizId = 'quiz_abc123';
 
-const response = await fetch(`https://sac-waffle-v2.theo-110.workers.dev/quiz/admin/${quizId}`, {
+const response = await fetch(`https://worker.thenewscc.com/quiz/admin/${quizId}`, {
   method: 'DELETE'
 });
 

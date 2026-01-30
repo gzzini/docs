@@ -1,6 +1,6 @@
 ---
 title: "Atualizar Resposta Rápida"
-api: "PATCH https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies/{quickReplyId}"
+api: "PATCH https://worker.thenewscc.com/support/quick-replies/{quickReplyId}"
 description: "Atualiza um template de resposta rápida existente"
 ---
 
@@ -90,7 +90,7 @@ Atualiza uma resposta rápida existente. Todos os campos são opcionais - apenas
 <RequestExample>
 
 ```bash Atualizar Título
-curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies/15" \
+curl -X PATCH "https://worker.thenewscc.com/support/quick-replies/15" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -99,7 +99,7 @@ curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies/
 ```
 
 ```bash Atualizar Conteúdo
-curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies/15" \
+curl -X PATCH "https://worker.thenewscc.com/support/quick-replies/15" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
@@ -108,7 +108,7 @@ curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies/
 ```
 
 ```bash Atualizar Múltiplos Campos
-curl -X PATCH "https://sac-waffle-v2.theo-110.workers.dev/support/quick-replies/15" \
+curl -X PATCH "https://worker.thenewscc.com/support/quick-replies/15" \
   -H "Authorization: Bearer seu_token_jwt" \
   -H "Content-Type: application/json" \
   -d '{
